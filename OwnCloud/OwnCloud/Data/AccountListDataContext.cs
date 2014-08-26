@@ -26,7 +26,11 @@ namespace OwnCloud.Data
 
             foreach (Account account in App.DataContext.Accounts)
             {
-                Accounts.Add(account);
+                // Only add the account, if CalDAV was set up
+                if (!account.CalDAVPath.Equals(""))
+                {
+                    Accounts.Add(account);
+                }
             }
         }
     }

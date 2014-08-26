@@ -205,7 +205,7 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CalDAV path.
+        ///   Looks up a localized string similar to CalDAV path (leave blank if not using CalDAV).
         /// </summary>
         public static string EditAccountPage_CalDAVPath {
             get {

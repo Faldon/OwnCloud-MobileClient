@@ -190,12 +190,20 @@ namespace OwnCloud
                     }
                 };
                 collector.WaitFor(state.AssociatedAccount.WebDAVPath);
-                collector.WaitFor(state.AssociatedAccount.CalDAVPath);
+                // If CalDAV path left blank, don't test it
+                if (!state.AssociatedAccount.CalDAVPath.Equals(""))
+                {
+                    collector.WaitFor(state.AssociatedAccount.CalDAVPath);
+                }
 
                 // define paths to test
                 Queue<string> pathsToTest = new Queue<string>();
                 pathsToTest.Enqueue(state.AssociatedAccount.WebDAVPath);
-                pathsToTest.Enqueue(state.AssociatedAccount.CalDAVPath);
+                // If CalDAV path left blank, don't add it
+                if (!state.AssociatedAccount.CalDAVPath.Equals(""))
+                {
+                    pathsToTest.Enqueue(state.AssociatedAccount.CalDAVPath);
+                }
 
                 // create master instance
                 WebDAV davTest = new WebDAV(state.AssociatedAccount.GetUri(), state.AssociatedAccount.GetCredentials());

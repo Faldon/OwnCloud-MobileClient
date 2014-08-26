@@ -130,7 +130,7 @@
     <value>Add account</value>
   </data>
   <data name="EditAccountPage_CalDAVPath" xml:space="preserve">
-    <value>CalDAV path</value>
+    <value>CalDAV path (leave blank if not using CalDAV)</value>
   </data>
   <data name="EditAccountPage_CheckingConnection" xml:space="preserve">
     <value>Please wait while checking connection...</value>
