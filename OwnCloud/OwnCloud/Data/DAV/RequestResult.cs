@@ -60,6 +60,8 @@ namespace OwnCloud.Data.DAV
             // to jump over elements. Hence we stop at the element and
             // store the element name. Then wait for Text-Elements value
             // to capture.
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.DtdProcessing = DtdProcessing.Parse;
             using(XmlReader reader = XmlReader.Create(_stream, null)) {
 
                 Item item = new Item();
