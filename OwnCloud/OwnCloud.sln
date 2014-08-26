@@ -1,20 +1,38 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Phone
+# Visual Studio Express 2013 for Windows
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnCloud", "OwnCloud\OwnCloud.csproj", "{94974BF1-3670-4363-BE9B-D5AED90BF10F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM = Debug|ARM
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|ARM = Release|ARM
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|ARM.ActiveCfg = Debug|ARM
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|ARM.Build.0 = Debug|ARM
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|ARM.Deploy.0 = Debug|ARM
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|x86.ActiveCfg = Debug|x86
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|x86.Build.0 = Debug|x86
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Debug|x86.Deploy.0 = Debug|x86
 		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|ARM.ActiveCfg = Release|ARM
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|ARM.Build.0 = Release|ARM
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|ARM.Deploy.0 = Release|ARM
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|x86.ActiveCfg = Release|x86
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|x86.Build.0 = Release|x86
+		{94974BF1-3670-4363-BE9B-D5AED90BF10F}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
