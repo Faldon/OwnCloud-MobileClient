@@ -56,7 +56,7 @@ namespace OwnCloud.View.Page
             base.OnNavigatedTo(e);
         }
 
-        private void LongListSelector_OnLink(object sender, LinkUnlinkEventArgs e)
+        private void LongListSelector_OnLink(object sender, ItemRealizationEventArgs e)
         {
             DataContext.ItemLinked(sender, e);
         }

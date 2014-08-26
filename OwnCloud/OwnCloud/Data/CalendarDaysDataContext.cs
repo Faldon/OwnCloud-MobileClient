@@ -32,11 +32,11 @@ namespace OwnCloud.Data
         }
 
 
-        public void ItemLinked(object sender, LinkUnlinkEventArgs e)
+        public void ItemLinked(object sender, ItemRealizationEventArgs e)
         {
             var last = Days.Last();
             
-            if (e.ContentPresenter.Content.Equals(last))
+            if (e.Container.Content.Equals(last))
             {
                 Days.Add(last.AddDays(1));
             }

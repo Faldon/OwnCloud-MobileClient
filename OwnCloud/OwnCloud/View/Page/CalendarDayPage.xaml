@@ -51,8 +51,8 @@
             <!--Pivotelement eins-->
             <controls:PivotItem Header="Day">
                 <Grid>
-                    <toolkit:LongListSelector Loaded="HookScrollViewer" x:Name="LlsDays" IsFlatList="True" Link="LongListSelector_OnLink" ItemsSource="{Binding Days}">
-                        <toolkit:LongListSelector.ItemTemplate>
+                    <phone:LongListSelector Loaded="HookScrollViewer" x:Name="LlsDays" IsGroupingEnabled="False" ItemRealized="LongListSelector_OnLink" ItemsSource="{Binding Days}">
+                        <phone:LongListSelector.ItemTemplate>
                             <DataTemplate>
                                 <cntrl:CalendarDayOverview>
                                     <cntrl:CalendarDayOverview.EventSource>
@@ -60,8 +60,8 @@
                                     </cntrl:CalendarDayOverview.EventSource>
                                 </cntrl:CalendarDayOverview>
                             </DataTemplate>
-                        </toolkit:LongListSelector.ItemTemplate>
-                    </toolkit:LongListSelector>
+                        </phone:LongListSelector.ItemTemplate>
+                    </phone:LongListSelector>
                 </Grid>
             </controls:PivotItem>
 
