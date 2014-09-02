@@ -285,6 +285,15 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Calendar access.
+        /// </summary>
+        public static string EditAccountPage_EnableCalDAV {
+            get {
+                return ResourceManager.GetString("EditAccountPage_EnableCalDAV", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password.
         /// </summary>
         public static string EditAccountPage_Password {

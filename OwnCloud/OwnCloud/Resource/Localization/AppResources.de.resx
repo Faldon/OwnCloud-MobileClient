@@ -314,4 +314,7 @@ Server Antwort: {1}</value>
   <data name="FileItem_Up" xml:space="preserve">
     <value>Aufwärts</value>
   </data>
+  <data name="EditAccountPage_EnableCalDAV" xml:space="preserve">
+    <value>Kalender Zugriff</value>
+  </data>
 </root>

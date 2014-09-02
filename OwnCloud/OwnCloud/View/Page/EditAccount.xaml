@@ -56,6 +56,7 @@
                     </Grid>
                 </StackPanel>
 
+                <!--
                 <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,20">
                     <TextBlock Text="{Binding Path=LocalizedResources.EditAccountPage_WebDAVPath, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"/>
@@ -67,7 +68,18 @@
                         <TextBox Grid.Column="0" Text="{Binding WebDAVPath, Mode=TwoWay}"/>
                     </Grid>
                 </StackPanel>
+                -->
 
+                <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox IsChecked="{Binding CalendarEnabled, Mode=TwoWay}" Content="{Binding Path=LocalizedResources.EditAccountPage_EnableCalDAV, Source={StaticResource LocalizedStrings}}"/>
+                    </Grid>
+                </StackPanel>
+
+                <!--
                 <StackPanel Grid.Row="2" Orientation="Vertical" Margin="0,0,0,20">
                     <TextBlock Text="{Binding Path=LocalizedResources.EditAccountPage_CalDAVPath, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"/>
@@ -79,6 +91,7 @@
                         <TextBox Grid.Column="0" Text="{Binding CalDAVPath, Mode=TwoWay}"/>
                     </Grid>
                 </StackPanel>
+                -->
                 
                 <StackPanel Grid.Row="3" Orientation="Vertical" Margin="0,0,0,0">
                     <Grid>

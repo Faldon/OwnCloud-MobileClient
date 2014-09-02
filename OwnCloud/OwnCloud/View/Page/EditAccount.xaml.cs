@@ -190,18 +190,15 @@ namespace OwnCloud
                     }
                 };
                 collector.WaitFor(state.AssociatedAccount.WebDAVPath);
-                // If CalDAV path left blank, don't test it
-                if (!state.AssociatedAccount.CalDAVPath.Equals(""))
-                {
-                    collector.WaitFor(state.AssociatedAccount.CalDAVPath);
-                }
 
                 // define paths to test
                 Queue<string> pathsToTest = new Queue<string>();
                 pathsToTest.Enqueue(state.AssociatedAccount.WebDAVPath);
-                // If CalDAV path left blank, don't add it
-                if (!state.AssociatedAccount.CalDAVPath.Equals(""))
+              
+                // If CalDAV is enabled, add path and test
+                if (state.AssociatedAccount.CalendarEnabled)
                 {
+                    collector.WaitFor(state.AssociatedAccount.CalDAVPath);
                     pathsToTest.Enqueue(state.AssociatedAccount.CalDAVPath);
                 }
 
@@ -265,6 +262,9 @@ namespace OwnCloud
 
             // encrypt data
             account.StoreCredentials();
+
+            // Create local folder structure
+            App.DataContext.Storage.CreateDirectory(account.ServerDomain + "\\" + account.DisplayUserName);
 
             // edit/insert
             if (!_editMode) {

@@ -62,7 +62,8 @@ namespace OwnCloud.Data.DAV
             // to capture.
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.DtdProcessing = DtdProcessing.Parse;
-            using(XmlReader reader = XmlReader.Create(_stream, null)) {
+
+            using(XmlReader reader = XmlReader.Create(_stream, settings)) {
 
                 Item item = new Item();
                 var waitForResourceType = false;
@@ -74,193 +75,200 @@ namespace OwnCloud.Data.DAV
                 PropertyState pItem = null;
                 DAVLocking litem = null;
 
-                while (reader.Read())
-                {
-                    switch (reader.NodeType)
+                try
+                {                  
+                    while (reader.Read())
                     {
-                        // look for special elements
-                        case XmlNodeType.Element:
-                            if (reader.NamespaceURI == XmlNamespaces.NsDav)
-                            {
-                                switch (reader.LocalName)
+                        switch (reader.NodeType)
+                        {
+                            // look for special elements
+                            case XmlNodeType.Element:
+                                if (reader.NamespaceURI == XmlNamespaces.NsDav)
+                                {
+                                    switch (reader.LocalName)
+                                    {
+                                        // DAV Elements
+
+                                        // Response
+                                        case Elements.Response:
+                                            // start a new item
+                                            // pItem must be set before d:prop in order to
+                                            // catch non-real properties such "href"
+                                            item = new Item();
+                                            propertyStateList = new List<PropertyState>();
+                                            pItem = new PropertyState();
+                                            break;
+
+                                        // Resource type
+                                        case Elements.Collection:
+                                            if (waitForResourceType)
+                                            {
+                                                item.ResourceType = ResourceType.Collection;
+                                            }
+                                            break;
+
+                                        // Lock
+                                        case Elements.LockEntry:
+                                            litem = new DAVLocking();
+                                            lockingList.Add(litem);
+                                            break;
+                                        case Elements.LockScope:
+                                            waitForLockScope = true;
+                                            break;
+                                        case Elements.LockType:
+                                            waitForLockType = true;
+                                            break;
+                                        case Elements.ExclusiveLocking:
+                                            if (waitForLockScope)
+                                            {
+                                                litem.Scope = DAVLocking.LockScope.Exclusive;
+                                            }
+                                            break;
+                                        case Elements.SharedLocking:
+                                            if (waitForLockScope)
+                                            {
+                                                litem.Scope = DAVLocking.LockScope.Shared;
+                                            }
+                                            break;
+                                        case Elements.WriteLocking:
+                                            if (waitForLockType)
+                                            {
+                                                litem.Type = DAVLocking.LockType.Write;
+                                            }
+                                            break;
+                                        case Elements.LockDiscovery:
+                                            ///TODO 
+                                            break;
+
+                                        // DAV Properties
+                                        case Elements.Properties:
+                                            // a pItem was already created before
+                                            break;
+
+                                        case Properties.ResourceType:
+                                            waitForResourceType = true;
+                                            break;
+
+                                        case Properties.SupportedLock:
+                                            lockingList = new List<DAVLocking>();
+                                            break;
+
+                                        default:
+                                            lastElementName = reader.LocalName;
+                                            break;
+                                    }
+                                }
+                                break;
+
+                            // clean up
+                            case XmlNodeType.EndElement:
+                                if (reader.NamespaceURI == XmlNamespaces.NsDav)
+                                {
+                                    switch (reader.LocalName)
+                                    {
+                                        // DAV Elements
+                                        case Elements.PropertyState:
+                                            // save to list and create a new one (which stays maybe temporary)
+                                            propertyStateList.Add(pItem);
+                                            pItem = new PropertyState();
+                                            break;
+
+                                        case Elements.Response:
+                                            // clean the list
+                                            // the HTTP Status is important
+                                            foreach (PropertyState state in propertyStateList)
+                                            {
+                                                if (state.Status == ServerStatus.OK)
+                                                {
+                                                    item.Properties = state.Properties;
+                                                }
+                                                else
+                                                {
+                                                    item.FailedProperties.Add(state);
+                                                }
+                                            }
+
+                                            // Close the item
+                                            Items.Add(item);
+                                            item = null;
+
+                                            // Reset the property state list
+                                            propertyStateList = null;
+                                            pItem = null;
+                                            break;
+
+                                        // Locking
+                                        case Elements.LockType:
+                                            waitForLockType = false;
+                                            break;
+                                        case Elements.LockScope:
+                                            waitForLockScope = false;
+                                            break;
+
+                                        // DAV Properties
+                                        case Properties.ResourceType:
+                                            waitForResourceType = false;
+                                            break;
+                                        case Properties.SupportedLock:
+                                            item.Locking = lockingList;
+                                            break;
+
+                                    }
+                                }
+                                break;
+
+                            // Grap the text values
+                            case XmlNodeType.Text:
+
+                                // no whitespace please
+                                if (reader.Value == null) continue;
+
+                                // can't set in empty element
+                                if (item == null) continue;
+
+                                switch (lastElementName)
                                 {
                                     // DAV Elements
-
-                                    // Response
-                                    case Elements.Response:
-                                        // start a new item
-                                        // pItem must be set before d:prop in order to
-                                        // catch non-real properties such "href"
-                                        item = new Item();
-                                        propertyStateList = new List<PropertyState>();
-                                        pItem = new PropertyState();
+                                    case Elements.Reference:
+                                        string _ref = Uri.UnescapeDataString(reader.Value);
+                                        pItem.Properties.Add(lastElementName, _ref);
+                                        pItem.Properties.Add(lastElementName + ".local", _ref.Trim('/').Split('/').Last());
                                         break;
 
-                                    // Resource type
-                                    case Elements.Collection:
-                                        if (waitForResourceType)
-                                        {
-                                            item.ResourceType = ResourceType.Collection;
-                                        }
-                                        break;
-
-                                    // Lock
-                                    case Elements.LockEntry:
-                                        litem = new DAVLocking();
-                                        lockingList.Add(litem);
-                                        break;
-                                    case Elements.LockScope:
-                                        waitForLockScope = true;
-                                        break;
-                                    case Elements.LockType:
-                                        waitForLockType = true;
-                                        break;
-                                    case Elements.ExclusiveLocking:
-                                        if (waitForLockScope)
-                                        {
-                                            litem.Scope = DAVLocking.LockScope.Exclusive;
-                                        }
-                                        break;
-                                    case Elements.SharedLocking:
-                                        if (waitForLockScope)
-                                        {
-                                            litem.Scope = DAVLocking.LockScope.Shared;
-                                        }
-                                        break;
-                                    case Elements.WriteLocking:
-                                        if (waitForLockType)
-                                        {
-                                            litem.Type = DAVLocking.LockType.Write;
-                                        }
-                                        break;
-                                    case Elements.LockDiscovery:
-                                        ///TODO 
+                                    // Status element
+                                    case Elements.Status:
+                                        List<string> s = new List<string>(reader.Value.Split(' '));
+                                        s.RemoveAt(0);
+                                        pItem.Status = (ServerStatus)Enum.Parse(typeof(ServerStatus), s[0], false);
+                                        s.RemoveAt(0);
+                                        pItem.ServerStatusText = String.Join(" ", s.ToArray());
                                         break;
 
                                     // DAV Properties
-                                    case Elements.Properties:
-                                        // a pItem was already created before
+                                    case Properties.QuotaUsedBytes:
+                                    case Properties.QuotaAvailableBytes:
+                                    case Properties.GetContentLength:
+                                        pItem.Properties.Add(lastElementName, long.Parse(reader.Value));
                                         break;
-
-                                    case Properties.ResourceType:
-                                        waitForResourceType = true;
+                                    case Properties.DisplayName:
+                                    case Properties.GetContentLanguage:
+                                    case Properties.GetContentType:
+                                    case Properties.GetETag:
+                                        pItem.Properties.Add(lastElementName, reader.Value);
                                         break;
-
-                                    case Properties.SupportedLock:
-                                        lockingList = new List<DAVLocking>();
-                                        break;
-                                    
-                                    default:
-                                        lastElementName = reader.LocalName;
+                                    case Properties.GetLastModified:
+                                    case Properties.CreationDate:
+                                        pItem.Properties.Add(lastElementName, DateTime.Parse(reader.Value));
                                         break;
                                 }
-                            }
-                            break;
-                        
-                        // clean up
-                        case XmlNodeType.EndElement:
-                            if (reader.NamespaceURI == XmlNamespaces.NsDav)
-                            {
-                                switch (reader.LocalName)
-                                {
-                                    // DAV Elements
-                                    case Elements.PropertyState:
-                                        // save to list and create a new one (which stays maybe temporary)
-                                        propertyStateList.Add(pItem);
-                                        pItem = new PropertyState();
-                                        break;
-
-                                    case Elements.Response:
-                                        // clean the list
-                                        // the HTTP Status is important
-                                        foreach (PropertyState state in propertyStateList)
-                                        {
-                                            if (state.Status == ServerStatus.OK)
-                                            {
-                                                item.Properties = state.Properties;
-                                            }
-                                            else
-                                            {
-                                                item.FailedProperties.Add(state);
-                                            }
-                                        }
-
-                                        // Close the item
-                                        Items.Add(item);
-                                        item = null;
-
-                                        // Reset the property state list
-                                        propertyStateList = null;
-                                        pItem = null;
-                                        break;
-
-                                    // Locking
-                                    case Elements.LockType:
-                                        waitForLockType = false;
-                                        break;
-                                    case Elements.LockScope:
-                                        waitForLockScope = false;
-                                        break;
-
-                                    // DAV Properties
-                                    case Properties.ResourceType:
-                                        waitForResourceType = false;
-                                        break;
-                                    case Properties.SupportedLock:
-                                        item.Locking = lockingList;
-                                        break;
-
-                                }
-                            }
-                            break;
-
-                        // Grap the text values
-                        case XmlNodeType.Text:
-
-                            // no whitespace please
-                            if (reader.Value == null) continue;
-
-                            // can't set in empty element
-                            if (item == null) continue;
-
-                            switch (lastElementName)
-                            {
-                                // DAV Elements
-                                case Elements.Reference:
-                                    string _ref = Uri.UnescapeDataString(reader.Value);
-                                    pItem.Properties.Add(lastElementName, _ref);
-                                    pItem.Properties.Add(lastElementName + ".local", _ref.Trim('/').Split('/').Last());
-                                    break;
-
-                                // Status element
-                                case Elements.Status:
-                                    List<string> s = new List<string>(reader.Value.Split(' '));
-                                    s.RemoveAt(0);
-                                    pItem.Status = (ServerStatus)Enum.Parse(typeof(ServerStatus), s[0], false);
-                                    s.RemoveAt(0);
-                                    pItem.ServerStatusText = String.Join(" ", s.ToArray());
-                                    break;
-
-                                // DAV Properties
-                                case Properties.QuotaUsedBytes:
-                                case Properties.QuotaAvailableBytes:
-                                case Properties.GetContentLength:
-                                    pItem.Properties.Add(lastElementName, long.Parse(reader.Value));
-                                    break;
-                                case Properties.DisplayName:
-                                case Properties.GetContentLanguage:
-                                case Properties.GetContentType:
-                                case Properties.GetETag:
-                                    pItem.Properties.Add(lastElementName, reader.Value);
-                                    break;
-                                case Properties.GetLastModified:
-                                case Properties.CreationDate:
-                                    pItem.Properties.Add(lastElementName, DateTime.Parse(reader.Value));
-                                    break;
-                            }
-                            lastElementName = "";
-                            break;
+                                lastElementName = "";
+                                break;
+                        }
                     }
+                }
+                catch (XmlException e)
+                {
+                    System.Diagnostics.Debug.WriteLine(e.Message);
                 }
             }
         }

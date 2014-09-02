@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.IO.IsolatedStorage;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -12,6 +15,7 @@ using OwnCloud.Data;
 using OwnCloud.Data.DAV;
 using OwnCloud.View.Controls;
 using OwnCloud.Extensions;
+using Windows.Storage;
 
 namespace OwnCloud.View.Page
 {
@@ -20,6 +24,7 @@ namespace OwnCloud.View.Page
 
         private Account _workingAccount;
         private FileListDataContext _context;
+        private IsolatedStorageFile _localStorage;
         private string[] _views = { "detail", "tile" };
         private int _viewIndex = 0;
         private string _workingPath = "";
@@ -29,6 +34,7 @@ namespace OwnCloud.View.Page
             InitializeComponent();
             _context = new FileListDataContext();
             DataContext = _context;
+
             // Translate unsupported XAML bindings
             // ApplicationBar.TranslateButtons();
         }
@@ -47,6 +53,8 @@ namespace OwnCloud.View.Page
             {
                 _workingAccount = App.DataContext.LoadAccount(NavigationContext.QueryString["account"]);
                 _workingAccount.RestoreCredentials();
+                _localStorage = App.DataContext.Storage;
+                
             }
             catch (Exception)
             {
@@ -295,13 +303,14 @@ namespace OwnCloud.View.Page
 
         private void DetailListSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (DetailList.SelectedIndex == -1) return;
             if (DetailList.Items.Count == 0) return;
 
             FileDetailViewControl item = (FileDetailViewControl)(DetailList.SelectedItem);
             OpenItem(item.FileProperties);
         }
 
-        private void OpenItem(File item)
+        private async void OpenItem(File item)
         {
             if (item.IsDirectory)
             {
@@ -309,9 +318,64 @@ namespace OwnCloud.View.Page
             }
             else
             {
-                //todo: win8 file+uri associations callers
-                //todo: open file
+                // Download file to isolated storage
+
+                var downloaded = await DownloadFileAsync(_workingAccount.GetUri(item.FilePath), item.FileName, item.FileLastModified, new CancellationToken(false));
+                if (downloaded)
+                {
+                    StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(_workingAccount.ServerDomain + "\\" + _workingAccount.DisplayUserName + "\\" + item.FileName);
+                    var success = await Windows.System.Launcher.LaunchFileAsync(file);
+                    DetailList.SelectedIndex = -1;
+                }
             }
+        }
+
+        private async Task<bool> DownloadFileAsync(Uri uriToDownload, string fileName, DateTime lastModificationDate, CancellationToken cToken)
+        {
+            try
+            {
+                    var userFile = _workingAccount.ServerDomain + "\\" + _workingAccount.DisplayUserName + "\\" + fileName;
+                    if (_localStorage.FileExists(userFile))
+                    {
+                        var lastWriteDate = _localStorage.GetLastWriteTime(userFile);
+                        if (lastWriteDate > lastModificationDate) return true;
+                    }
+                    using (System.IO.Stream mystr = await DownloadFile(uriToDownload, _workingAccount.GetCredentials()))
+                    using (IsolatedStorageFileStream file = _localStorage.CreateFile(userFile))
+                    {
+                        const int BUFFER_SIZE = 1024;
+                        byte[] buf = new byte[BUFFER_SIZE];
+
+                        int bytesread = 0;
+                        while ((bytesread = await mystr.ReadAsync(buf, 0, BUFFER_SIZE)) > 0)
+                        {
+                            cToken.ThrowIfCancellationRequested();
+                            file.Write(buf, 0, bytesread);
+                        }
+                    }
+                
+                return true;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                return false;
+            }
+        }
+
+        private static Task<System.IO.Stream> DownloadFile(Uri url, NetworkCredential credentials)
+        {
+            var tcs = new TaskCompletionSource<System.IO.Stream>();
+            var wc = new WebClient();
+            wc.Credentials = credentials;
+            wc.OpenReadCompleted += (s, e) =>
+            {
+                if (e.Error != null) tcs.TrySetException(e.Error);
+                else if (e.Cancelled) tcs.TrySetCanceled();
+                else tcs.TrySetResult(e.Result);
+            };
+            wc.OpenReadAsync(url);
+            return tcs.Task;
         }
     }
 }

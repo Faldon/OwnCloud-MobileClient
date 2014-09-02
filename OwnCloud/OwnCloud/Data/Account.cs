@@ -15,8 +15,8 @@ namespace OwnCloud.Data
     {
         public Account()
         {
-            WebDAVPath = "/owncloud/remote.php/webdav/";
-            CalDAVPath = "/owncloud/remote.php/caldav/";
+            WebDAVPath = "/remote.php/webdav";
+            CalDAVPath = "/remote.php/caldav";
             Protocol = "https";
             Username = "";
             Password = "";
@@ -226,6 +226,25 @@ namespace OwnCloud.Data
             get
             {
                 return IsAnonymous ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+
+        public bool CalendarEnabled
+        {
+            get
+            {
+                return !CalDAVPath.Equals("");
+            }
+            set
+            {
+                if (value)
+                {
+                    CalDAVPath = "/remote.php/caldav";
+                }
+                else
+                {
+                    CalDAVPath = "";
+                }
             }
         }
 
