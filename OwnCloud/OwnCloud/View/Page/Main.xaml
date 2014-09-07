@@ -134,8 +134,8 @@
             </controls:PanoramaItem>
             -->
 
-            <controls:PanoramaItem Name="MainPageCalendar" Header="{Binding Path=LocalizedResources.MainPage_CalendarHeader, Source={StaticResource LocalizedStrings}}" HeaderTemplate="{StaticResource PanoramaItemHeader}">
-                <ListBox ItemsSource="{Binding Accounts}"
+            <controls:PanoramaItem Name="MainPageCalendar" Header="{Binding Path=LocalizedResources.MainPage_CalendarHeader, Source={StaticResource LocalizedStrings}}" HeaderTemplate="{StaticResource PanoramaItemHeader}" Visibility="{Binding MainCalendarPageVisibility}">
+                <ListBox Name="AccountList" ItemsSource="{Binding Accounts}"
                          Margin="12,0">
                     <ListBox.DataContext>
                         <odata:AccountListDataContext />

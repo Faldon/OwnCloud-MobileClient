@@ -33,7 +33,7 @@ namespace OwnCloud.Data
         public Table<TableCalendar> Calendars;
         public Table<TableEvent> Events;
         public Table<Account> Accounts;
-
+        
         private DispatcherTimer _deviceStatusTimer;
         private IsolatedStorageFile _isf;
 
@@ -48,6 +48,20 @@ namespace OwnCloud.Data
                            where acc.GUID == int.Parse(guid.ToString())
                            select acc;
             return accounts.First();
+        }
+
+        private Visibility _mainCalendarPageVisibility;
+        public Visibility MainCalendarPageVisibility
+        {
+            get
+            {
+                return _mainCalendarPageVisibility;
+            }
+            set
+            {
+                _mainCalendarPageVisibility = value;
+                OnPropertyChanged("MainCalendarPageVisibility");
+            }
         }
 
         /// <summary>

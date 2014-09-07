@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Windows;
+using Microsoft.Phone.Controls;
 
 namespace OwnCloud.Data
 {
@@ -26,8 +28,8 @@ namespace OwnCloud.Data
 
             foreach (Account account in App.DataContext.Accounts)
             {
-                // Only add the account, if CalDAV was set up
-                if (!account.CalDAVPath.Equals(""))
+                // Only add the account, if CalDAV access was enabled
+                if (account.CalendarEnabled)
                 {
                     Accounts.Add(account);
                 }

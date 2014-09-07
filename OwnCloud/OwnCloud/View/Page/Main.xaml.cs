@@ -40,6 +40,19 @@ namespace OwnCloud
 
         }
 
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            // Reload the AccountListDataContext
+            App.DataContext.Refresh(System.Data.Linq.RefreshMode.OverwriteCurrentValues, App.DataContext.Accounts);
+            AccountList.DataContext = null;
+            AccountList.DataContext = new AccountListDataContext();
+
+            // update visibility of calendar panorama control
+            App.DataContext.MainCalendarPageVisibility = (App.DataContext.Accounts.AsEnumerable().Any(a => a.CalendarEnabled)) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         private void SettingsAccountsTab(object sender, System.Windows.Input.GestureEventArgs e)
         {
             NavigationService.Navigate(new Uri("/View/Page/AccountList.xaml", UriKind.Relative));
