@@ -98,7 +98,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding IsAnonymous, Mode=TwoWay}" Content="{Binding Path=LocalizedResources.EditAccountPage_Anonymous, Source={StaticResource LocalizedStrings}}"/>
+                        <!--<CheckBox IsChecked="{Binding IsAnonymous, Mode=TwoWay}" Content="{Binding Path=LocalizedResources.EditAccountPage_Anonymous, Source={StaticResource LocalizedStrings}}"/>-->
                     </Grid>
                 </StackPanel>
 

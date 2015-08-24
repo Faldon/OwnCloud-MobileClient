@@ -128,5 +128,25 @@ namespace OwnCloud.Data.DAV
                 {Header.Depth, HeaderAttribute.MethodDepth.ApplyResourceAndChildren}
             });
         }
+
+        /// <summary>
+        /// Creates a make collection (new folder) request.
+        /// </summary>
+        /// <param name="path">The full path of the collection.</param>
+        /// <returns></returns>
+        static public DAVRequestHeader MakeCollection(string path)
+        {
+            return new DAVRequestHeader(Method.MakeCollection, path);
+        }
+
+        /// <summary>
+        /// Creates a delete request.
+        /// </summary>
+        /// <param name="path">The full path of the item to delete.</param>
+        /// <returns></returns>
+        static public DAVRequestHeader Delete(string path)
+        {
+            return new DAVRequestHeader(Method.Delete, path);
+        }
     }
 }

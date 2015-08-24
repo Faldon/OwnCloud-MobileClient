@@ -262,7 +262,7 @@ Gültig bis: {3:g}</value>
     <value>An Startseite heften</value>
   </data>
   <data name="Tile_RemoteFileTitle" xml:space="preserve">
-    <value>Datein</value>
+    <value>Dateien</value>
   </data>
   <data name="CalendarMonthPage_Title" xml:space="preserve">
     <value>Owncloud Kalendar</value>
@@ -302,8 +302,8 @@ Server Antwort: {1}</value>
   <data name="ApplicationBarButton_ChooseAccount" xml:space="preserve">
     <value>Konto wählen</value>
   </data>
-  <data name="ApplicationBarButton_Lock" xml:space="preserve">
-    <value>Sperren</value>
+  <data name="ApplicationBarButton_Edit" xml:space="preserve">
+    <value>Konto bearbeiten</value>
   </data>
   <data name="ApplicationBarButton_Unlock" xml:space="preserve">
     <value>Sperre aufheben</value>
@@ -316,5 +316,53 @@ Server Antwort: {1}</value>
   </data>
   <data name="EditAccountPage_EnableCalDAV" xml:space="preserve">
     <value>Kalender Zugriff</value>
+  </data>
+  <data name="ApplicationBarButton_Upload" xml:space="preserve">
+    <value>Hochladen</value>
+  </data>
+  <data name="ApplicationBarButton_NewFolder" xml:space="preserve">
+    <value>Neuer Ordner</value>
+  </data>
+  <data name="Button_Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Button_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="NewFolder_Caption" xml:space="preserve">
+    <value>Neuen Ordner anlegen</value>
+  </data>
+  <data name="NewFolder_Message" xml:space="preserve">
+    <value>Einen Namen für den neuen Ordner angeben:</value>
+  </data>
+  <data name="NewFolder_Error" xml:space="preserve">
+    <value>Beim Erstellen des Ordners "{0}" trat ein Fehler auf.</value>
+  </data>
+  <data name="ApplicationBarButton_SelectItems" xml:space="preserve">
+    <value>Auswahl</value>
+  </data>
+  <data name="ApplicationBarButton_Delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="ApplicationBarMenuItem_SelectAll" xml:space="preserve">
+    <value>Alle Dateien auswählen</value>
+  </data>
+  <data name="ApplicationBarMenuItem_UnSelectAll" xml:space="preserve">
+    <value>Alle Dateien abwählen</value>
+  </data>
+  <data name="ItemDeletion_Error" xml:space="preserve">
+    <value>Einige Daten konnten nicht gelöscht werden.</value>
+  </data>
+  <data name="RemoteFilesPage_FetchingStructure" xml:space="preserve">
+    <value>Ordnerstruktur wird geladen...</value>
+  </data>
+  <data name="MainPage_Local_Files" xml:space="preserve">
+    <value>Dateien auf dem Gerät</value>
+  </data>
+  <data name="DeleteFiles_Caption" xml:space="preserve">
+    <value>Dateien löschen</value>
+  </data>
+  <data name="DeleteFiles_Message" xml:space="preserve">
+    <value>Wirklich ausgewählte Dateien/Ordner löschen?</value>
   </data>
 </root>

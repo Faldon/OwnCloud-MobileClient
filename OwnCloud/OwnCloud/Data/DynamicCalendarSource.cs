@@ -30,7 +30,7 @@ namespace OwnCloud.Data
 
         public delegate void EventsRequested(object sender,LoadEventResult e);
 
-        public class LoadEventResult
+        public class LoadEventResult : EventArgs
         {
             public IEnumerable<TableEvent> Result;
         }

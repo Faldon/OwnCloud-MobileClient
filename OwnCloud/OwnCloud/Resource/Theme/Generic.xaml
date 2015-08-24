@@ -5,6 +5,7 @@
   xmlns:converter="clr-namespace:OwnCloud.View.Converter">
     
     <converter:ToUppercaseConverter x:Key="ToUppercaseConverter" />
+    <converter:SyncButtonVisibilityConverter x:Key="SyncButtonVisibilityConverter" />
 
     <Style x:Key="PageHeader" TargetType="TextBlock" BasedOn="{StaticResource PhoneTextNormalStyle}">
         <Setter Property="FontFamily" Value="{StaticResource PhoneFontFamilySemiBold}" />

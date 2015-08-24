@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -18,7 +22,12 @@ namespace OwnCloud
 {
     public partial class App : Application
     {
+#if WINDOWS_PHONE_APP
+        ContinuationManager continuationManager;
+#endif
         private static OwnCloudDataContext _context = null;
+
+        public FileOpenPickerContinuationEventArgs FilePickerContinuationArgs { get; set; }
 
         public static OwnCloudDataContext DataContext
         {
@@ -81,6 +90,15 @@ namespace OwnCloud
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 System.Diagnostics.Debugger.Break();
+            }   
+        }
+
+        private void Application_ContractActivated(object sender, IActivatedEventArgs e)
+        {
+            var filePickerContinuationArgs = e as FileOpenPickerContinuationEventArgs;
+            if (filePickerContinuationArgs != null)
+            {
+                this.FilePickerContinuationArgs = filePickerContinuationArgs;
             }
         }
 
@@ -98,6 +116,8 @@ namespace OwnCloud
 
             RootFrame.NavigationFailed += RootFrame_NavigationFailed;
             phoneApplicationInitialized = true;
+
+            PhoneApplicationService.Current.ContractActivated += Application_ContractActivated;
         }
 
         private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)

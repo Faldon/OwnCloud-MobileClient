@@ -59,8 +59,7 @@
         
         <!-- ApplicationBar for Accounts -->
         <shell:ApplicationBar x:Key="AccountApplicationBar">
-            <shell:ApplicationBarIconButton IconUri="/Assets/Icons/Add.png" Text="ApplicationBarButton_Add" Click="AddAccountTap"/>
-            <shell:ApplicationBarIconButton IconUri="/Assets/Icons/lock.png" Text="ApplicationBarButton_Lock" Click="LockAccountsTap"/>
+            <shell:ApplicationBarIconButton IconUri="/Assets/Icons/edit.png" Text="ApplicationBarButton_Edit" Click="EditAccountTap"/>
         </shell:ApplicationBar>
         
         <!-- Applicationbar for Files -->
@@ -75,13 +74,12 @@
 
     <Grid x:Name="LayoutRoot">
         <controls:Panorama Name="MainPanorama" Title="{Binding Path=LocalizedResources.AppTitle, Source={StaticResource LocalizedStrings}}" TitleTemplate="{StaticResource PanoramaHeader}" SelectionChanged="PanoramaSelectionChanged" ManipulationStarted="PanoramaManipulationStarted">
-            <controls:PanoramaItem Name="AccountPanoramaItem" Header="{Binding Path=LocalizedResources.MainPage_Accounts, Source={StaticResource LocalizedStrings}}" HeaderTemplate="{StaticResource PanoramaItemHeader}">
+            <controls:PanoramaItem Name="AccountPanoramaItem" Header="{Binding Path=LocalizedResources.MainPage_Files, Source={StaticResource LocalizedStrings}}" HeaderTemplate="{StaticResource PanoramaItemHeader}">
                 <StackPanel>
-                    <ListBox Name="AccountsList" Tap="RemoteAccountTap">
+                    <ListBox Name="RemoteFiles" Tap="RemoteFilesTap">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="12,0,12,12" ManipulationDelta="AccountsList_ManipulationDelta" ManipulationStarted="AccountsList_ManipulationStarted" ManipulationCompleted="AccountsList_ManipulationComplete"
-                                      toolkit:TiltEffect.IsTiltEnabled="True">
+                                <Grid Margin="12,0,12,12">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="50"/>
                                         <ColumnDefinition Width="*"/>
@@ -92,13 +90,32 @@
                                         </toolkit:ContextMenu>
                                     </toolkit:ContextMenuService.ContextMenu>
 
-                                    <Image Grid.Column="0" Source="/Resource/Image/owncloud-logo.png"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding ServerDomain}" Style="{StaticResource PhoneTextExtraLargeStyle}"></TextBlock>
+                                    <Image Grid.Column="0" Source="/Resource/Image/cloud.png"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Path=LocalizedResources.MainPage_Remote_Files , Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextLargeStyle}"></TextBlock>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Path=LocalizedResources.SettingsPage_AddAccount_Help, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextSubtleStyle}"/>
+                    <ListBox Name="LocalFiles" Tap="LocalFilesTap">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="12,0,12,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <toolkit:ContextMenuService.ContextMenu>
+                                        <toolkit:ContextMenu>
+                                            <toolkit:MenuItem Header="{Binding Path=LocalizedResources.MainPage_PinToStart, Source={StaticResource LocalizedStrings}}" Click="RemoteFilesPinToStart" />
+                                        </toolkit:ContextMenu>
+                                    </toolkit:ContextMenuService.ContextMenu>
+
+                                    <Image Grid.Column="0" Source="/Resource/Image/phone.png"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Path=LocalizedResources.MainPage_Local_Files , Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextLargeStyle}"></TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </StackPanel>
             </controls:PanoramaItem>
 
@@ -171,7 +188,7 @@
                         <TextBlock Grid.Column="1" Text="{Binding AvailableLocalStorage}" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right"/>
                     </Grid>
                     
-                    <TextBlock Text="Misc" Style="{StaticResource PhoneTextExtraLargeStyle}" Margin="12,15,0,0"/>
+                    <!--<TextBlock Text="Misc" Style="{StaticResource PhoneTextExtraLargeStyle}" Margin="12,15,0,0"/>
                     
                     <CheckBox Content="{Binding Path=LocalizedResources.SettingsPage_EnableFilePreview, Source={StaticResource LocalizedStrings}}" IsChecked="{Binding EnableFilePreview, Mode=TwoWay}"/>
                     <TextBlock TextWrapping="Wrap" Text="{Binding Path=LocalizedResources.SettingsPage_EnableFilePreviewSubText, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextSubtleStyle}" Margin="12,-12,0,0"/>
@@ -187,7 +204,7 @@
                         <TextBlock Style="{StaticResource PhoneTextSubtleStyle}"
                                    Text="Threshold" />
                         <TextBox Text="{Binding SkipRemoteFilesOverBytes, Mode=TwoWay}" InputScope="Number" />
-                    </StackPanel>
+                    </StackPanel>-->
 
                     <CheckBox Margin="0,15,0,0" IsChecked="{Binding EnableRemoteDeleting, Mode=TwoWay}">
                         <TextBlock TextWrapping="Wrap" Text="{Binding Path=LocalizedResources.SettingsPage_EnableRemoteDeleting, Source={StaticResource LocalizedStrings}}"/>

@@ -302,8 +302,8 @@ Server Answer: {1}</value>
   <data name="ApplicationBarButton_ChooseAccount" xml:space="preserve">
     <value>Choose account</value>
   </data>
-  <data name="ApplicationBarButton_Lock" xml:space="preserve">
-    <value>Lock</value>
+  <data name="ApplicationBarButton_Edit" xml:space="preserve">
+    <value>Edit Account</value>
   </data>
   <data name="ApplicationBarButton_Unlock" xml:space="preserve">
     <value>Unlock</value>
@@ -316,5 +316,53 @@ Server Answer: {1}</value>
   </data>
   <data name="EditAccountPage_EnableCalDAV" xml:space="preserve">
     <value>Calendar access</value>
+  </data>
+  <data name="ApplicationBarButton_Upload" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="ApplicationBarButton_NewFolder" xml:space="preserve">
+    <value>New folder</value>
+  </data>
+  <data name="Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Button_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="NewFolder_Caption" xml:space="preserve">
+    <value>Create new folder</value>
+  </data>
+  <data name="NewFolder_Message" xml:space="preserve">
+    <value>Enter a name for the new folder:</value>
+  </data>
+  <data name="NewFolder_Error" xml:space="preserve">
+    <value>An error occured on creation of folder "{0}".</value>
+  </data>
+  <data name="ApplicationBarButton_SelectItems" xml:space="preserve">
+    <value>Selection</value>
+  </data>
+  <data name="ApplicationBarButton_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="ApplicationBarMenuItem_SelectAll" xml:space="preserve">
+    <value>Select all files</value>
+  </data>
+  <data name="ApplicationBarMenuItem_UnSelectAll" xml:space="preserve">
+    <value>Unselect all files</value>
+  </data>
+  <data name="ItemDeletion_Error" xml:space="preserve">
+    <value>Some items could not be deleted.</value>
+  </data>
+  <data name="RemoteFilesPage_FetchingStructure" xml:space="preserve">
+    <value>Fetching Structure...</value>
+  </data>
+  <data name="MainPage_Local_Files" xml:space="preserve">
+    <value>Local Files</value>
+  </data>
+  <data name="DeleteFiles_Caption" xml:space="preserve">
+    <value>Delete files</value>
+  </data>
+  <data name="DeleteFiles_Message" xml:space="preserve">
+    <value>Really delete selected files/folders?</value>
   </data>
 </root>

@@ -15,8 +15,8 @@ namespace OwnCloud.Data
     {
         public Account()
         {
-            WebDAVPath = "/remote.php/webdav";
-            CalDAVPath = "/remote.php/caldav";
+            WebDAVPath = "/remote.php/webdav/";
+            CalDAVPath = "/remote.php/caldav/";
             Protocol = "https";
             Username = "";
             Password = "";

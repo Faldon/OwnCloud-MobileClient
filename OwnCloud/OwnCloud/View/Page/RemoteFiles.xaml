@@ -50,10 +50,11 @@
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
             <TextBlock Text="{Binding Path=LocalizedResources.MainPage_Remote_Files, Source={StaticResource LocalizedStrings}, Converter={StaticResource ToUppercaseConverter}}"
                        Style="{StaticResource PageHeader}"/>
+            <TextBlock Name="BreadCrumb" FontSize="{StaticResource PhoneFontSizeSmall}" Margin="{StaticResource PhoneHorizontalMargin}"/>
         </StackPanel>
 
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <ListBox Name="DetailList" SelectionChanged="DetailListSelectionChanged">
+            <ListBox Name="DetailList">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -63,17 +64,20 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
             </ListBox>
-            <ScrollViewer Name="TileViewContainer" HorizontalScrollBarVisibility="Disabled">
-                <toolkit:WrapPanel Name="TileView" Margin="12,0">
-                
-                </toolkit:WrapPanel>
-            </ScrollViewer>
         </Grid>
     </Grid>
     
     <phone:PhoneApplicationPage.Resources>
         <shell:ApplicationBar x:Key="DefaultAppBar">
-            <shell:ApplicationBarIconButton Click="ChangeView" Text="ApplicationBarButton_View" IconUri="/Assets/Icons/view.png"/>
+            <shell:ApplicationBarIconButton Click="SelectFile" Text="ApplicationBarButton_Upload" IconUri="/Assets/Icons/upload.png"/>
+            <shell:ApplicationBarIconButton Click="NewFolder" Text="ApplicationBarButton_NewFolder" IconUri="/Assets/Icons/add_folder.png"/>
+            <shell:ApplicationBarIconButton Click="CheckItems" Text="ApplicationBarButton_SelectItems" IconUri="/Assets/Icons/select.png"/>
+        </shell:ApplicationBar>
+        <shell:ApplicationBar x:Key="SelectFilesAppBar" IsMenuEnabled="True">
+            <shell:ApplicationBarIconButton Click="SelectionDelete" Text="ApplicationBarButton_Delete" IconUri="/Assets/Icons/Delete.png"/>
+            <shell:ApplicationBarIconButton Click="SelectionCancel" Text="Button_Cancel" IconUri="/Assets/Icons/cancel.png"/>
+            <shell:ApplicationBar.MenuItems>
+            </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.Resources>
 

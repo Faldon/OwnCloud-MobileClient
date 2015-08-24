@@ -19,8 +19,6 @@ namespace OwnCloud.View.Controls
             InitializeComponent();
         }
 
-        public event EventHandler<System.Windows.Input.GestureEventArgs> OnEnableSyncTap;
-
         private Storyboard _board;
 
         /// <summary>
@@ -32,23 +30,6 @@ namespace OwnCloud.View.Controls
             {
                 return (File)DataContext;
             }
-        }
-
-        private void EnableSyncTap(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            if (OnEnableSyncTap != null)
-            {
-                if (_board == null)
-                {
-                    _board = Resources["RotateSyncButton"] as Storyboard;
-                    _board.Completed += new EventHandler(delegate
-                    {
-                        OnEnableSyncTap(this.DataContext, e);
-                    });
-                }
-                _board.Begin();
-            }
-            e.Handled = true;
         }
     }
 }
