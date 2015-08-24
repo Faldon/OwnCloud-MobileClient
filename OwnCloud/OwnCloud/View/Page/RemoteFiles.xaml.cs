@@ -47,7 +47,7 @@ namespace OwnCloud.View.Page
             appBar.MenuItems.Add(selectAllMenuItem);
             appBar.MenuItems.Add(unselectAllMenuItem);
         }
-        
+
         private void ToggleTray()
         {
             Dispatcher.BeginInvoke(() =>
@@ -72,6 +72,15 @@ namespace OwnCloud.View.Page
             ApplicationBar = (ApplicationBar)Resources["DefaultAppBar"];
             ApplicationBar.TranslateButtons();
             FetchStructure(_workingAccount.WebDAVPath);
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            var app = App.Current as App;
+            if (app.FilePickerContinuationArgs != null)
+            {
+                this.ContinueFileOpenPicker(app.FilePickerContinuationArgs);
+            }
         }
 
         void selectAllFiles(object sender, EventArgs e)
@@ -412,7 +421,10 @@ namespace OwnCloud.View.Page
                 if (_localStorage.FileExists(userFile))
                 {
                     var lastWriteDate = _localStorage.GetLastWriteTime(userFile);
-                    if (lastWriteDate > lastModificationDate) return true;
+                    if (lastWriteDate > lastModificationDate)
+                    {
+                        return true;
+                    }
                 }
                 if (!_localStorage.DirectoryExists(localPath))
                 {
@@ -441,130 +453,46 @@ namespace OwnCloud.View.Page
             }
         }
 
-        private async Task<bool> UploadFilesAsync(Uri url, NetworkCredential credentials, String uploadDir, StorageFile[] files)
+        private async Task<bool> UploadFileAsync(Uri uriToUpload, NetworkCredential credentials, StorageFile file)
         {
             try
             {
                 var tcs = new TaskCompletionSource<System.IO.Stream>();
-                var request = HttpWebRequest.Create(url);
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uriToUpload);
+                request.UseDefaultCredentials = false;
                 request.Credentials = credentials;
-                request.Method = "POST";
-                //var boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x", NumberFormatInfo.InvariantInfo);
-                //request.ContentType = "multipart/form-data; boundary=" + boundary;
-                //boundary = "--" + boundary;
+                request.Method = "PUT";
 
-                //System.IO.Stream requestStream = await request.GetRequestStreamAsync();
-
-                //// Write the values
-                //var buffer = Encoding.UTF8.GetBytes(boundary + Environment.NewLine);
-
-                //requestStream.Write(buffer, 0, buffer.Length);
-                //buffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"{1}{1}", "dir", Environment.NewLine));
-                //requestStream.Write(buffer, 0, buffer.Length);
-                //buffer = Encoding.UTF8.GetBytes(uploadDir + Environment.NewLine);
-                //requestStream.Write(buffer, 0, buffer.Length);
-
-
-                //// Write the files
-                //foreach (var file in files)
-                //{
-                //    var filebuffer = Encoding.UTF8.GetBytes(boundary + Environment.NewLine);
-                //    requestStream.Write(filebuffer, 0, filebuffer.Length);
-                //    filebuffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"{2}", "file", file.Name, Environment.NewLine));
-                //    requestStream.Write(filebuffer, 0, filebuffer.Length);
-                //    filebuffer = Encoding.UTF8.GetBytes(string.Format("Content-Type: {0}{1}{1}", file.ContentType, Environment.NewLine));
-                //    requestStream.Write(filebuffer, 0, filebuffer.Length);
-
-                //    var fileStream = await file.OpenAsync(FileAccessMode.Read);
-                //    var reader = new Windows.Storage.Streams.DataReader(fileStream.GetInputStreamAt(0));
-                //    var bytes = new byte[fileStream.Size];
-                //    await reader.LoadAsync((uint)fileStream.Size);
-                //    reader.ReadBytes(bytes);
-                //    var fs = new System.IO.MemoryStream(bytes);
-                //    fs.CopyTo(requestStream);
-
-                //    filebuffer = Encoding.UTF8.GetBytes(Environment.NewLine);
-                //    requestStream.Write(filebuffer, 0, filebuffer.Length);
-                //}
-
-                //var boundaryBuffer = Encoding.UTF8.GetBytes(boundary + "--");
-                //requestStream.Write(boundaryBuffer, 0, boundaryBuffer.Length);
-                request.BeginGetResponse(async (result) =>
+                using (System.IO.Stream requestStream = await request.GetRequestStreamAsync())
+                using (var fileStream = await file.OpenAsync(FileAccessMode.Read))
                 {
-                    try
-                    {
-                        HttpWebRequest r = (HttpWebRequest)result.AsyncState;
-                        using (System.IO.Stream requestStream = request.EndGetRequestStream(result))
-                        {
-                            var boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x", NumberFormatInfo.InvariantInfo);
-                            request.ContentType = "multipart/form-data; boundary=" + boundary;
-                            boundary = "--" + boundary;
+                    var reader = new Windows.Storage.Streams.DataReader(fileStream.GetInputStreamAt(0));
+                    var bytes = new byte[fileStream.Size];
+                    await reader.LoadAsync((uint)fileStream.Size);
+                    reader.ReadBytes(bytes);
+                    var fs = new System.IO.MemoryStream(bytes);
+                    fs.CopyTo(requestStream);
+                    fs.Close();
+                }
+                bool success = true;
 
-                            //System.IO.Stream requestStream = await request.GetRequestStreamAsync();
-
-                            // Write the values
-                            var buffer = Encoding.UTF8.GetBytes(boundary + Environment.NewLine);
-
-                            requestStream.Write(buffer, 0, buffer.Length);
-                            buffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"{1}{1}", "dir", Environment.NewLine));
-                            requestStream.Write(buffer, 0, buffer.Length);
-                            buffer = Encoding.UTF8.GetBytes(uploadDir + Environment.NewLine);
-                            requestStream.Write(buffer, 0, buffer.Length);
-
-
-                            // Write the files
-                            foreach (var file in files)
-                            {
-                                var filebuffer = Encoding.UTF8.GetBytes(boundary + Environment.NewLine);
-                                requestStream.Write(filebuffer, 0, filebuffer.Length);
-                                filebuffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"{2}", "file", file.Name, Environment.NewLine));
-                                requestStream.Write(filebuffer, 0, filebuffer.Length);
-                                filebuffer = Encoding.UTF8.GetBytes(string.Format("Content-Type: {0}{1}{1}", file.ContentType, Environment.NewLine));
-                                requestStream.Write(filebuffer, 0, filebuffer.Length);
-
-                                var fileStream = await file.OpenAsync(FileAccessMode.Read);
-                                var reader = new Windows.Storage.Streams.DataReader(fileStream.GetInputStreamAt(0));
-                                var bytes = new byte[fileStream.Size];
-                                await reader.LoadAsync((uint)fileStream.Size);
-                                reader.ReadBytes(bytes);
-                                var fs = new System.IO.MemoryStream(bytes);
-                                fs.CopyTo(requestStream);
-
-                                filebuffer = Encoding.UTF8.GetBytes(Environment.NewLine);
-                                requestStream.Write(filebuffer, 0, filebuffer.Length);
-                            }
-
-                            var boundaryBuffer = Encoding.UTF8.GetBytes(boundary + "--");
-                            requestStream.Write(boundaryBuffer, 0, boundaryBuffer.Length);
-                        }
-                        request.BeginGetResponse(a =>
+                request.BeginGetResponse(a =>
                         {
                             try
                             {
-                                var response = request.EndGetResponse(a);
-                                var responseStream = response.GetResponseStream();
-                                using (var sr = new System.IO.StreamReader(responseStream))
+                                HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(a);
+                                if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created)
                                 {
-                                    {
-                                        using (System.IO.StreamReader streamReader = new System.IO.StreamReader(response.GetResponseStream()))
-                                        {
-                                            string responseString = streamReader.ReadToEnd();
-                                        }
-                                    }
+                                    success = false;
                                 }
                             }
                             catch (Exception)
                             {
 
                             }
-                        }, null);
-                    }
-                    catch (Exception e)
-                    {
-                        System.Diagnostics.Debug.WriteLine(e.Message);
-                    }
-                }, request);
-                return true;
+                        }, success);
+
+                return success;
             }
             catch (Exception ex)
             {
@@ -594,27 +522,17 @@ namespace OwnCloud.View.Page
                 args.Files != null &&
                 args.Files.Count > 0)
             {
-                //var url = _workingAccount.GetUri("/index/files/ajax/upload.php");
-                var url = _workingAccount.GetUri(_workingPath);
-                //StorageFile[] files = new StorageFile[args.Files.ToArray];
+                _workingPath = args.ContinuationData["UploadPath"] as string;
 
-
-                //foreach (StorageFile file in args.Files) {
-                //    files[files.Length] = file;
-                //}
-
-                var success = await UploadFilesAsync(url, _workingAccount.GetCredentials(), args.ContinuationData["UploadPath"] as string, (StorageFile[])args.Files.ToArray());
+                foreach (StorageFile file in args.Files)
+                {
+                    var url = _workingAccount.GetUri(_workingPath + file.Name);
+                    var success = await UploadFileAsync(url, _workingAccount.GetCredentials(), file);
+                }
+                App.Current.FilePickerContinuationArgs = null;
                 FetchStructure(_workingPath);
             }
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            var app = App.Current as App;
-            if (app.FilePickerContinuationArgs != null)
-            {
-                this.ContinueFileOpenPicker(app.FilePickerContinuationArgs);
-            }
-        }
     }
 }
