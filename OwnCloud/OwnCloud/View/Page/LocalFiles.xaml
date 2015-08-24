@@ -71,11 +71,11 @@
         <shell:ApplicationBar x:Key="DefaultAppBar">
             <!--<shell:ApplicationBarIconButton Click="SelectFile" Text="ApplicationBarButton_Upload" IconUri="/Assets/Icons/upload.png"/>
             <shell:ApplicationBarIconButton Click="NewFolder" Text="ApplicationBarButton_NewFolder" IconUri="/Assets/Icons/add_folder.png"/>-->
-            <shell:ApplicationBarIconButton Click="CheckItems" Text="ApplicationBarButton_SelectItems" IconUri="/Assets/Icons/select.png"/>
+            <shell:ApplicationBarIconButton Click="EnterFileSelection" Text="ApplicationBarButton_SelectItems" IconUri="/Assets/Icons/select.png"/>
         </shell:ApplicationBar>
         <shell:ApplicationBar x:Key="SelectFilesAppBar" IsMenuEnabled="True">
-            <shell:ApplicationBarIconButton Click="SelectionDelete" Text="ApplicationBarButton_Delete" IconUri="/Assets/Icons/Delete.png"/>
-            <shell:ApplicationBarIconButton Click="SelectionCancel" Text="Button_Cancel" IconUri="/Assets/Icons/cancel.png"/>
+            <shell:ApplicationBarIconButton Click="DeleteSelectedFiles" Text="ApplicationBarButton_Delete" IconUri="/Assets/Icons/Delete.png"/>
+            <shell:ApplicationBarIconButton Click="LeaveFileSelection" Text="Button_Cancel" IconUri="/Assets/Icons/cancel.png"/>
             <shell:ApplicationBar.MenuItems>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>

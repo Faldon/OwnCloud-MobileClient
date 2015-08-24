@@ -1,28 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
+using OwnCloud.Data;
+using OwnCloud.Data.DAV;
+using OwnCloud.Extensions;
+using OwnCloud.View.Controls;
+using System;
+using System.Globalization;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Net;
-using System.IO.IsolatedStorage;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 using System.Windows.Media;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using OwnCloud.Data;
-using OwnCloud.Data.DAV;
-using OwnCloud.View.Controls;
-using OwnCloud.Extensions;
+using System.Windows.Navigation;
+using Windows.ApplicationModel.Activation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.Foundation.Collections;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using System.Globalization;
-using System.Text;
-using System.Windows.Data;
 
 namespace OwnCloud.View.Page
 {
@@ -34,7 +30,6 @@ namespace OwnCloud.View.Page
         private IsolatedStorageFile _localStorage;
         private string[] _views = { "detail", "tile" };
         private string _workingPath = "";
-        private DAVRequestResult.Item _item;
         private bool _deletionSuccess = true;
 
         public RemoteFiles()
@@ -46,29 +41,13 @@ namespace OwnCloud.View.Page
             var appBar = this.Resources["SelectFilesAppBar"] as ApplicationBar;
             appBar.TranslateButtons();
             ApplicationBarMenuItem selectAllMenuItem = new ApplicationBarMenuItem(Resource.Localization.AppResources.ApplicationBarMenuItem_SelectAll);
-            selectAllMenuItem.Click += selectAllMenuItems;
+            selectAllMenuItem.Click += selectAllFiles;
             ApplicationBarMenuItem unselectAllMenuItem = new ApplicationBarMenuItem(Resource.Localization.AppResources.ApplicationBarMenuItem_UnSelectAll);
-            unselectAllMenuItem.Click += unselectAllMenuItems;
+            unselectAllMenuItem.Click += deselectAllFiles;
             appBar.MenuItems.Add(selectAllMenuItem);
             appBar.MenuItems.Add(unselectAllMenuItem);
         }
-
-        void selectAllMenuItems(object sender, EventArgs e)
-        {
-            foreach (FileDetailViewControl detailControl in DetailList.Items)
-            {
-                detailControl.FileCheckbox.IsChecked = true;
-            }
-        }
-
-        void unselectAllMenuItems(object sender, EventArgs e)
-        {
-            foreach (FileDetailViewControl detailControl in DetailList.Items)
-            {
-                detailControl.FileCheckbox.IsChecked = false;
-            }
-        }
-
+        
         private void ToggleTray()
         {
             Dispatcher.BeginInvoke(() =>
@@ -95,7 +74,23 @@ namespace OwnCloud.View.Page
             FetchStructure(_workingAccount.WebDAVPath);
         }
 
-        private void SelectFile(object sender, EventArgs e)
+        void selectAllFiles(object sender, EventArgs e)
+        {
+            foreach (FileDetailViewControl detailControl in DetailList.Items)
+            {
+                detailControl.FileCheckbox.IsChecked = true;
+            }
+        }
+
+        void deselectAllFiles(object sender, EventArgs e)
+        {
+            foreach (FileDetailViewControl detailControl in DetailList.Items)
+            {
+                detailControl.FileCheckbox.IsChecked = false;
+            }
+        }
+
+        private void OpenFilePicker(object sender, EventArgs e)
         {
             FileOpenPicker opener = new FileOpenPicker();
             opener.ViewMode = PickerViewMode.Thumbnail;
@@ -107,7 +102,7 @@ namespace OwnCloud.View.Page
 
         }
 
-        private void CheckItems(object sender, EventArgs e)
+        private void EnterFileSelection(object sender, EventArgs e)
         {
             ApplicationBar = this.Resources["SelectFilesAppBar"] as ApplicationBar;
 
@@ -125,7 +120,7 @@ namespace OwnCloud.View.Page
 
         }
 
-        private void SelectionCancel(object sender, EventArgs e)
+        private void LeaveFileSelection(object sender, EventArgs e)
         {
             ApplicationBar = this.Resources["DefaultAppBar"] as ApplicationBar;
             foreach (FileDetailViewControl detailControl in DetailList.Items)
@@ -136,7 +131,7 @@ namespace OwnCloud.View.Page
 
         }
 
-        private void SelectionDelete(object sender, EventArgs e)
+        private void DeleteSelectedFiles(object sender, EventArgs e)
         {
             var box = new CustomMessageBox()
             {
@@ -151,6 +146,8 @@ namespace OwnCloud.View.Page
                 if (deleteFiles_MessageBox.Result == CustomMessageBoxResult.LeftButton)
                 {
                     var checkedItems = DetailList.Items.Cast<FileDetailViewControl>().Where(t => (bool)t.FileCheckbox.IsChecked);
+                    progress.IsVisible = true;
+                    progress.Text = "";
                     foreach (FileDetailViewControl detailControl in checkedItems)
                     {
 
@@ -172,7 +169,7 @@ namespace OwnCloud.View.Page
                             }
 
                             var dav = new WebDAV(_workingAccount.GetUri(), _workingAccount.GetCredentials());
-                            dav.StartRequest(DAVRequestHeader.Delete(path), checkedItems.Last() == detailControl, SelectionDeleteComplete);
+                            dav.StartRequest(DAVRequestHeader.Delete(path), checkedItems.Last() == detailControl, DeleteSelectedFilesComplete);
                         }
                     }
                 }
@@ -180,7 +177,7 @@ namespace OwnCloud.View.Page
             box.Show();
         }
 
-        private void SelectionDeleteComplete(DAVRequestResult result, object userObj)
+        private void DeleteSelectedFilesComplete(DAVRequestResult result, object userObj)
         {
             if (result.Status != ServerStatus.NoContent)
             {
@@ -191,13 +188,15 @@ namespace OwnCloud.View.Page
                 switch (_deletionSuccess)
                 {
                     case true:
+                        Dispatcher.BeginInvoke(new Action(() => progress.IsVisible = false));
                         Dispatcher.BeginInvoke(new Action(() => FetchStructure(_workingPath)));
-                        Dispatcher.BeginInvoke(new Action(() => SelectionCancel(this, null)));
+                        Dispatcher.BeginInvoke(new Action(() => LeaveFileSelection(this, null)));
                         break;
                     case false:
+                        Dispatcher.BeginInvoke(new Action(() => progress.IsVisible = false));
                         Dispatcher.BeginInvoke(new Action(() => MessageBox.Show(Resource.Localization.AppResources.ItemDeletion_Error)));
                         Dispatcher.BeginInvoke(new Action(() => FetchStructure(_workingPath)));
-                        Dispatcher.BeginInvoke(new Action(() => SelectionCancel(this, null)));
+                        Dispatcher.BeginInvoke(new Action(() => LeaveFileSelection(this, null)));
                         _deletionSuccess = true;
                         break;
                 }
@@ -205,7 +204,7 @@ namespace OwnCloud.View.Page
 
         }
 
-        private void NewFolder(object sender, EventArgs e)
+        private void CreateNewFolder(object sender, EventArgs e)
         {
             var folderName = new TextBox();
             var box = new CustomMessageBox()
@@ -223,13 +222,13 @@ namespace OwnCloud.View.Page
                 {
                     var path = _workingPath + "/" + folderName.Text;
                     var dav = new WebDAV(_workingAccount.GetUri(), _workingAccount.GetCredentials());
-                    dav.StartRequest(DAVRequestHeader.MakeCollection(path), folderName.Text, NewFolderComplete);
+                    dav.StartRequest(DAVRequestHeader.MakeCollection(path), folderName.Text, CreateNewFolderComplete);
                 }
             };
             box.Show();
         }
 
-        private void NewFolderComplete(DAVRequestResult result, object userObj)
+        private void CreateNewFolderComplete(DAVRequestResult result, object userObj)
         {
             if (result.Status == ServerStatus.Created)
             {
@@ -276,12 +275,6 @@ namespace OwnCloud.View.Page
             }
 
             BreadCrumb.Text = _workingPath.Substring(_workingAccount.WebDAVPath.Length - 1);
-        }
-
-        private void StartRequest()
-        {
-            var dav = new WebDAV(_workingAccount.GetUri(), _workingAccount.GetCredentials());
-            dav.StartRequest(DAVRequestHeader.CreateListing(_workingPath), DAVRequestBody.CreateAllPropertiesListing(), null, FetchStructureComplete);
         }
 
         private void FetchStructureComplete(DAVRequestResult result, object userObj)
@@ -335,11 +328,11 @@ namespace OwnCloud.View.Page
                         if (display)
                         {
                             FileDetailViewControl detailControl = new FileDetailViewControl()
-                                    {
-                                        DataContext = fileItem,
-                                        Opacity = 0,
-                                        Background = new SolidColorBrush() { Color = Colors.Transparent },
-                                    };
+                            {
+                                DataContext = fileItem,
+                                Opacity = 0,
+                                Background = new SolidColorBrush() { Color = Colors.Transparent },
+                            };
                             detailControl.Tap += FileItem_Tapped;
 
                             DetailList.Items.Add(detailControl);
@@ -374,7 +367,13 @@ namespace OwnCloud.View.Page
             }
         }
 
-        void FileItem_Tapped(object sender, System.Windows.Input.GestureEventArgs e)
+        private void StartRequest()
+        {
+            var dav = new WebDAV(_workingAccount.GetUri(), _workingAccount.GetCredentials());
+            dav.StartRequest(DAVRequestHeader.CreateListing(_workingPath), DAVRequestBody.CreateAllPropertiesListing(), null, FetchStructureComplete);
+        }
+
+        private void FileItem_Tapped(object sender, System.Windows.Input.GestureEventArgs e)
         {
             var item = (FileDetailViewControl)sender;
             item.RotateSyncButton.Begin();

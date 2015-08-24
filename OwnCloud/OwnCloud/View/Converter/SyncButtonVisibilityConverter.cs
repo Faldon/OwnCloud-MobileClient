@@ -13,12 +13,12 @@ namespace OwnCloud.View.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            // Assuming that you have the sponsor's name as string as follows: 
             bool isDirectory = (bool)value;
 
             if (!isDirectory)
+            {
                 return Visibility.Visible;
-
+            }
             return Visibility.Collapsed;
         }
 

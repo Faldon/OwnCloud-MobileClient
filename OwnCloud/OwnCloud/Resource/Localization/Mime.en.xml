@@ -3,6 +3,7 @@
 	<mime type="image/png">Graphic</mime>
 	<mime type="image/jpeg">Graphic</mime>
 	<mime type="image/jp2">Graphic</mime>
+  <mime type="image/gif">Graphic</mime>
 	<mime type="image/svg+xml">Vector Graphic</mime>
 	<mime type="image/vnd.xiff">Graphic</mime>
 	<mime type="image/vnd.adobe.photoshop">Photoshop File</mime>
