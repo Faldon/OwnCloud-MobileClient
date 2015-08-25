@@ -262,7 +262,7 @@ Gültig bis: {3:g}</value>
     <value>An Startseite heften</value>
   </data>
   <data name="Tile_RemoteFileTitle" xml:space="preserve">
-    <value>Dateien</value>
+    <value>OwnCloud</value>
   </data>
   <data name="CalendarMonthPage_Title" xml:space="preserve">
     <value>Owncloud Kalendar</value>
@@ -367,5 +367,8 @@ Server Antwort: {1}</value>
   </data>
   <data name="ItemUpload_Error" xml:space="preserve">
     <value>Einige Dateien konnten nicht hochgeladen werden.</value>
+  </data>
+  <data name="Tile_LocalFileTitle" xml:space="preserve">
+    <value>Dateien</value>
   </data>
 </root>

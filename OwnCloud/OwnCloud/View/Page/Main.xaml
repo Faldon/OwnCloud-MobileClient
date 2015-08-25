@@ -106,7 +106,7 @@
                                     </Grid.ColumnDefinitions>
                                     <toolkit:ContextMenuService.ContextMenu>
                                         <toolkit:ContextMenu>
-                                            <toolkit:MenuItem Header="{Binding Path=LocalizedResources.MainPage_PinToStart, Source={StaticResource LocalizedStrings}}" Click="RemoteFilesPinToStart" />
+                                            <toolkit:MenuItem Header="{Binding Path=LocalizedResources.MainPage_PinToStart, Source={StaticResource LocalizedStrings}}" Click="LocaFilesPinToStart" />
                                         </toolkit:ContextMenu>
                                     </toolkit:ContextMenuService.ContextMenu>
 

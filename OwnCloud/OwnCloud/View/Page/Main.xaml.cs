@@ -114,6 +114,13 @@ namespace OwnCloud
             Extensions.TileHelper.AddOnlineFilesToTile(accountID);
         }
 
+        private void LocaFilesPinToStart(object sender, RoutedEventArgs e)
+        {
+            var accountID = ((sender as FrameworkElement).DataContext as Account).GUID;
+
+            Extensions.TileHelper.AddLocalFilesToTile(accountID);
+        }
+
         private void PanoramaSelectionChanged(object sender, RoutedEventArgs e)
         {
             if (ApplicationBar != null) ApplicationBar.IsVisible = false;

@@ -58,6 +58,30 @@ namespace OwnCloud.Extensions
             PinUrlToStart(invokeUrl, name, "Resource/Image/RemoteFolderLogo.png");
         }
 
+        public static void AddLocalFilesToTile(int _accountID)
+        {
+            string name = Resource.Localization.AppResources.Tile_LocalFileTitle;
+
+            try
+            {
+                using (var context = new OwnCloudDataContext())
+                {
+                    var account = context.Accounts.Single(o => o.GUID == _accountID);
+                    account.RestoreCredentials();
+                    name = account.Username + " " + name;
+                }
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+                //Do nothing
+            }
+
+            var invokeUrl = new Uri("/View/Page/LocalFiles.xaml?account=" + _accountID, UriKind.Relative);
+
+            PinUrlToStart(invokeUrl, name, "Resource/Image/LocalFolderLogo.png");
+        }
 
         private static void PinUrlToStart(Uri invokeUrl, string name, string logoUrl)
         {

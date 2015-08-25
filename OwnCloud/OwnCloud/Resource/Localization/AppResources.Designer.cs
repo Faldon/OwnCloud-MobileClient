@@ -791,6 +791,15 @@ namespace OwnCloud.Resource.Localization {
         /// <summary>
         ///   Looks up a localized string similar to Files.
         /// </summary>
+        public static string Tile_LocalFileTitle {
+            get {
+                return ResourceManager.GetString("Tile_LocalFileTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OwnCloud.
+        /// </summary>
         public static string Tile_RemoteFileTitle {
             get {
                 return ResourceManager.GetString("Tile_RemoteFileTitle", resourceCulture);

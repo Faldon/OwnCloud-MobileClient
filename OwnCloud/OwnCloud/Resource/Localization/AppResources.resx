@@ -262,7 +262,7 @@ Valid To: {3:g}</value>
     <value>Pin to start</value>
   </data>
   <data name="Tile_RemoteFileTitle" xml:space="preserve">
-    <value>Files</value>
+    <value>OwnCloud</value>
   </data>
   <data name="CalendarMonthPage_Title" xml:space="preserve">
     <value>Owncloud calendars</value>
@@ -367,5 +367,8 @@ Server Answer: {1}</value>
   </data>
   <data name="ItemUpload_Error" xml:space="preserve">
     <value>Some items could not be uploaded.</value>
+  </data>
+  <data name="Tile_LocalFileTitle" xml:space="preserve">
+    <value>Files</value>
   </data>
 </root>

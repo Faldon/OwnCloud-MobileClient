@@ -374,6 +374,7 @@
     <Content Include="Resource\Image\CalendarLogo.png" />
     <Content Include="Assets\Icons\calendar_small.png" />
     <Content Include="Resource\Image\cloud.png" />
+    <Content Include="Resource\Image\LocalFolderLogo.png" />
     <Content Include="Resource\Image\PanoramaBackground.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
