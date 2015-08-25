@@ -31,6 +31,7 @@ namespace OwnCloud.View.Page
         private string[] _views = { "detail", "tile" };
         private string _workingPath = "";
         private bool _deletionSuccess = true;
+        private bool _uploadSuccess = true;
 
         public RemoteFiles()
         {
@@ -474,25 +475,13 @@ namespace OwnCloud.View.Page
                     fs.CopyTo(requestStream);
                     fs.Close();
                 }
-                bool success = true;
 
-                request.BeginGetResponse(a =>
-                        {
-                            try
-                            {
-                                HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(a);
-                                if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created)
-                                {
-                                    success = false;
-                                }
-                            }
-                            catch (Exception)
-                            {
-
-                            }
-                        }, success);
-
-                return success;
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                if (response.StatusCode != HttpStatusCode.NoContent && response.StatusCode != HttpStatusCode.Created)
+                {
+                    return false;
+                }
+                return true;
             }
             catch (Exception ex)
             {
@@ -528,11 +517,16 @@ namespace OwnCloud.View.Page
                 {
                     var url = _workingAccount.GetUri(_workingPath + file.Name);
                     var success = await UploadFileAsync(url, _workingAccount.GetCredentials(), file);
+                    _uploadSuccess = (success == true) && (_uploadSuccess == true);
+                }
+                if (!_uploadSuccess)
+                {
+                    Dispatcher.BeginInvoke(new Action(() => MessageBox.Show(Resource.Localization.AppResources.ItemUpload_Error)));
+                    _uploadSuccess = true;
                 }
                 App.Current.FilePickerContinuationArgs = null;
                 FetchStructure(_workingPath);
             }
         }
-
     }
 }

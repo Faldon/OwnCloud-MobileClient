@@ -365,4 +365,7 @@ Server Antwort: {1}</value>
   <data name="DeleteFiles_Message" xml:space="preserve">
     <value>Wirklich ausgewählte Dateien/Ordner löschen?</value>
   </data>
+  <data name="ItemUpload_Error" xml:space="preserve">
+    <value>Einige Dateien konnten nicht hochgeladen werden.</value>
+  </data>
 </root>

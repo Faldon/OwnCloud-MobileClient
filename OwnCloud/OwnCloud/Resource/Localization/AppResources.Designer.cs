@@ -483,6 +483,15 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some items could not be uploaded..
+        /// </summary>
+        public static string ItemUpload_Error {
+            get {
+                return ResourceManager.GetString("ItemUpload_Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Accounts.
         /// </summary>
         public static string MainPage_Accounts {

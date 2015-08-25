@@ -19,8 +19,6 @@ namespace OwnCloud.View.Controls
             InitializeComponent();
         }
 
-        private Storyboard _board;
-
         /// <summary>
         /// Holds the File-Properties only available if DataContext was set properly.
         /// </summary>

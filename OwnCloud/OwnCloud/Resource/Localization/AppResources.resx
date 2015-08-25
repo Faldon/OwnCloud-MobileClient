@@ -365,4 +365,7 @@ Server Answer: {1}</value>
   <data name="DeleteFiles_Message" xml:space="preserve">
     <value>Really delete selected files/folders?</value>
   </data>
+  <data name="ItemUpload_Error" xml:space="preserve">
+    <value>Some items could not be uploaded.</value>
+  </data>
 </root>
