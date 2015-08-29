@@ -9,8 +9,8 @@
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     >
 	<UserControl.Resources>
-		<Storyboard x:Name="SlideTopBegin" Completed="SlideTopBegin_OnCompleted">
-			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetY)" Storyboard.TargetName="GrdMovingPart">
+		<Storyboard x:Name="SlideLeftBegin" Completed="SlideLeftBegin_OnCompleted">
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetX)" Storyboard.TargetName="GrdMovingPart">
 				<EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0"/>
 				<EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="-90"/>
 			</DoubleAnimationUsingKeyFrames>
@@ -19,8 +19,8 @@
                 <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
-        <Storyboard x:Name="SlideTopEnd">
-            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetY)" Storyboard.TargetName="GrdMovingPart">
+        <Storyboard x:Name="SlideLeftEnd">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetX)" Storyboard.TargetName="GrdMovingPart">
                 <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="90"/>
                 <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
             </DoubleAnimationUsingKeyFrames>
@@ -29,8 +29,8 @@
                 <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="1"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
-        <Storyboard x:Name="SlideBottomBegin" Completed="SlideBottomBegin_OnCompleted">
-            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetY)" Storyboard.TargetName="GrdMovingPart">
+        <Storyboard x:Name="SlideRightBegin" Completed="SlideRightBegin_OnCompleted">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetX)" Storyboard.TargetName="GrdMovingPart">
                 <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0"/>
                 <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="90"/>
             </DoubleAnimationUsingKeyFrames>
@@ -39,8 +39,8 @@
                 <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
-        <Storyboard x:Name="SlideBottomEnd">
-            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetY)" Storyboard.TargetName="GrdMovingPart">
+        <Storyboard x:Name="SlideRightEnd">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetX)" Storyboard.TargetName="GrdMovingPart">
                 <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="-90"/>
                 <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
             </DoubleAnimationUsingKeyFrames>

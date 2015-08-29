@@ -88,8 +88,8 @@ namespace OwnCloud.View.Controls
             OnDateChanging();
 
             if ((DateTime)e.NewValue > (DateTime)e.OldValue)
-                SlideTopBegin.Begin();
-            else SlideBottomBegin.Begin();
+                SlideLeftBegin.Begin();
+            else SlideRightBegin.Begin();
         }
 
         
@@ -98,16 +98,16 @@ namespace OwnCloud.View.Controls
 
         #region private Functions
 
-        private void SlideTopBegin_OnCompleted(object sender, EventArgs e)
+        private void SlideLeftBegin_OnCompleted(object sender, EventArgs e)
         {
             ChangeDate();
-            SlideTopEnd.Begin();
+            SlideLeftEnd.Begin();
         }
 
-        private void SlideBottomBegin_OnCompleted(object sender, EventArgs e)
+        private void SlideRightBegin_OnCompleted(object sender, EventArgs e)
         {
             ChangeDate();
-            SlideBottomEnd.Begin();
+            SlideRightEnd.Begin();
         }
 
         public void ChangeDate()
@@ -314,9 +314,9 @@ namespace OwnCloud.View.Controls
 
         private void GestureListener_OnDragCompleted(object sender, DragCompletedGestureEventArgs e)
         {
-            if (e.Direction == Orientation.Horizontal) return;
+            if (e.Direction == Orientation.Vertical) return;
 
-            SelectedDate = e.VerticalChange > 0 ? SelectedDate.AddMonths(-1) : SelectedDate.AddMonths(1);
+            SelectedDate = e.HorizontalChange > 0 ? SelectedDate.AddMonths(-1) : SelectedDate.AddMonths(1);
         }
 
         #endregion
