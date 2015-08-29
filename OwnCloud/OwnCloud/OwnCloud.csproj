@@ -178,6 +178,7 @@
       <DependentUpon>ProgressOverlayControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Controls\PropgressOverlayPopup.cs" />
+    <Compile Include="View\Converter\CalendarColorConverter.cs" />
     <Compile Include="View\Converter\SyncButtonVisibilityConverter.cs" />
     <Compile Include="View\Converter\ToUppercaseConverter.cs" />
     <Compile Include="View\Page\AppointmentPage.xaml.cs" />
