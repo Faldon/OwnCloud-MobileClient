@@ -1,5 +1,6 @@
 ﻿using System.Data.Linq;
 using System.Data.Linq.Mapping;
+using Microsoft.Phone.Controls;
 
 namespace OwnCloud.Data
 {
@@ -85,6 +86,17 @@ namespace OwnCloud.Data
             set { OnPropertyChanging("DisplayName"); _displayName = value; OnPropertyChanged("DisplayName"); }
         }
 
+        private string _calendarColor;
+        /// <summary>
+        /// Der Anzeigename des Kalendars
+        /// </summary>
+        [Column]
+        public string CalendarColor
+        {
+            get { return _calendarColor; }
+            set { OnPropertyChanging("CalendarColor"); _calendarColor = value; OnPropertyChanged("CalendarColor"); }
+        }
+
         #region child events
 
         private EntitySet<TableEvent> _events = new EntitySet<TableEvent>();
@@ -111,6 +123,7 @@ namespace OwnCloud.Data
                     Url = calendar.Url
                     , GetCTag = calendar.GetCTag
                     , DisplayName = calendar.DisplayName
+                    , CalendarColor = calendar.CalendarColor
                 };
         }
 

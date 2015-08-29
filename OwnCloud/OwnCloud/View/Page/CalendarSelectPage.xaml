@@ -35,7 +35,7 @@
             </toolkit:NavigationOutTransition.Forward>
         </toolkit:NavigationOutTransition>
     </toolkit:TransitionService.NavigationOutTransition>
-    
+
     <!--LayoutRoot ist das Stammraster, in dem alle anderen Seiteninhalte platziert werden-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.RowDefinitions>
@@ -52,8 +52,14 @@
         <ItemsControl Grid.Row="1" Margin="12,0,12,0" ItemsSource="{Binding Path=ServerCalendars}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid>                       
-                        <toolkit:ToggleSwitch Checked="CalendarEnabledChange" Unchecked="CalendarEnabledChange"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Rectangle Fill="{Binding Path=CalendarInfo.CalendarColor, Converter={StaticResource CalendarColorConverter}}" Grid.Column="0" 
+                                   Width="40" Height="40" Stroke="White" StrokeThickness="2" />
+                        <toolkit:ToggleSwitch Grid.Column="1" Checked="CalendarEnabledChange" Unchecked="CalendarEnabledChange"
                                               IsChecked="{Binding IsClientEnabled}"
                                               Header="{Binding Path=CalendarInfo.DisplayName}"/>
                     </Grid>

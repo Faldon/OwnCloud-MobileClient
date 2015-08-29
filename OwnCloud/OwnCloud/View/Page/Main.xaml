@@ -159,7 +159,7 @@
                     </ListBox.DataContext>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <toolkit:HubTile Background="BlueViolet" DisplayNotification="False"
+                            <toolkit:HubTile Background="{StaticResource PhoneAccentBrush}" DisplayNotification="False"
                                              Title="{Binding DisplayUserName}" Message="{Binding DisplayUserName}" Source="/Resource/Image/CalendarLogo.png"
                                              Tap="OpenCalendarTap"
                                              >

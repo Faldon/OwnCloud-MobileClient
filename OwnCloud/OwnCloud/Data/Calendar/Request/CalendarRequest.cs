@@ -20,6 +20,7 @@ namespace OwnCloud.Data.Calendar.Request
             writer.WriteStartElement("propfind", "DAV:");
             writer.WriteAttributeString("xmlns", "d", null, "DAV:");
             writer.WriteAttributeString("xmlns", "cs", null, "http://calendarserver.org/ns/");
+            writer.WriteAttributeString("xmlns", "a", null, "http://apple.com/ns/ical/");
 
             writer.WriteStartElement("prop", "DAV:");
 
@@ -27,6 +28,9 @@ namespace OwnCloud.Data.Calendar.Request
             writer.WriteEndElement();
 
             writer.WriteStartElement("getctag", "http://calendarserver.org/ns/");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("calendar-color", "http://apple.com/ns/ical/");
             writer.WriteEndElement();
 
             writer.WriteEndElement();

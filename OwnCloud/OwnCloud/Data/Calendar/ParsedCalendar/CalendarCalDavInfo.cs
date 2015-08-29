@@ -17,5 +17,9 @@
         /// Get the relative server url to this calendar
         /// </summary>
         public string Url { get; set; }
+        /// <summary>
+        /// Display color of the calendar
+        /// </summary>
+        public string CalendarColor { get; set; }
     }
 }

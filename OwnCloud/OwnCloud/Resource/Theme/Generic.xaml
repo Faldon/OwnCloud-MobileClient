@@ -6,6 +6,7 @@
     
     <converter:ToUppercaseConverter x:Key="ToUppercaseConverter" />
     <converter:SyncButtonVisibilityConverter x:Key="SyncButtonVisibilityConverter" />
+    <converter:CalendarColorConverter x:Key="CalendarColorConverter" />
 
     <Style x:Key="PageHeader" TargetType="TextBlock" BasedOn="{StaticResource PhoneTextNormalStyle}">
         <Setter Property="FontFamily" Value="{StaticResource PhoneFontFamilySemiBold}" />

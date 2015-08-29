@@ -371,4 +371,7 @@ Server Answer: {1}</value>
   <data name="Tile_LocalFileTitle" xml:space="preserve">
     <value>Files</value>
   </data>
+  <data name="EditAccountPage_CheckingConnection_CalDAVTestFailed" xml:space="preserve">
+    <value>CalDAV-structure was not recognized. Please make sure that calendar access is enabled for your user account.</value>
+  </data>
 </root>

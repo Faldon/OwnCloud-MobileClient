@@ -313,6 +313,15 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CalDAV-structure was not recognized. Please make sure that calendar access is enabled for your user account..
+        /// </summary>
+        public static string EditAccountPage_CheckingConnection_CalDAVTestFailed {
+            get {
+                return ResourceManager.GetString("EditAccountPage_CheckingConnection_CalDAVTestFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DAV-structure was not recognized. Please check the server paths.
         ///Failed path: {0}
         ///Server Answer: {1}.

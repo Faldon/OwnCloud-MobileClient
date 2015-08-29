@@ -27,7 +27,5 @@ namespace OwnCloud.Data
             get { return _calendarInfo; }
             set { _calendarInfo = value; }
         }
-
-
     }
 }

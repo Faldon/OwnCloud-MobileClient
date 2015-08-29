@@ -213,12 +213,23 @@ namespace OwnCloud
                     {
                         if (requestResult.Status != ServerStatus.MultiStatus)
                         {
-                            // all other states are fail states
-                            success = false;
-                            Dispatcher.BeginInvoke(() =>
+                            if (path.Contains("caldav"))
                             {
-                                MessageBox.Show("EditAccountPage_CheckingConnection_DAVTestFailed".Translate(userObj, requestResult.StatusText), "Error_Caption".Translate(), MessageBoxButton.OK);
-                            });
+                                state.AssociatedAccount.CalendarEnabled = false;
+                                Dispatcher.BeginInvoke(() =>
+                                {
+                                    MessageBox.Show("EditAccountPage_CheckingConnection_CalDAVTestFailed".Translate(), "Error_Caption".Translate(), MessageBoxButton.OK);
+                                });
+                            }
+                            else
+                            {
+                                success = false;
+                                Dispatcher.BeginInvoke(() =>
+                                {
+                                    MessageBox.Show("EditAccountPage_CheckingConnection_DAVTestFailed".Translate(userObj, requestResult.StatusText), "Error_Caption".Translate(), MessageBoxButton.OK);
+                                });
+                            }
+                            
                         }
                         collector.Raise(userObj);
                     });

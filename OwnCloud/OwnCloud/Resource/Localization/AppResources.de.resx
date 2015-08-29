@@ -315,7 +315,7 @@ Server Antwort: {1}</value>
     <value>Aufwärts</value>
   </data>
   <data name="EditAccountPage_EnableCalDAV" xml:space="preserve">
-    <value>Kalender Zugriff</value>
+    <value>Kalenderzugriff</value>
   </data>
   <data name="ApplicationBarButton_Upload" xml:space="preserve">
     <value>Hochladen</value>
@@ -370,5 +370,8 @@ Server Antwort: {1}</value>
   </data>
   <data name="Tile_LocalFileTitle" xml:space="preserve">
     <value>Dateien</value>
+  </data>
+  <data name="EditAccountPage_CheckingConnection_CalDAVTestFailed" xml:space="preserve">
+    <value>Die CalDAV Struktur wurde nicht erkannt. Bitte vergewissern Sie sich, dass der Kalenderzugriff für Ihr Benutzerkonto aktiviert ist.</value>
   </data>
 </root>

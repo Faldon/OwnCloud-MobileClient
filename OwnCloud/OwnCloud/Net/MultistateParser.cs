@@ -82,6 +82,7 @@ namespace OwnCloud.Net
                 {
                     info.DisplayName = prop.GetIfExists(XName.Get("displayname", XmlNamespaces.NsDav));
                     info.GetCTag = prop.GetIfExists(XName.Get("getctag", XmlNamespaces.NsCalenderServer));
+                    info.CalendarColor = prop.GetIfExists(XName.Get("calendar-color", XmlNamespaces.NsAppleIcal));
                 }
 
                 calendars.Add(info);
