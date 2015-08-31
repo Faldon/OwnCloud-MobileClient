@@ -374,4 +374,7 @@ Server Antwort: {1}</value>
   <data name="EditAccountPage_CheckingConnection_CalDAVTestFailed" xml:space="preserve">
     <value>Die CalDAV Struktur wurde nicht erkannt. Bitte vergewissern Sie sich, dass der Kalenderzugriff für Ihr Benutzerkonto aktiviert ist.</value>
   </data>
+  <data name="AppointmentDuration" xml:space="preserve">
+    <value>{0} Stunde{1} {2} Minute{3}</value>
+  </data>
 </root>

@@ -393,7 +393,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resource\Localization\AppResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resource\Localization\AppResources.de.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

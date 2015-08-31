@@ -187,6 +187,15 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} hour{1} {2} minute{1}.
+        /// </summary>
+        public static string AppointmentDuration {
+            get {
+                return ResourceManager.GetString("AppointmentDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The end date is before the start date. Please fix this..
         /// </summary>
         public static string AppointmentPage_WrongDate {

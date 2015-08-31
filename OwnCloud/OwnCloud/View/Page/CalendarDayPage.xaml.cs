@@ -63,14 +63,14 @@ namespace OwnCloud.View.Page
 
         private void LayoutRoot_OnLoaded(object sender, RoutedEventArgs e)
         {
-            LlsDays.ScrollTo(_startDate);
+            //LlsDays.ScrollTo(_startDate);
         }
 
         private void HookScrollViewer(object sender, RoutedEventArgs e)
         {
-            var element = (FrameworkElement)sender;
-           _dayScoller = FindChildOfType<ScrollViewer>(element);
-           _dayScoller.LayoutUpdated += _dayScoller_LayoutUpdated;
+           // var element = (FrameworkElement)sender;
+           //_dayScoller = FindChildOfType<ScrollViewer>(element);
+           //_dayScoller.LayoutUpdated += _dayScoller_LayoutUpdated;
         }
 
         void _dayScoller_LayoutUpdated(object sender, EventArgs e)

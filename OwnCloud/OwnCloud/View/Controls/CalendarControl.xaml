@@ -69,7 +69,17 @@
 
             <Grid x:Name="GrdDayIndicator"></Grid>
             <Grid x:Name="GrdAppointments"></Grid>
-
+            <StackPanel x:Name="DayDetails" 
+                        Background="Black" 
+                        Tap="CloseDayDetails"
+                        Visibility="Collapsed" >
+                <TextBlock x:Name="DayDetailsHeader"
+                           Margin="10,5,5,10"
+                           Style="{StaticResource PhoneTextTitle2Style}"
+                           FontStretch="Condensed"
+                           Text="" />
+                <Grid x:Name="DayAppointmentDetails" Margin="10,0,0,10"/>
+            </StackPanel>
         </Grid>
 
 

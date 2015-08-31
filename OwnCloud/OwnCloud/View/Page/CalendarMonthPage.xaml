@@ -49,19 +49,27 @@
         </Grid.RowDefinitions>
 
         <!--TitlePanel enthält den Namen der Anwendung und den Seitentitel-->
-         <StackPanel Grid.Row="0" Margin="12,17,0,28">
+        <StackPanel Grid.Row="0" Margin="12,17,0,28">
             <TextBlock Text="{Binding Path=LocalizedResources.CalendarMonthPage_Title, Source={StaticResource LocalizedStrings}, Converter={StaticResource ToUppercaseConverter}}"
-                       Style="{StaticResource PageHeader}"/>
-            <TextBlock Text="" x:Name="TbMonthHeader" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+                       Style="{StaticResource PageHeader}" Margin="9,0,0,10"/>
+            <TextBlock Text="" x:Name="TbYearHeader" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" x:Name="TbMonthHeader" Style="{StaticResource PhoneTextExtraLargeStyle}" />
+                <TextBlock Grid.Column="1" Text="" x:Name="TbNextMonthHeader" Style="{StaticResource PhoneTextExtraLargeStyle}" Foreground="Gray" />
+            </Grid>
         </StackPanel>
 
         <!--ContentPanel - zusätzliche Inhalte hier platzieren-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <controls:CalendarControl DateChanged="CcCalendar_OnDateChanged" x:Name="CcCalendar" />
+        <Grid x:Name="ContentPanel" Margin="12,123,12,28" Grid.RowSpan="2">
+            <controls:CalendarControl DateChanged="CcCalendar_OnDateChanged" x:Name="CcCalendar" Margin="0,0,0,0" />
         </Grid>
-        
+
     </Grid>
-    
+
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar>
             <shell:ApplicationBarIconButton 

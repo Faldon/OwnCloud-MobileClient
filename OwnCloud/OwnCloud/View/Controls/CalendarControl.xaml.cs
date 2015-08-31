@@ -11,15 +11,22 @@ using Microsoft.Phone.Controls;
 using Ocwp.Controls;
 using OwnCloud.Data;
 using OwnCloud.Extensions;
+using System.Windows.Media.Animation;
 
 namespace OwnCloud.View.Controls
 {
     public partial class CalendarControl
     {
+        static Dictionary<string, string> plurals = new Dictionary<string, string>() {
+                           {"en" , "s"},
+                           {"de" , "n"},
+                           {"fr" , "s"}
+                        };
+
         public CalendarControl()
         {
             InitializeComponent();
-            
+
             Unloaded += CalendarControl_Unloaded;
         }
 
@@ -43,7 +50,7 @@ namespace OwnCloud.View.Controls
         }
         private DateTime _firstDayOfCalendarMonth;
         private DateTime _lastDayOfCalendarMonth;
-        private Dictionary<int, StackPanel> _dayPanels = new Dictionary<int, StackPanel>(); 
+        private Dictionary<int, StackPanel> _dayPanels = new Dictionary<int, StackPanel>();
 
         #endregion
 
@@ -53,14 +60,14 @@ namespace OwnCloud.View.Controls
         public int? AccountID
         {
             get { return _accountID; }
-            set 
+            set
             {
                 if (_accountID == null)
                 {
                     _accountID = value;
                 }
                 else
-                    _accountID = value; 
+                    _accountID = value;
             }
         }
 
@@ -92,7 +99,7 @@ namespace OwnCloud.View.Controls
             else SlideRightBegin.Begin();
         }
 
-        
+
 
         #endregion
 
@@ -123,7 +130,7 @@ namespace OwnCloud.View.Controls
             if (_accountID == null)
                 return;
 
-            RefreshAppointments();
+            Dispatcher.BeginInvoke(new Action(() => RefreshAppointments()));
         }
 
         private void ResetGridLines()
@@ -155,7 +162,7 @@ namespace OwnCloud.View.Controls
 
                     var dayIndicator = new TextBlock
                         {
-                            
+
 
                             VerticalAlignment = VerticalAlignment.Bottom,
                             HorizontalAlignment = HorizontalAlignment.Left,
@@ -167,7 +174,13 @@ namespace OwnCloud.View.Controls
                     Grid.SetRow(dayIndicator, j + 1);
                     GrdDayIndicator.Children.Add(dayIndicator);
 
-                    var dayOpenControl = new CalendarDayControl {TargetDate = fieldDate,AccountID = _accountID ?? 0};
+                    //var dayOpenControl = new CalendarDayControl { TargetDate = fieldDate, AccountID = _accountID ?? 0 };
+                    var dayOpenControl = new StackPanel
+                        {
+                            Background = new SolidColorBrush(Colors.Black),
+                            Name = fieldDate.ToString()
+                        };
+                    dayOpenControl.Tap += ShowDayDetails;
                     Grid.SetColumn(dayOpenControl, i);
                     Grid.SetRow(dayOpenControl, j + 1);
                     GrdCalendarLines.Children.Add(dayOpenControl);
@@ -221,7 +234,7 @@ namespace OwnCloud.View.Controls
         public void RefreshAppointments()
         {
             var calendarEvents = Context.Calendars.Where(o => o._accountId == AccountID).Select(o => o.Events.Where(q => q.To > _firstDayOfCalendarMonth && q.From < _lastDayOfCalendarMonth));
-            
+
             //merge all calendar events
             IEnumerable<TableEvent> events = new TableEvent[0];
 
@@ -232,11 +245,9 @@ namespace OwnCloud.View.Controls
                 .OrderByDescending(o => o.To - o.From) //Längere Event sollen oben angezeigt werden
                 .ToArray();
 
-            
+
             //Refresh events to get the changes, if a sync was completed
-// ReSharper disable CoVariantArrayConversion
             Context.Refresh(RefreshMode.OverwriteCurrentValues, events);
-// ReSharper restore CoVariantArrayConversion
 
             //Delete displayed events
             GrdAppointments.Children.Clear();
@@ -266,15 +277,15 @@ namespace OwnCloud.View.Controls
 
                     if (dPanel == null) { currentDate = currentDate.AddDays(1); continue; }
 
-                    var tb = new TextBlock
-                        {
-                            Text = ((tableEvent.IsFullDayEvent || currentDate.Date != tableEvent.From.Date)
-                                       ? ""
-                                       : (tableEvent.From.ToString("HH:mm "))) +
-                                         tableEvent.Title,
-                            FontSize = 11
-                        };
-                    dPanel.Children.Add(tb);
+                    var rect = new Rectangle
+                    {
+                        Fill = GetCalendarColor(tableEvent.CalendarId),
+                        Width = GrdAppointments.ColumnDefinitions.FirstOrDefault().ActualWidth * 0.3,
+                        Height = 5,
+                        Margin = new Thickness(0, 5, 10, 5),
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Right
+                    };
+                    dPanel.Children.Add(rect);
 
                     currentDate = currentDate.AddDays(1);
                 }
@@ -282,8 +293,166 @@ namespace OwnCloud.View.Controls
             }
         }
 
+        void ShowDayDetails(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            StackPanel dPanel = (StackPanel)sender;
+            DateTime fieldDate = DateTime.Parse(dPanel.Name);
+            IEnumerable<TableEvent> events = GetCalendarEvents(fieldDate, fieldDate.AddDays(1));
+
+            //int row = Grid.GetRow(dPanel);
+
+
+            //var DayIndicators = GrdDayIndicator.Children.OfType<TextBlock>().Where(o => Grid.GetRow(o) == Grid.GetRow(dPanel));
+            //foreach(TextBlock t in DayIndicators.ToArray())
+            //{
+            //    t.Visibility = Visibility.Collapsed;
+            //}
+            //var c = DayIndicators.ToArray();
+
+            if (DayDetailsHeader.Text == fieldDate.ToLongDateString())
+            {
+                DayDetails.Visibility = DayDetails.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                RefreshAppointments();
+                return;
+            }
+
+            DayDetails.Margin = new Thickness(0, GrdAppointments.RowDefinitions.FirstOrDefault().ActualHeight * 2, 0, GrdAppointments.RowDefinitions.LastOrDefault().ActualHeight + 2);
+            DayDetailsHeader.Text = fieldDate.ToLongDateString();
+
+            DayAppointmentDetails.Children.Clear();
+            foreach (TableEvent tableEvent in events)
+            {
+                Grid dayEvent = new Grid();
+                switch (tableEvent.IsFullDayEvent)
+                {
+                    case true:
+                        dayEvent.SetGridRows(1);
+                        dayEvent.SetGridColumns(2);
+                        dayEvent.ColumnDefinitions[0].Width = new GridLength(20);
+
+                        TextBlock fullDayText = new TextBlock()
+                        {
+                            Text = tableEvent.Title,
+                            Style = Application.Current.Resources["PhoneTextTitle3Style"] as Style,
+                            Foreground = GetCalendarColor(tableEvent.CalendarId),
+                            Margin = new Thickness(10, 5, 10, 5)
+                        };
+                        Grid.SetColumn(fullDayText, 1);
+                        Grid.SetRow(fullDayText, 0);
+
+                        var fullDayRect = new Rectangle()
+                        {
+                            StrokeThickness = 1.0,
+                            Stroke = GetCalendarColor(tableEvent.CalendarId),
+                            Fill = new SolidColorBrush(Colors.Black),
+                            Height = fullDayText.ActualHeight * 0.8,
+                            Width = 10,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        Grid.SetColumn(fullDayRect, 0);
+                        Grid.SetRow(fullDayRect, 0);
+
+                        dayEvent.Children.Add(fullDayRect);
+                        dayEvent.Children.Add(fullDayText);
+                        break;
+                    case false:
+                        dayEvent.SetGridRows(2);
+                        dayEvent.SetGridColumns(3);
+                        dayEvent.ColumnDefinitions[0].Width = new GridLength(20);
+                        dayEvent.ColumnDefinitions[1].Width = GridLength.Auto;
+
+                        TextBlock startTime = new TextBlock()
+                        {
+                            Text = tableEvent.From.ToString("HH:mm"),
+                            Style = Application.Current.Resources["PhoneTextBlockBase"] as Style,
+                            Foreground = new SolidColorBrush(Colors.White),
+                            VerticalAlignment = System.Windows.VerticalAlignment.Bottom,
+                            Margin = new Thickness(10, 0, 10, 0)
+                        };
+                        Grid.SetColumn(startTime, 1);
+                        Grid.SetRow(startTime, 0);
+
+                        TextBlock dayText = new TextBlock()
+                        {
+                            Text = tableEvent.Title,
+                            Style = Application.Current.Resources["PhoneTextBlockBase"] as Style,
+                            Foreground = GetCalendarColor(tableEvent.CalendarId),
+                            VerticalAlignment = System.Windows.VerticalAlignment.Bottom,
+                            Margin = new Thickness(10, 0, 10, 0)
+                        };
+                        Grid.SetColumn(dayText, 2);
+                        Grid.SetRow(dayText, 0);
+
+                        string[] param = { 
+                                             (tableEvent.To - tableEvent.From).Hours.ToString(), 
+                                             (tableEvent.To - tableEvent.From).Hours == 1 ? "" : CalendarControl.plurals[CultureInfo.CurrentCulture.TwoLetterISOLanguageName], 
+                                             (tableEvent.To - tableEvent.From).Minutes.ToString(),
+                                             (tableEvent.To - tableEvent.From).Minutes == 1 ? "" : CalendarControl.plurals[CultureInfo.CurrentCulture.TwoLetterISOLanguageName], 
+                                         };
+                        TextBlock durationText = new TextBlock()
+                        {
+                            Text = String.Format(Resource.Localization.AppResources.AppointmentDuration, param),
+                            Style = Application.Current.Resources["PhoneTextBlockBase"] as Style,
+                            Foreground = new SolidColorBrush(Colors.Gray),
+                            VerticalAlignment = System.Windows.VerticalAlignment.Top,
+                            Margin = new Thickness(10, 0, 10, 0)
+                        };
+                        Grid.SetColumn(durationText, 2);
+                        Grid.SetRow(durationText, 1);
+
+                        var dayRect = new Rectangle()
+                        {
+                            StrokeThickness = 1.0,
+                            Stroke = GetCalendarColor(tableEvent.CalendarId),
+                            Fill = GetCalendarColor(tableEvent.CalendarId),
+                            Height = dayText.ActualHeight * 1.6,
+                            Width = 10,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        Grid.SetColumn(dayRect, 0);
+                        Grid.SetRow(dayRect, 0);
+                        Grid.SetRowSpan(dayRect, 2);
+
+                        dayEvent.Children.Add(dayRect);
+                        dayEvent.Children.Add(startTime);
+                        dayEvent.Children.Add(dayText);
+                        dayEvent.Children.Add(durationText);
+                        break;
+                }
+                //TextBlock tb = new TextBlock()
+                //{
+                //    Text = tableEvent.Title,
+                //    Foreground = GetCalendarColor(tableEvent.CalendarId),
+                //    Margin = new Thickness(10, 5, 5, 10)
+                //};
+                DayAppointmentDetails.Children.Add(dayEvent);
+            }
+
+            //Storyboard s = new Storyboard();
+
+            //DoubleAnimation fadeInAnimation = new DoubleAnimation();
+            //fadeInAnimation.From = 0.0;
+            //fadeInAnimation.To = 1.0;
+            //fadeInAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.1));
+
+            //Storyboard.SetTarget(fadeInAnimation, DayDetails);
+            //Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath("Opacity"));
+
+            //s.Children.Add(fadeInAnimation);
+
+            //GrdMovingPart.Children.Add(appointmentDetails);
+            DayDetails.Visibility = Visibility.Visible;
+            //s.Begin();
+        }
+
+        void CloseDayDetails(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            DayDetails.Visibility = Visibility.Collapsed;
+            RefreshAppointments();
+        }
+
         /// <summary>
-        /// Gibt das StackPanel zurück, in dem die Termine für einen Tag leigen
+        /// Gibt das StackPanel zurück, in dem die Termine für einen Tag liegen
         /// </summary>
         /// <returns></returns>
         private StackPanel GetDayStackPanel(DateTime date)
@@ -306,7 +475,30 @@ namespace OwnCloud.View.Controls
             return newSPanel;
         }
 
+        private SolidColorBrush GetCalendarColor(int CalendarId)
+        {
+            var calendar = Context.Calendars.Where(o => o._accountId == AccountID && o.Id == CalendarId).FirstOrDefault();
+            var converter = new OwnCloud.View.Converter.CalendarColorConverter();
+            SolidColorBrush color = (SolidColorBrush)converter.Convert(calendar.CalendarColor, null, null, null);
+            return color;
+        }
 
+        private IEnumerable<TableEvent> GetCalendarEvents(DateTime startTime, DateTime endTime)
+        {
+            var calendarEvents = Context.Calendars.Where(o => o._accountId == AccountID).Select(o => o.Events.Where(
+                q => q.From >= startTime && q.To <= endTime
+            ));
+            IEnumerable<TableEvent> events = new TableEvent[0];
+
+            foreach (var calendar in calendarEvents)
+                events = events.Concat(calendar);
+
+            events = events
+                .OrderByDescending(o => o.To - o.From)
+                .ToArray();
+
+            return events;
+        }
 
         #endregion
 
@@ -338,6 +530,6 @@ namespace OwnCloud.View.Controls
         public event RoutedEventHandler DateChanged;
 
         #endregion
-        
+
     }
 }
