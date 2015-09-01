@@ -52,11 +52,15 @@ namespace OwnCloud.View.Page
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             if (e.NavigationMode == NavigationMode.Back)
+            {
                 return;
+            }
 
-            if(NavigationContext.QueryString.ContainsKey("url"))
-                LoadFromUrl(NavigationContext.QueryString["url"]);
-
+            if (NavigationContext.QueryString.ContainsKey("eTag"))
+            {
+                LoadFromETag(NavigationContext.QueryString["eTag"]);
+            }
+                
             //Load Account ID
             if (NavigationContext.QueryString.ContainsKey("uid"))
                 _accountId = int.Parse(NavigationContext.QueryString["uid"]);
@@ -66,11 +70,9 @@ namespace OwnCloud.View.Page
 
         #region Load and Save and delete
 
-        private void LoadFromUrl(string url)
+        private void LoadFromETag(string eTag)
         {
-            _url = url;
-
-            var dbEvent = Context.Events.SingleOrDefault(o => o.Url == url);
+            var dbEvent = Context.Events.SingleOrDefault(o => o.GetETag == eTag);
 
             if (dbEvent == null) return;
 
@@ -91,6 +93,7 @@ namespace OwnCloud.View.Page
                 TpTo.Value = storedEvent.To;
                 TbDescription.Text = storedEvent.Description ?? "";
                 CbFullDayEvent.IsChecked = storedEvent.IsFullDayEvent;
+                _url = dbEvent.Url;
 
                 if (!storedEvent.IsFullDayEvent)
                 {
@@ -105,7 +108,7 @@ namespace OwnCloud.View.Page
 
                 TpFrom.Value = storedEvent.From;
                 TpTo.Value = storedEvent.To;
-                
+
 
             }
         }

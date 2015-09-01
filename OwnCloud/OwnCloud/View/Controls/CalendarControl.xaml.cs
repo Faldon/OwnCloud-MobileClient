@@ -299,16 +299,6 @@ namespace OwnCloud.View.Controls
             DateTime fieldDate = DateTime.Parse(dPanel.Name);
             IEnumerable<TableEvent> events = GetCalendarEvents(fieldDate, fieldDate.AddDays(1));
 
-            //int row = Grid.GetRow(dPanel);
-
-
-            //var DayIndicators = GrdDayIndicator.Children.OfType<TextBlock>().Where(o => Grid.GetRow(o) == Grid.GetRow(dPanel));
-            //foreach(TextBlock t in DayIndicators.ToArray())
-            //{
-            //    t.Visibility = Visibility.Collapsed;
-            //}
-            //var c = DayIndicators.ToArray();
-
             if (DayDetailsHeader.Text == fieldDate.ToLongDateString())
             {
                 DayDetails.Visibility = DayDetails.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
@@ -322,7 +312,10 @@ namespace OwnCloud.View.Controls
             DayAppointmentDetails.Children.Clear();
             foreach (TableEvent tableEvent in events)
             {
-                Grid dayEvent = new Grid();
+                Grid dayEvent = new Grid()
+                    {
+                        Name = tableEvent.GetETag
+                    };
                 switch (tableEvent.IsFullDayEvent)
                 {
                     case true:
@@ -405,7 +398,7 @@ namespace OwnCloud.View.Controls
                             StrokeThickness = 1.0,
                             Stroke = GetCalendarColor(tableEvent.CalendarId),
                             Fill = GetCalendarColor(tableEvent.CalendarId),
-                            Height = dayText.ActualHeight * 1.6,
+                            Height = dayText.ActualHeight * 1.7,
                             Width = 10,
                             VerticalAlignment = VerticalAlignment.Center
                         };
@@ -419,30 +412,16 @@ namespace OwnCloud.View.Controls
                         dayEvent.Children.Add(durationText);
                         break;
                 }
-                //TextBlock tb = new TextBlock()
-                //{
-                //    Text = tableEvent.Title,
-                //    Foreground = GetCalendarColor(tableEvent.CalendarId),
-                //    Margin = new Thickness(10, 5, 5, 10)
-                //};
+                dayEvent.Tap += OpenAppointmentPage;
                 DayAppointmentDetails.Children.Add(dayEvent);
             }
-
-            //Storyboard s = new Storyboard();
-
-            //DoubleAnimation fadeInAnimation = new DoubleAnimation();
-            //fadeInAnimation.From = 0.0;
-            //fadeInAnimation.To = 1.0;
-            //fadeInAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.1));
-
-            //Storyboard.SetTarget(fadeInAnimation, DayDetails);
-            //Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath("Opacity"));
-
-            //s.Children.Add(fadeInAnimation);
-
-            //GrdMovingPart.Children.Add(appointmentDetails);
             DayDetails.Visibility = Visibility.Visible;
-            //s.Begin();
+        }
+
+        void OpenAppointmentPage(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            Grid dayEvent = (Grid)sender;
+            App.Current.RootFrame.Navigate(new Uri("/View/Page/AppointmentPage.xaml?eTag=" + dayEvent.Name + "&uid=" + AccountID.ToString(), UriKind.Relative));
         }
 
         void CloseDayDetails(object sender, System.Windows.Input.GestureEventArgs e)
