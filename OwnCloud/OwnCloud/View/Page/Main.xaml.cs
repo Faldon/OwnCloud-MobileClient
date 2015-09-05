@@ -69,11 +69,11 @@ namespace OwnCloud
 
         private void OpenCalendarTap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            var currentAccount = ((FrameworkElement)sender).DataContext as Account;
-
-            //Navigate to the calendar page with te userID
+            var currentAccount = App.DataContext.Accounts.FirstOrDefault();
             if (currentAccount != null)
+            {
                 NavigationService.Navigate(new Uri("/View/Page/CalendarMonthPage.xaml?uid=" + String.Format(@"{0:g}", currentAccount.GUID), UriKind.Relative));
+            }
         }
 
         private void RemoteFilesTap(object sender, System.Windows.Input.GestureEventArgs e)

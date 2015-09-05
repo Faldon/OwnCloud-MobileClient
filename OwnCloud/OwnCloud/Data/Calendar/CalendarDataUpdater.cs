@@ -13,7 +13,7 @@ namespace OwnCloud.Data.Calendar
         /// <param name="dbEvent">The event</param>
         /// <param name="description">The New desciption of the event</param>
         /// <param name="updateUid">True, when a new UID sould be set. Only recommenten, with a new (unsaved) event</param>
-        public static void UpdateCalendarData(TableEvent dbEvent, string description,bool updateUid)
+        public static void UpdateCalendarData(TableEvent dbEvent, string description, bool updateUid)
         {
             TokenNode calendarNode = calendarNode = ReadTokenNode(dbEvent);
 

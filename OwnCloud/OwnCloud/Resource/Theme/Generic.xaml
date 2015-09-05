@@ -8,8 +8,16 @@
     <converter:SyncButtonVisibilityConverter x:Key="SyncButtonVisibilityConverter" />
     <converter:CalendarColorConverter x:Key="CalendarColorConverter" />
 
+    <System:Double x:Key="PhoneFontSizeExtraSmall">16</System:Double>
+
     <Style x:Key="PageHeader" TargetType="TextBlock" BasedOn="{StaticResource PhoneTextNormalStyle}">
         <Setter Property="FontFamily" Value="{StaticResource PhoneFontFamilySemiBold}" />
         <Setter Property="FontSize" Value="{StaticResource PhoneFontSizeMedium}" />
+    </Style>
+    <Style x:Key="PhoneTextExtraSmallStyle" TargetType="TextBlock" BasedOn="{StaticResource PhoneTextBlockBase}">
+        <Setter Property="FontSize" Value="{StaticResource PhoneFontSizeExtraSmall}" />
+    </Style>
+    <Style x:Key="PhoneTextSmallStyle" TargetType="TextBlock" BasedOn="{StaticResource PhoneTextBlockBase}">
+        <Setter Property="FontSize" Value="{StaticResource PhoneFontSizeSmall}" />
     </Style>
 </ResourceDictionary>

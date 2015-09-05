@@ -16,7 +16,7 @@ namespace OwnCloud
             string format_code = "{0:0.0} {1:g}";
             int c = 1;
             double size = (double)input;
-            
+
             if (size < 1024)
             {
                 postfix = "KB";
@@ -78,11 +78,11 @@ namespace OwnCloud
         static public void DebugBytes(byte[] input)
         {
             System.Diagnostics.Debug.WriteLine("\n-------------------------------");
-            System.Diagnostics.Debug.WriteLine("Debug Bytes Length: "+input.Length);
+            System.Diagnostics.Debug.WriteLine("Debug Bytes Length: " + input.Length);
             string bytes = "";
             string text = "";
 
-            for (int index = 0;  index < input.Length; ++index)
+            for (int index = 0; index < input.Length; ++index)
             {
                 bytes += String.Format("{0:x2}", input[index]) + " ";
 
@@ -159,6 +159,22 @@ namespace OwnCloud
                 Utility.Debug(stream.GetBuffer());
             }
             System.Diagnostics.Debug.WriteLine("-------------------------------");
+        }
+
+        public static System.String GetRandomString(System.Int32 length)
+        {
+            System.Byte[] seedBuffer = new System.Byte[4];
+            var rngCryptoServiceProvider = new System.Security.Cryptography.RNGCryptoServiceProvider();
+            rngCryptoServiceProvider.GetBytes(seedBuffer);
+            System.String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+            System.Random random = new System.Random(System.BitConverter.ToInt32(seedBuffer, 0));
+            return new System.String(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static string SHA1Hash(string input)
+        {
+            var hash = (new SHA1Managed()).ComputeHash(Encoding.UTF8.GetBytes(input));
+            return string.Join("", hash.Select(b => b.ToString("x2").ToLower()).ToArray());
         }
     }
 }

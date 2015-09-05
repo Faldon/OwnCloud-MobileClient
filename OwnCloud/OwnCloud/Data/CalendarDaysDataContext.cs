@@ -15,11 +15,11 @@ namespace OwnCloud.Data
             _startDate = startDate.Date;
 
             Days = new ObservableCollection<DateTime>();
-            for (var i = -10; i < 10; i++)
-            {
-                Days.Add(_startDate.AddDays(i));
-            }
-
+            //for (var i = -10; i < 10; i++)
+            //{
+            //    Days.Add(_startDate.AddDays(i));
+            //}
+            Days.Add(_startDate);
         }
 
         private DateTime _startDate;
@@ -34,18 +34,18 @@ namespace OwnCloud.Data
 
         public void ItemLinked(object sender, ItemRealizationEventArgs e)
         {
-            var last = Days.Last();
+            //var last = Days.Last();
 
-            if (e.Container.Content.Equals(last))
-            {
-                Days.Add(last.AddDays(1));
-            }
+            //if (e.Container.Content.Equals(last))
+            //{
+            //    Days.Add(last.AddDays(1));
+            //}
         }
 
         public void AddOnTop()
         {
-            var first = Days.First();
-            Days.Insert(0,(first.AddDays(-1)));
+            //var first = Days.First();
+            //Days.Insert(0,(first.AddDays(-1)));
         }
 
     }

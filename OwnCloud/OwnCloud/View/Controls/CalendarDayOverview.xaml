@@ -14,13 +14,16 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Margin="5,15,0,5" Text="{Binding StringFormat=dd.MM.yyyy}"></TextBlock>
+        <TextBlock Margin="5,15,0,5" Text="{Binding StringFormat=dd.MM.yyyy}" Style="{StaticResource PhoneTextNormalStyle}"></TextBlock>
 
         <Grid x:Name="BackgroundGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="80" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="120" />
+            </Grid.RowDefinitions>
 
             <Rectangle HorizontalAlignment="Right" Width="1" Grid.RowSpan="24" Fill="White"></Rectangle>
             <Rectangle VerticalAlignment="Top" Grid.ColumnSpan="2" Height="1" Fill="White" />

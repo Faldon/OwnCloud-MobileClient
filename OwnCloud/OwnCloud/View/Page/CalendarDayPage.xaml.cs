@@ -75,12 +75,12 @@ namespace OwnCloud.View.Page
 
         void _dayScoller_LayoutUpdated(object sender, EventArgs e)
         {
-            if (_dayScoller.VerticalOffset < 1)
-            {
-                DataContext.AddOnTop();
-                LlsDays.ScrollTo(DataContext.Days[1]);
-                _dayScoller.ScrollToVerticalOffset(2);
-            }
+            //if (_dayScoller.VerticalOffset < 1)
+            //{
+            //    DataContext.AddOnTop();
+            //    LlsDays.ScrollTo(DataContext.Days[1]);
+            //    _dayScoller.ScrollToVerticalOffset(2);
+            //}
         }
 
         public static T FindChildOfType<T>(DependencyObject root) where T : class

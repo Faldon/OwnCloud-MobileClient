@@ -80,6 +80,12 @@
                 Text="CalendarMonthPage_ReloadEvents"
                 IconUri="/Assets/Icons/Reload.png" 
                 Click="ReloadCalendarEvents" />
+            <shell:ApplicationBarIconButton 
+                Text="CalendarMonthPage_NewAppointment"
+                IconUri="/Assets/Icons/Add.png" 
+                Click="GotoAppointmentView" />
+            <shell:ApplicationBar.MenuItems>
+            </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 

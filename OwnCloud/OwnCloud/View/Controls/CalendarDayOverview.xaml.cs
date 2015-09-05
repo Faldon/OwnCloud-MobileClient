@@ -19,7 +19,8 @@ namespace OwnCloud.View.Controls
 
         public DynamicCalendarSource EventSource
         {
-            get; set;
+            get;
+            set;
         }
 
 
@@ -27,19 +28,27 @@ namespace OwnCloud.View.Controls
         {
             BackgroundGrid.SetGridRows(24);
             AppointmentGrid.SetGridRows(24);
-            
+
             //Add horizontal lines
             for (int i = 0; i < 24; i++)
             {
                 var r = new Rectangle
-                    {
-                        Fill = new SolidColorBrush(Colors.White)
-                        , VerticalAlignment = VerticalAlignment.Bottom
-                        , Height = 1
-                    };
-                Grid.SetRow(r,i);
+                {
+                    Fill = new SolidColorBrush(Colors.White),
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Height = 1
+                };
+                var tb = new TextBlock
+                {
+                    Text = i.ToString().PadLeft(2, '0')+":00",
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Style = Application.Current.Resources["PhoneTextNormalStyle"] as Style
+                };
+                Grid.SetRow(r, i);
                 Grid.SetColumnSpan(r, 2);
+                Grid.SetRow(tb, i);
                 BackgroundGrid.Children.Add(r);
+                BackgroundGrid.Children.Add(tb);
             }
 
             UpdateEvents();
@@ -71,12 +80,12 @@ namespace OwnCloud.View.Controls
                 int endRow = 23;
                 if (currentEvent.To.Date == SelectedDate)
                 {
-                    endRow = Math.Max(currentEvent.To.Hour,1);
+                    endRow = Math.Max(currentEvent.To.Hour, 1);
                 }
 
                 var appointmentControl = new CalendarDayOverviewAppointment();
-                Grid.SetRow(appointmentControl,startRow);
-                Grid.SetRowSpan(appointmentControl,endRow - startRow + 1);
+                Grid.SetRow(appointmentControl, startRow);
+                Grid.SetRowSpan(appointmentControl, endRow - startRow + 1);
                 appointmentControl.DataContext = currentEvent;
                 AppointmentGrid.Children.Add(appointmentControl);
 

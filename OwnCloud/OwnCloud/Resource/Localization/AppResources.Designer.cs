@@ -169,6 +169,24 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Day.
+        /// </summary>
+        public static string ApplicationBarMenuItem_Day {
+            get {
+                return ResourceManager.GetString("ApplicationBarMenuItem_Day", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Month.
+        /// </summary>
+        public static string ApplicationBarMenuItem_Month {
+            get {
+                return ResourceManager.GetString("ApplicationBarMenuItem_Month", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select all files.
         /// </summary>
         public static string ApplicationBarMenuItem_SelectAll {
@@ -187,11 +205,74 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} hour{1} {2} minute{1}.
+        ///   Looks up a localized string similar to {0} hour{1} {2} minute{3}.
         /// </summary>
         public static string AppointmentDuration {
             get {
                 return ResourceManager.GetString("AppointmentDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Title.
+        /// </summary>
+        public static string AppointmentPage_AppointmentTitle {
+            get {
+                return ResourceManager.GetString("AppointmentPage_AppointmentTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Calendar.
+        /// </summary>
+        public static string AppointmentPage_CalendarSelect {
+            get {
+                return ResourceManager.GetString("AppointmentPage_CalendarSelect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description.
+        /// </summary>
+        public static string AppointmentPage_Description {
+            get {
+                return ResourceManager.GetString("AppointmentPage_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to From.
+        /// </summary>
+        public static string AppointmentPage_From {
+            get {
+                return ResourceManager.GetString("AppointmentPage_From", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Full day event.
+        /// </summary>
+        public static string AppointmentPage_FullDay {
+            get {
+                return ResourceManager.GetString("AppointmentPage_FullDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Appointment.
+        /// </summary>
+        public static string AppointmentPage_PageTitle {
+            get {
+                return ResourceManager.GetString("AppointmentPage_PageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To.
+        /// </summary>
+        public static string AppointmentPage_To {
+            get {
+                return ResourceManager.GetString("AppointmentPage_To", resourceCulture);
             }
         }
         
@@ -241,11 +322,29 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New appointment.
+        /// </summary>
+        public static string CalendarMonthPage_NewAppointment {
+            get {
+                return ResourceManager.GetString("CalendarMonthPage_NewAppointment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reload.
         /// </summary>
         public static string CalendarMonthPage_ReloadEvents {
             get {
                 return ResourceManager.GetString("CalendarMonthPage_ReloadEvents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Day.
+        /// </summary>
+        public static string CalendarMonthPage_ShowDayView {
+            get {
+                return ResourceManager.GetString("CalendarMonthPage_ShowDayView", resourceCulture);
             }
         }
         

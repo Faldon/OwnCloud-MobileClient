@@ -18,9 +18,14 @@ namespace OwnCloud.View.Page
         public CalendarMonthPage()
         {
             InitializeComponent();
-
-            // Translate unsupported XAML bindings
             ApplicationBar.TranslateButtons();
+
+            ApplicationBarMenuItem dayView = new ApplicationBarMenuItem(Resource.Localization.AppResources.ApplicationBarMenuItem_Day);
+            dayView.Click += GotoDayView;
+            ApplicationBarMenuItem monthView = new ApplicationBarMenuItem(Resource.Localization.AppResources.ApplicationBarMenuItem_Month);
+            monthView.IsEnabled = false;
+            ApplicationBar.MenuItems.Add(dayView);
+            ApplicationBar.MenuItems.Add(monthView);
 
             this.Unloaded += CalendarMonthPage_Unloaded;
         }
@@ -101,12 +106,23 @@ namespace OwnCloud.View.Page
         }
 
 
-
         #region Private events
 
         private void GotoCalendarSettings(object sender, EventArgs e)
         {
             NavigationService.Navigate(new Uri("/View/Page/CalendarSelectPage.xaml?uid=" + _userId.ToString(), UriKind.Relative));
+        }
+
+        private void GotoDayView(object sender, EventArgs e)
+        {
+            var dayOpenControl = new Ocwp.Controls.CalendarDayControl { TargetDate = CcCalendar.SelectedDate, AccountID = CcCalendar.AccountID ?? 0 };
+            App.Current.RootFrame.Navigate(new Uri("/View/Page/CalendarDayPage.xaml?uid=" + CcCalendar.AccountID.ToString() + "&startDate=" + CcCalendar.SelectedDate.ToShortDateString(),
+                                                   UriKind.Relative));
+        }
+
+        private void GotoAppointmentView(object sender, EventArgs e)
+        {
+            App.Current.RootFrame.Navigate(new Uri("/View/Page/AppointmentPage.xaml?uid=" + CcCalendar.AccountID.ToString(), UriKind.Relative));
         }
 
         private void CcCalendar_OnDateChanged(object sender, RoutedEventArgs e)

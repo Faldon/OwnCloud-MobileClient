@@ -156,25 +156,26 @@ namespace OwnCloud.View.Controls
 
                     Color dayIndicatorColor = Colors.White;
                     if (fieldDate.Date == DateTime.Now.Date)
+                    {
                         dayIndicatorColor = (Color)Application.Current.Resources["PhoneAccentColor"];
+                    }
                     else if (fieldDate.Month != SelectedDate.Month)
+                    {
                         dayIndicatorColor = Colors.Gray;
+                    }
 
                     var dayIndicator = new TextBlock
                         {
-
-
                             VerticalAlignment = VerticalAlignment.Bottom,
                             HorizontalAlignment = HorizontalAlignment.Left,
                             Text = fieldDate.Day.ToString(CultureInfo.InvariantCulture),
-                            Foreground =
-                                new SolidColorBrush(dayIndicatorColor)
+                            Foreground = new SolidColorBrush(dayIndicatorColor),
+                            Margin = new Thickness(5,0,0,5)
                         };
                     Grid.SetColumn(dayIndicator, i);
                     Grid.SetRow(dayIndicator, j + 1);
                     GrdDayIndicator.Children.Add(dayIndicator);
 
-                    //var dayOpenControl = new CalendarDayControl { TargetDate = fieldDate, AccountID = _accountID ?? 0 };
                     var dayOpenControl = new StackPanel
                         {
                             Background = new SolidColorBrush(Colors.Black),
@@ -282,7 +283,7 @@ namespace OwnCloud.View.Controls
                         Fill = GetCalendarColor(tableEvent.CalendarId),
                         Width = GrdAppointments.ColumnDefinitions.FirstOrDefault().ActualWidth * 0.3,
                         Height = 5,
-                        Margin = new Thickness(0, 5, 10, 5),
+                        Margin = new Thickness(0, 5, 10, 0),
                         HorizontalAlignment = System.Windows.HorizontalAlignment.Right
                     };
                     dPanel.Children.Add(rect);
@@ -326,9 +327,9 @@ namespace OwnCloud.View.Controls
                         TextBlock fullDayText = new TextBlock()
                         {
                             Text = tableEvent.Title,
-                            Style = Application.Current.Resources["PhoneTextTitle3Style"] as Style,
+                            Style = Application.Current.Resources["PhoneTextSmallStyle"] as Style,
                             Foreground = GetCalendarColor(tableEvent.CalendarId),
-                            Margin = new Thickness(10, 5, 10, 5)
+                            Margin = new Thickness(10, 0, 10, 0)
                         };
                         Grid.SetColumn(fullDayText, 1);
                         Grid.SetRow(fullDayText, 0);
@@ -357,7 +358,7 @@ namespace OwnCloud.View.Controls
                         TextBlock startTime = new TextBlock()
                         {
                             Text = tableEvent.From.ToString("HH:mm"),
-                            Style = Application.Current.Resources["PhoneTextBlockBase"] as Style,
+                            Style = Application.Current.Resources["PhoneTextExtraSmallStyle"] as Style,
                             Foreground = new SolidColorBrush(Colors.White),
                             VerticalAlignment = System.Windows.VerticalAlignment.Bottom,
                             Margin = new Thickness(10, 0, 10, 0)
@@ -368,7 +369,7 @@ namespace OwnCloud.View.Controls
                         TextBlock dayText = new TextBlock()
                         {
                             Text = tableEvent.Title,
-                            Style = Application.Current.Resources["PhoneTextBlockBase"] as Style,
+                            Style = Application.Current.Resources["PhoneTextExtraSmallStyle"] as Style,
                             Foreground = GetCalendarColor(tableEvent.CalendarId),
                             VerticalAlignment = System.Windows.VerticalAlignment.Bottom,
                             Margin = new Thickness(10, 0, 10, 0)
@@ -385,7 +386,7 @@ namespace OwnCloud.View.Controls
                         TextBlock durationText = new TextBlock()
                         {
                             Text = String.Format(Resource.Localization.AppResources.AppointmentDuration, param),
-                            Style = Application.Current.Resources["PhoneTextBlockBase"] as Style,
+                            Style = Application.Current.Resources["PhoneTextExtraSmallStyle"] as Style,
                             Foreground = new SolidColorBrush(Colors.Gray),
                             VerticalAlignment = System.Windows.VerticalAlignment.Top,
                             Margin = new Thickness(10, 0, 10, 0)

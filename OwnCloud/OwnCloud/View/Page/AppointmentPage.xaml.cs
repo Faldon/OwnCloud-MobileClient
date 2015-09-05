@@ -18,8 +18,10 @@ namespace OwnCloud.View.Page
         public AppointmentPage()
         {
             InitializeComponent();
+            ApplicationBar.TranslateButtons();
 
             this.Unloaded += AppointmentPage_Unloaded;
+            TpTo.Value = TpTo.Value.Value.AddHours(1);
         }
 
         void AppointmentPage_Unloaded(object sender, System.Windows.RoutedEventArgs e)
@@ -56,14 +58,18 @@ namespace OwnCloud.View.Page
                 return;
             }
 
+            //Load Account ID
+            if (NavigationContext.QueryString.ContainsKey("uid"))
+            { 
+                _accountId = int.Parse(NavigationContext.QueryString["uid"]);                
+            }
+
+            CalendarPicker.ItemsSource = Context.Calendars;
+
             if (NavigationContext.QueryString.ContainsKey("eTag"))
             {
                 LoadFromETag(NavigationContext.QueryString["eTag"]);
             }
-                
-            //Load Account ID
-            if (NavigationContext.QueryString.ContainsKey("uid"))
-                _accountId = int.Parse(NavigationContext.QueryString["uid"]);
 
             base.OnNavigatedTo(e);
         }
@@ -73,6 +79,8 @@ namespace OwnCloud.View.Page
         private void LoadFromETag(string eTag)
         {
             var dbEvent = Context.Events.SingleOrDefault(o => o.GetETag == eTag);
+            var calendar = Context.Calendars.SingleOrDefault(c => c.Id == dbEvent.CalendarId);
+            CalendarPicker.SelectedItem = calendar;
 
             if (dbEvent == null) return;
 
@@ -107,9 +115,7 @@ namespace OwnCloud.View.Page
                 }
 
                 TpFrom.Value = storedEvent.From;
-                TpTo.Value = storedEvent.To;
-
-
+                TpTo.Value = storedEvent.To;            
             }
         }
 
@@ -120,10 +126,24 @@ namespace OwnCloud.View.Page
             var dbEvent = Context.Events.SingleOrDefault(o => o.Url == _url);
             if (dbEvent == null) return;
 
-            SaveTableEvent(dbEvent);
+            SaveTableEvent(dbEvent, true);
         }
 
-        private void SaveTableEvent(TableEvent dbEvent)
+        private void SaveNew()
+        {
+            LockPage();
+
+            var dbEvent = new TableEvent()
+            {
+                Url = (CalendarPicker.SelectedItem as TableCalendar).Url + "owncloud_mobile-" + Utility.SHA1Hash(DateTime.Now.ToLongDateString()) + ".ics",
+                CalendarId = (CalendarPicker.SelectedItem as TableCalendar).Id
+            };
+            if (dbEvent == null) return;
+
+            SaveTableEvent(dbEvent, false);
+        }
+
+        private void SaveTableEvent(TableEvent dbEvent, bool merge)
         {
             dbEvent.From = (DpFrom.Value ?? DateTime.Now).CombineWithTime(TpFrom.Value ?? DateTime.Now);
             dbEvent.To = (DpTo.Value ?? DateTime.Now).CombineWithTime(TpTo.Value ?? DateTime.Now);
@@ -143,9 +163,25 @@ namespace OwnCloud.View.Page
                 return;
             }
 
-
-            CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, false);
-
+            if (!merge)
+            {
+                dbEvent.CalendarData = System.IO.File.OpenText("Assets/NewCalendar.ics").ReadToEnd();
+                CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, true);
+            }
+            else
+            {
+                if (CalendarPicker.SelectedItem == Context.Calendars.SingleOrDefault(c => c.Id == dbEvent.CalendarId))
+                {
+                    CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, false);
+                }
+                else
+                {
+                    dbEvent.Url = (CalendarPicker.SelectedItem as TableCalendar).Url + dbEvent.Url.Substring(dbEvent.Url.LastIndexOf("/")).TrimStart('/');
+                    CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, true);
+                    DeleteExisting(false);
+                }
+            }
+            
             var ocCLient = LoadOcCalendarClient();
             ocCLient.SaveEventComplete += ocCLient_SaveEventComplete;
             ocCLient.SaveEvent(dbEvent);
@@ -166,10 +202,13 @@ namespace OwnCloud.View.Page
         /// <summary>
         /// Deletes the current existing event
         /// </summary>
-        private void DeleteExisting()
+        private void DeleteExisting(bool redirect)
         {
             var client = LoadOcCalendarClient();
-            client.DeleteEventComplete += ocCLient_DeleteEventComplete;
+            if(redirect)
+            {
+                client.DeleteEventComplete += ocCLient_DeleteEventComplete;
+            }
             client.DeleteEvent(_url);
         }
 
@@ -186,7 +225,7 @@ namespace OwnCloud.View.Page
 
         private OcCalendarClient LoadOcCalendarClient()
         {
-            if(Account.IsEncrypted)
+            if (Account.IsEncrypted)
                 Account.RestoreCredentials();
 
             return new OcCalendarClient(Account.GetUri().AbsoluteUri,
@@ -221,13 +260,20 @@ namespace OwnCloud.View.Page
         private void OnSaveClick(object sender, EventArgs e)
         {
             if (_url != null)
+            {
                 SaveExisting();
+            }
+            else
+            {
+                SaveNew();
+            }
+                
         }
 
         private void OnDeleteClick(object sender, EventArgs e)
         {
-            if(_url != null)
-                DeleteExisting();
+            if (_url != null)
+                DeleteExisting(true);
         }
 
         private void CbFullDayEventChanged(object sender, RoutedEventArgs e)
@@ -235,9 +281,6 @@ namespace OwnCloud.View.Page
             TpFrom.Visibility = TpTo.Visibility = CbFullDayEvent.IsChecked ?? false ? Visibility.Collapsed : Visibility.Visible;
 
         }
-
         #endregion
-
-        
     }
 }

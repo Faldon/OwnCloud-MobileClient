@@ -377,4 +377,37 @@ Server Antwort: {1}</value>
   <data name="AppointmentDuration" xml:space="preserve">
     <value>{0} Stunde{1} {2} Minute{3}</value>
   </data>
+  <data name="CalendarMonthPage_ShowDayView" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="CalendarMonthPage_NewAppointment" xml:space="preserve">
+    <value>Neuer Termin</value>
+  </data>
+  <data name="AppointmentPage_AppointmentTitle" xml:space="preserve">
+    <value>Titel</value>
+  </data>
+  <data name="AppointmentPage_CalendarSelect" xml:space="preserve">
+    <value>Kalender</value>
+  </data>
+  <data name="AppointmentPage_Description" xml:space="preserve">
+    <value>Beschreibung</value>
+  </data>
+  <data name="AppointmentPage_From" xml:space="preserve">
+    <value>Von</value>
+  </data>
+  <data name="AppointmentPage_FullDay" xml:space="preserve">
+    <value>Ganztägiger Termin</value>
+  </data>
+  <data name="AppointmentPage_PageTitle" xml:space="preserve">
+    <value>Termin</value>
+  </data>
+  <data name="AppointmentPage_To" xml:space="preserve">
+    <value>Bis</value>
+  </data>
+  <data name="ApplicationBarMenuItem_Day" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="ApplicationBarMenuItem_Month" xml:space="preserve">
+    <value>Monat</value>
+  </data>
 </root>

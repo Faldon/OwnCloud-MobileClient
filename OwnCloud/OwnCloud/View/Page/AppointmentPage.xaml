@@ -49,8 +49,9 @@
 
         <!--TitlePanel enthält den Namen der Anwendung und den Seitentitel-->
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="OWNCLOUD CLIENT" Style="{StaticResource PageHeader}"/>
-            <TextBlock Text="Appointment" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock Text="{Binding Path=LocalizedResources.CalendarMonthPage_Title, Source={StaticResource LocalizedStrings}, Converter={StaticResource ToUppercaseConverter}}"
+                       Style="{StaticResource PageHeader}" />
+            <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_PageTitle, Source={StaticResource LocalizedStrings}}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
         <!--ContentPanel - zusätzliche Inhalte hier platzieren-->
@@ -58,23 +59,38 @@
 
             <ScrollViewer>
                 <StackPanel>
-                    <TextBlock Text="Title"
+                    <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_AppointmentTitle, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"></TextBlock>
                     <TextBox x:Name="TbTitle" />
-                    
-                    <TextBlock Text="From"
+
+                    <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_From, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"></TextBlock>
                     <toolkit:DatePicker x:Name="DpFrom" />
                     <toolkit:TimePicker x:Name="TpFrom" />
 
-                    <TextBlock Text="To"
+                    <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_To, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"></TextBlock>
                     <toolkit:DatePicker x:Name="DpTo" />
                     <toolkit:TimePicker x:Name="TpTo" />
 
-                    <CheckBox Content="Full day event" Checked="CbFullDayEventChanged" Unchecked="CbFullDayEventChanged" x:Name="CbFullDayEvent" />
-                    
-                    <TextBlock Text="Description"
+                    <CheckBox Content="{Binding Path=LocalizedResources.AppointmentPage_FullDay, Source={StaticResource LocalizedStrings}}" Checked="CbFullDayEventChanged" Unchecked="CbFullDayEventChanged" x:Name="CbFullDayEvent" />
+
+                    <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_CalendarSelect, Source={StaticResource LocalizedStrings}}"
+                               Style="{StaticResource PhoneTextSubtleStyle}"/>
+                    <toolkit:ListPicker x:Name="CalendarPicker">
+                        <toolkit:ListPicker.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Fill="{Binding Path=CalendarColor, Converter={StaticResource CalendarColorConverter}}" 
+                                               Width="30" Height="30" Stroke="White" StrokeThickness="2"
+                                               Margin="0,0,10,0" />
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </toolkit:ListPicker.ItemTemplate>
+                    </toolkit:ListPicker>
+
+                    <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_Description, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"/>
                     <TextBox x:Name="TbDescription" AcceptsReturn="True" Height="200"></TextBox>
                     
@@ -86,8 +102,8 @@
 
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar>
-            <shell:ApplicationBarIconButton Text="Save" IconUri="/Assets/Icons/Save.png" Click="OnSaveClick" />
-            <shell:ApplicationBarIconButton Text="Delete" IconUri="/Assets/Icons/Delete.png" Click="OnDeleteClick" />
+            <shell:ApplicationBarIconButton Text="ApplicationBarButton_Save" IconUri="/Assets/Icons/Save.png" Click="OnSaveClick" />
+            <shell:ApplicationBarIconButton Text="ApplicationBarButton_Delete" IconUri="/Assets/Icons/Delete.png" Click="OnDeleteClick" />
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 </phone:PhoneApplicationPage>
