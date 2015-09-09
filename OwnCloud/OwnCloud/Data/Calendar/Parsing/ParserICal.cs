@@ -2,6 +2,7 @@
 using System.Linq;
 using System.IO;
 using OwnCloud.Data.Calendar.ParsedCalendar;
+using System.Collections.Generic;
 
 namespace OwnCloud.Data.Calendar.Parsing
 {
@@ -33,6 +34,8 @@ namespace OwnCloud.Data.Calendar.Parsing
             bool refBool = false;
             string refString = "";
 
+            cEvent.IsRecurringEvent = TryFindRecuringInformation(node, "RRULE");
+
             if (TryFindDate(node, "DTSTART", ref refDate, out refBool))
             {
                 cEvent.From = refDate;
@@ -49,6 +52,38 @@ namespace OwnCloud.Data.Calendar.Parsing
                 cEvent.Description = refString;
             
             return cEvent;
+        }
+
+        public Dictionary<string, object> ParseRecurringRules(Stream value)
+        {
+            var rules = new Dictionary<string, object>();
+            var nodeParser = new ParserNodeToken();
+            var rootNode = nodeParser.Parse(value).Childs[0];
+            TokenNode eventNode = FindNextChild(rootNode, 0, "VEVENT");
+
+            var tokenQuery = eventNode.Tokens.Where(o => o.NamingKey == "RRULE").ToArray();
+            if (tokenQuery.Any())
+            {
+                var tokens = tokenQuery.First().Value.DecodedValue.Split(';');
+                foreach (string token in tokens)
+                {
+                    string key = token.Split('=')[0];
+                    switch(key)
+                    {
+                        case "UNTIL":
+                            rules.Add(key, DateTime.ParseExact(token.Split('=')[1], "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture));
+                            break;
+                        case "COUNT":
+                        case "INTERVAL":
+                            rules.Add(key, Int32.Parse(token.Split('=')[1]));
+                            break;
+                        default:
+                            rules.Add(key, token.Split('=')[1]);
+                            break;
+                    }
+                }
+            }
+            return rules;
         }
 
         private bool TryFindDate(TokenNode node, string tokenName, ref DateTime result, out bool isFullDayTime)
@@ -69,6 +104,13 @@ namespace OwnCloud.Data.Calendar.Parsing
             else isFullDayTime = false;
 
             return false;
+        }
+
+        private bool TryFindRecuringInformation(TokenNode node, string tokenName)
+        {
+            var tokenQuery = node.Tokens.Where(o => o.NamingKey == tokenName).ToArray();
+
+            return tokenQuery.Any();
         }
 
         private string TryFindString(TokenNode node, string tokenName)
@@ -93,6 +135,5 @@ namespace OwnCloud.Data.Calendar.Parsing
 
             return null;
         }
-
     }
 }

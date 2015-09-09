@@ -23,5 +23,7 @@ namespace OwnCloud.Data.Calendar.ParsedCalendar
         public bool IsFullDayEvent { get; set; }
 
         public string ETag { get; set; }
+
+        public bool IsRecurringEvent { get; set; }
     }
 }

@@ -46,7 +46,6 @@
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
             <TextBlock Text="{Binding Path=LocalizedResources.SettingsPage_Title, Source={StaticResource LocalizedStrings}, Converter={StaticResource ToUppercaseConverter}}"
                        Style="{StaticResource PageHeader}"/>
-            <TextBlock Text="{Binding PageMode}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
         <ItemsControl Grid.Row="1" Margin="12,0,12,0" ItemsSource="{Binding Path=ServerCalendars}">

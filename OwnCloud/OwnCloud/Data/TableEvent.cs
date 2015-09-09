@@ -24,6 +24,7 @@ namespace OwnCloud.Data
         private DateTime _from;
         private DateTime _to;
         private bool _isFullDayEvent;
+        private bool _isRecurringEvent;
 
         /// <summary>
         /// Primärschlüssel des Events
@@ -101,7 +102,7 @@ namespace OwnCloud.Data
         }
 
         /// <summary>
-        /// Die rohen Kalendardaten
+        /// Der Titel des Events
         /// </summary>
         [Column]
         public string Title
@@ -116,7 +117,7 @@ namespace OwnCloud.Data
         }
 
         /// <summary>
-        /// Der ETag des Kalendars
+        /// Der ETag des Events
         /// </summary>
         [Column]
         public string GetETag
@@ -146,7 +147,7 @@ namespace OwnCloud.Data
         }
 
         /// <summary>
-        /// True, if the events needs to sync with the server. That occurs eg. when the event changed when there was no internet connection
+        /// True, if the events needs to sync with the server. That occurs eg. when the event changed when there was no internet connection.
         /// </summary>
         [Column]
         public bool RequirePushUpdate
@@ -155,7 +156,7 @@ namespace OwnCloud.Data
         }
 
         /// <summary>
-        /// Gibt an, ob das Event über den ganzen Tag geht
+        /// True, if the event lasts the whole day.
         /// </summary>
         [Column]
         public bool IsFullDayEvent
@@ -165,7 +166,17 @@ namespace OwnCloud.Data
         }
 
         /// <summary>
-        /// Erstellt ein Event für die Datenbank von einem Ungepasden Kalendar
+        /// True, if the event is a recurring event.
+        /// </summary>
+        [Column]
+        public bool IsRecurringEvent
+        {
+            get { return _isRecurringEvent; }
+            set { OnPropertyChanging("IsRecurringEvent"); _isRecurringEvent = value; OnPropertyChanged("IsRecurringEvent"); }
+        }
+
+        /// <summary>
+        /// Erstellt ein Event für die Datenbank von einem Ungeparsten Kalender
         /// </summary>
         /// <param name="unparsedEvent"></param>
         /// <returns></returns>

@@ -170,7 +170,7 @@ namespace OwnCloud.View.Controls
                             HorizontalAlignment = HorizontalAlignment.Left,
                             Text = fieldDate.Day.ToString(CultureInfo.InvariantCulture),
                             Foreground = new SolidColorBrush(dayIndicatorColor),
-                            Margin = new Thickness(5,0,0,5)
+                            Margin = new Thickness(5, 0, 0, 5)
                         };
                     Grid.SetColumn(dayIndicator, i);
                     Grid.SetRow(dayIndicator, j + 1);
@@ -234,7 +234,12 @@ namespace OwnCloud.View.Controls
         /// </summary>
         public void RefreshAppointments()
         {
-            var calendarEvents = Context.Calendars.Where(o => o._accountId == AccountID).Select(o => o.Events.Where(q => q.To > _firstDayOfCalendarMonth && q.From < _lastDayOfCalendarMonth));
+            var calendarEvents = Context.Calendars.Where(o =>
+                o._accountId == AccountID).Select(o =>
+                    o.Events.Where(q =>
+                        (q.To > _firstDayOfCalendarMonth && q.From < _lastDayOfCalendarMonth) || ((q.IsRecurringEvent) && (q.From < _lastDayOfCalendarMonth))
+                    )
+                );
 
             //merge all calendar events
             IEnumerable<TableEvent> events = new TableEvent[0];
@@ -255,50 +260,227 @@ namespace OwnCloud.View.Controls
             _dayPanels.Clear();
 
             //INsert new events
-            PutEvent(events);
+            PutEvents(events);
         }
 
         /// <summary>
         /// Puts the events into the control
         /// </summary>
         /// <param name="events"></param>
-        private void PutEvent(IEnumerable<TableEvent> events)
+        private void PutEvents(IEnumerable<TableEvent> events)
         {
             foreach (var tableEvent in events)
             {
                 var currentDate = tableEvent.From.Date;
                 var endDate = tableEvent.To.Date;
 
-                if (endDate == currentDate)
-                    endDate = endDate.AddSeconds(1);
-
-                while (currentDate < endDate)
+                if (tableEvent.IsRecurringEvent)
                 {
-                    StackPanel dPanel = GetDayStackPanel(currentDate);
+                    var rRules = OwnCloud.Data.Calendar.EventMetaUpdater.ParseRecurringRules(tableEvent);
+                    string rFrequency = (string)rRules.Single(r => r.Key == "FREQ").Value;
+                    int rInterval = (int)rRules.Single(r => r.Key == "INTERVAL").Value;
+                    DateTime rEnd = ((string)rRules.SingleOrDefault(r => r.Key == "UNTIL").Key == "UNTIL") ? Convert.ToDateTime(rRules.Single(r => r.Key == "UNTIL").Value) : DateTime.MaxValue;
+                    int rCount = (string)rRules.SingleOrDefault(r => r.Key == "COUNT").Key == "COUNT" ? (int)rRules.Single(r => r.Key == "COUNT").Value : 0;
 
-                    if (dPanel == null) { currentDate = currentDate.AddDays(1); continue; }
-
-                    var rect = new Rectangle
+                    if (rCount == 0 && rEnd < _firstDayOfCalendarMonth) { continue; }
+                    else if (rCount > 0)
                     {
-                        Fill = GetCalendarColor(tableEvent.CalendarId),
-                        Width = GrdAppointments.ColumnDefinitions.FirstOrDefault().ActualWidth * 0.3,
-                        Height = 5,
-                        Margin = new Thickness(0, 5, 10, 0),
-                        HorizontalAlignment = System.Windows.HorizontalAlignment.Right
-                    };
-                    dPanel.Children.Add(rect);
-
-                    currentDate = currentDate.AddDays(1);
+                        for (var i = 0; i < rCount; i++)
+                        {
+                            switch (rFrequency)
+                            {
+                                case "DAILY":
+                                    currentDate = tableEvent.From.Date.AddDays(i * rInterval);
+                                    endDate = tableEvent.To.Date.AddDays(i * rInterval);
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                    break;
+                                case "WEEKLY":
+                                    currentDate = tableEvent.From.Date.AddDays(i * rInterval * 7);
+                                    endDate = tableEvent.To.Date.AddDays(i * rInterval * 7);
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                    break;
+                                case "MONTHLY":
+                                    currentDate = tableEvent.From.Date.AddMonths(i * rInterval);
+                                    endDate = tableEvent.To.Date.AddMonths(i * rInterval);
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                    break;
+                                case "YEARLY":
+                                    currentDate = tableEvent.From.Date.AddYears(i * rInterval);
+                                    endDate = tableEvent.To.Date.AddYears(i * rInterval);
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                    break;
+                            }
+                        }
+                    }
+                    else if (rEnd > _firstDayOfCalendarMonth)
+                    {
+                        switch (rFrequency)
+                        {
+                            case "DAILY":
+                                currentDate = currentDate.AddDays((_firstDayOfCalendarMonth - currentDate).TotalDays + (_firstDayOfCalendarMonth - currentDate).TotalDays % rInterval);
+                                endDate = endDate.AddDays((_firstDayOfCalendarMonth - endDate).TotalDays + (_firstDayOfCalendarMonth - endDate).TotalDays % rInterval);
+                                while (currentDate < tableEvent.From)
+                                {
+                                    currentDate = currentDate.AddDays(rInterval);
+                                    endDate = endDate.AddDays(rInterval);
+                                }
+                                while (currentDate <= rEnd && currentDate <= _lastDayOfCalendarMonth)
+                                {
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                    currentDate = currentDate.AddDays(rInterval);
+                                    endDate = endDate.AddDays(rInterval);
+                                }
+                                break;
+                            case "WEEKLY":
+                                currentDate = tableEvent.From;
+                                endDate = tableEvent.To;
+                                while (currentDate <= _firstDayOfCalendarMonth)
+                                {
+                                    currentDate = currentDate.AddDays(7 * rInterval);
+                                    endDate = endDate.AddDays(7 * rInterval);
+                                }
+                                while (currentDate <= rEnd && currentDate <= _lastDayOfCalendarMonth)
+                                {
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                    currentDate = currentDate.AddDays(7 * rInterval);
+                                    endDate = endDate.AddDays(7 * rInterval);
+                                }
+                                break;
+                            case "MONTHLY":
+                                currentDate = tableEvent.From;
+                                endDate = tableEvent.To;
+                                while (currentDate.Date < SelectedDate.Date)
+                                {
+                                    currentDate = currentDate.AddMonths(rInterval);
+                                    endDate = endDate.AddMonths(rInterval);
+                                }
+                                if (currentDate <= rEnd && currentDate >= _firstDayOfCalendarMonth && currentDate <= _lastDayOfCalendarMonth)
+                                {
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                }
+                                break;
+                            case "YEARLY":
+                                currentDate = tableEvent.From;
+                                endDate = tableEvent.To;
+                                while (currentDate.Year < SelectedDate.Year)
+                                {
+                                    currentDate = currentDate.AddYears(rInterval);
+                                    endDate = endDate.AddYears(rInterval);
+                                }
+                                if (currentDate <= rEnd && currentDate >= _firstDayOfCalendarMonth && currentDate <= _lastDayOfCalendarMonth)
+                                {
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                }
+                                break;
+                        }
+                    }
+                    else if (rCount == 0 && rEnd == DateTime.MaxValue)
+                    {
+                        switch (rFrequency)
+                        {
+                            case "DAILY":
+                                currentDate = currentDate.AddDays((_firstDayOfCalendarMonth - currentDate).TotalDays + (_firstDayOfCalendarMonth - currentDate).TotalDays % rInterval);
+                                endDate = endDate.AddDays((_firstDayOfCalendarMonth - endDate).TotalDays + (_firstDayOfCalendarMonth - endDate).TotalDays % rInterval);
+                                while (currentDate < tableEvent.From)
+                                {
+                                    currentDate = currentDate.AddDays(rInterval);
+                                    endDate = endDate.AddDays(rInterval);
+                                }
+                                while (currentDate <= _lastDayOfCalendarMonth)
+                                {
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                    currentDate = currentDate.AddDays(rInterval);
+                                    endDate = endDate.AddDays(rInterval);
+                                }
+                                break;
+                            case "WEEKLY":
+                                currentDate = tableEvent.From;
+                                endDate = tableEvent.To;
+                                while (currentDate < _firstDayOfCalendarMonth)
+                                {
+                                    currentDate = currentDate.AddDays(7 * rInterval);
+                                    endDate = endDate.AddDays(7 * rInterval);
+                                }
+                                while (currentDate <= _lastDayOfCalendarMonth)
+                                {
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                    currentDate = currentDate.AddDays(7 * rInterval);
+                                    endDate = endDate.AddDays(7 * rInterval);
+                                }
+                                break;
+                            case "MONTHLY":
+                                while (currentDate.Date < SelectedDate.Date)
+                                {
+                                    currentDate = currentDate.AddMonths(rInterval);
+                                    endDate = endDate.AddMonths(rInterval);
+                                }
+                                if (currentDate >= _firstDayOfCalendarMonth && currentDate <= _lastDayOfCalendarMonth)
+                                {
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                }
+                                break;
+                            case "YEARLY":
+                                currentDate = tableEvent.From;
+                                endDate = tableEvent.To;
+                                while (currentDate.Year < SelectedDate.Year)
+                                {
+                                    currentDate = currentDate.AddYears(rInterval);
+                                    endDate = endDate.AddYears(rInterval);
+                                }
+                                if (currentDate >= _firstDayOfCalendarMonth && currentDate <= _lastDayOfCalendarMonth)
+                                {
+                                    PutSingleEvent(tableEvent, currentDate, endDate);
+                                }
+                                break;
+                        }
+                    }
                 }
 
+                else
+                {
+                    PutSingleEvent(tableEvent, currentDate, endDate);
+                }
             }
+        }
+
+        private void PutSingleEvent(TableEvent tableEvent, DateTime currentDate, DateTime endDate)
+        {
+            if (endDate == currentDate)
+                endDate = endDate.AddSeconds(1);
+
+            while (currentDate < endDate)
+            {
+                StackPanel dPanel = GetDayStackPanel(currentDate);
+
+                if (dPanel == null) { currentDate = currentDate.AddDays(1); continue; }
+
+                var rect = new Rectangle
+                {
+                    Name = tableEvent.EventId.ToString() + "_" + currentDate.ToShortDateString(),
+                    Fill = GetCalendarColor(tableEvent.CalendarId),
+                    Width = GrdAppointments.ColumnDefinitions.FirstOrDefault().ActualWidth * 0.3,
+                    Height = 5,
+                    Margin = new Thickness(0, 5, 10, 0),
+                    HorizontalAlignment = System.Windows.HorizontalAlignment.Right
+                };
+                dPanel.Children.Add(rect);
+                currentDate = currentDate.AddDays(1);
+            }
+
         }
 
         void ShowDayDetails(object sender, System.Windows.Input.GestureEventArgs e)
         {
             StackPanel dPanel = (StackPanel)sender;
             DateTime fieldDate = DateTime.Parse(dPanel.Name);
-            IEnumerable<TableEvent> events = GetCalendarEvents(fieldDate, fieldDate.AddDays(1));
+            StackPanel dsp = GetDayStackPanel(fieldDate);
+
+            List<int> dayEvents = new List<int>();
+            foreach (Rectangle rect in dsp.Children)
+            {
+                dayEvents.Add(Int32.Parse(rect.Name.Substring(0, rect.Name.IndexOf('_'))));
+            }
+            IEnumerable<TableEvent> events = GetCalendarEvents(dayEvents);
 
             if (DayDetailsHeader.Text == fieldDate.ToLongDateString())
             {
@@ -468,6 +650,21 @@ namespace OwnCloud.View.Controls
             var calendarEvents = Context.Calendars.Where(o => o._accountId == AccountID).Select(o => o.Events.Where(
                 q => q.From >= startTime && q.To <= endTime
             ));
+            IEnumerable<TableEvent> events = new TableEvent[0];
+
+            foreach (var calendar in calendarEvents)
+                events = events.Concat(calendar);
+
+            events = events
+                .OrderByDescending(o => o.To - o.From)
+                .ToArray();
+
+            return events;
+        }
+
+        private IEnumerable<TableEvent> GetCalendarEvents(List<int> eventId)
+        {
+            var calendarEvents = Context.Calendars.Where(o => o._accountId == AccountID).Select(o => o.Events.Where(q => eventId.Contains(q.EventId)));
             IEnumerable<TableEvent> events = new TableEvent[0];
 
             foreach (var calendar in calendarEvents)

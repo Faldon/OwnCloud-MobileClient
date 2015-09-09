@@ -35,7 +35,6 @@ namespace OwnCloud
 
             // trigger selection
             PanoramaSelectionChanged(MainPanorama, new RoutedEventArgs());
-
             if (App.DataContext.Accounts.Count() == 0)
             {
                 var timer = new System.Threading.Timer(

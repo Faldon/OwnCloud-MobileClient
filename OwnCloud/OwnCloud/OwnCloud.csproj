@@ -370,7 +370,6 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\WideLogo.png" />
     <Content Include="README_FIRST.txt" />
-    <None Include="Resources\NewCalendar.txt" />
     <Content Include="Resource\Image\Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

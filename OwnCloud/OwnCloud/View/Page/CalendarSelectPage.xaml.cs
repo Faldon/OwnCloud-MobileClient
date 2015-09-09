@@ -32,7 +32,6 @@ namespace OwnCloud.View.Page
         #region Private Fields
 
         private int _userId;
-        private Data.Account _account;
         private Data.OwnCloudDataContext _context;
         private Data.OwnCloudDataContext Context
         {

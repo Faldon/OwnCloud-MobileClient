@@ -179,7 +179,6 @@ namespace OwnCloud.Net
 
                             dbEvent.GetETag = serverEvent.EventInfo.GetETag;
                             dbEvent.CalendarData = serverEvent.RawEventData;
-                            //dbEvent.Calendar = serverCalendar;
 
                             EventMetaUpdater.UpdateEventMetadata(dbEvent);
 
@@ -202,8 +201,6 @@ namespace OwnCloud.Net
 
 
         }
-
-
 
         public event SyncCompleteHandler SyncComplete;
         protected virtual void OnSyncComplete(bool success)
