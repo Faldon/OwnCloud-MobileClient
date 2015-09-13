@@ -458,7 +458,6 @@ namespace OwnCloud.View.Page
         {
             try
             {
-                var tcs = new TaskCompletionSource<System.IO.Stream>();
                 HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uriToUpload);
                 request.UseDefaultCredentials = false;
                 request.Credentials = credentials;
@@ -512,6 +511,8 @@ namespace OwnCloud.View.Page
                 args.Files.Count > 0)
             {
                 _workingPath = args.ContinuationData["UploadPath"] as string;
+                progress.IsVisible = true;
+                progress.Text = "";
 
                 foreach (StorageFile file in args.Files)
                 {
@@ -524,6 +525,7 @@ namespace OwnCloud.View.Page
                     Dispatcher.BeginInvoke(new Action(() => MessageBox.Show(Resource.Localization.AppResources.ItemUpload_Error)));
                     _uploadSuccess = true;
                 }
+                progress.IsVisible = false;
                 App.Current.FilePickerContinuationArgs = null;
                 FetchStructure(_workingPath);
             }
