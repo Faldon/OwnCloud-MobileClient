@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using OwnCloud.Data.Calendar.Parsing;
+using System.Collections.Generic;
 
 namespace OwnCloud.Data.Calendar
 {
@@ -13,7 +14,7 @@ namespace OwnCloud.Data.Calendar
         /// <param name="dbEvent">The event</param>
         /// <param name="description">The New desciption of the event</param>
         /// <param name="updateUid">True, when a new UID sould be set. Only recommenten, with a new (unsaved) event</param>
-        public static void UpdateCalendarData(TableEvent dbEvent, string description, bool updateUid)
+        public static void UpdateCalendarData(TableEvent dbEvent, string description, string location, bool updateUid)
         {
             TokenNode calendarNode = calendarNode = ReadTokenNode(dbEvent);
 
@@ -21,12 +22,13 @@ namespace OwnCloud.Data.Calendar
 
             UpdateStringToken(icalEvent, "SUMMARY", dbEvent.Title);
             UpdateStringToken(icalEvent, "DESCRIPTION", description);
+            UpdateStringToken(icalEvent, "LOCATION", location);
             UpdateDateToken(icalEvent, "DTSTART", dbEvent.From, dbEvent.IsFullDayEvent);
             UpdateDateToken(icalEvent, "DTEND", dbEvent.To, dbEvent.IsFullDayEvent);
 
             //The uid helps the CalDav Server to uniquie identify the event and is required for events.
-            if(updateUid)
-                UpdateStringToken(icalEvent,"UID",Guid.NewGuid().ToString());
+            if (updateUid)
+                UpdateStringToken(icalEvent, "UID", Guid.NewGuid().ToString());
 
             using (var tmpStream = new MemoryStream())
             {
@@ -52,12 +54,41 @@ namespace OwnCloud.Data.Calendar
             }
         }
 
-        public static void UpdateStringToken(TokenNode icalEvent, string tokenName, string value,string subKey = "")
+        public static void UpdateRecurringRuleToken(TokenNode icalEvent, string tokenName, Dictionary<string, object> recurringRules)
+        {
+            if (recurringRules.Count == 0)
+            {
+                UpdateStringToken(icalEvent, tokenName, "");
+            }
+
+            else
+            {
+                var until = "";
+                var count = "";
+
+                var frequeny = "FREQ=" + recurringRules.Single(r => r.Key == "FREQ").Value.ToString() + ";";
+                var interval = "INTERVAL="+recurringRules.Single(r => r.Key == "INTERVAL").Value.ToString();
+
+                if(recurringRules.ContainsKey("COUNT"))
+                {
+                    count = ";COUNT=" + recurringRules.Single(r => r.Key == "COUNT").Value.ToString();
+                }
+                if (recurringRules.ContainsKey("UNTIL"))
+                {
+                    var date = (DateTime)recurringRules.Single(r => r.Key == "UNTIL").Value;
+                    until = ";UNTIL=" + date.ToString("yyyMMdd");
+                }
+                string value = frequeny + interval + count + until;
+                UpdateStringToken(icalEvent, tokenName, value);
+            }
+        }
+
+        public static void UpdateStringToken(TokenNode icalEvent, string tokenName, string value, string subKey = "")
         {
             var tquery = icalEvent.Tokens.SingleOrDefault(o => o.NamingKey.ToLower() == tokenName.ToLower()) ?? new Token { Key = tokenName };
 
             tquery.SubKey = subKey;
-            tquery.Value = new EncodedTokenValue {DecodedValue = value};
+            tquery.Value = new EncodedTokenValue { DecodedValue = value };
 
             if (!icalEvent.Tokens.Contains(tquery))
                 icalEvent.Tokens.Add(tquery);

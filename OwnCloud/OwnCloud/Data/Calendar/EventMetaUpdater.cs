@@ -7,7 +7,7 @@ namespace OwnCloud.Data.Calendar
 {
     public static class EventMetaUpdater
     {
-        private static  readonly ParserICal CalPaser = new ParserICal();
+        private static readonly ParserICal CalPaser = new ParserICal();
 
         /// <summary>
         /// Aktualisiert die Metadaten eines in der Datenbank gespeicherten Events

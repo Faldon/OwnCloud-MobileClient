@@ -127,7 +127,7 @@
     <value>OwnCloud Client</value>
   </data>
   <data name="EditAccountPage_AddAccount" xml:space="preserve">
-    <value>Add account</value>
+    <value>Account</value>
   </data>
   <data name="EditAccountPage_CalDAVPath" xml:space="preserve">
     <value>CalDAV path (leave blank if not using CalDAV)</value>
@@ -302,7 +302,7 @@ Server Answer: {1}</value>
   <data name="ApplicationBarButton_ChooseAccount" xml:space="preserve">
     <value>Choose account</value>
   </data>
-  <data name="ApplicationBarButton_Edit" xml:space="preserve">
+  <data name="ApplicationBarButton_EditAccount" xml:space="preserve">
     <value>Edit Account</value>
   </data>
   <data name="ApplicationBarButton_Unlock" xml:space="preserve">
@@ -409,5 +409,14 @@ Server Answer: {1}</value>
   </data>
   <data name="ApplicationBarMenuItem_Month" xml:space="preserve">
     <value>Month</value>
+  </data>
+  <data name="AppointmentPage_Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="AppointmentDetailPage_PageTitle" xml:space="preserve">
+    <value>Appointment details</value>
+  </data>
+  <data name="ApplicationBarButton_Edit" xml:space="preserve">
+    <value>Edit</value>
   </data>
 </root>

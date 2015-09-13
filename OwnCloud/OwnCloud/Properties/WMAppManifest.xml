@@ -4,7 +4,7 @@
   <Languages xmlns="">
     <Language code="de" />
   </Languages>
-  <App xmlns="" ProductID="{94974bf1-3670-4363-be9b-d5aed90bf10f}" Title="OwnCloud" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Thomas Pulzer" Description="OwnCloud Client" Publisher="pWare" BitsPerPixel="32" PublisherID="{2117b033-dde6-4d29-b510-ad1655376c61}">
+  <App xmlns="" ProductID="{8b76fedd-314a-451b-b2a4-67d4b2de1ce9}" Title="OwnCloud Mobile" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Thomas Pulzer" Description="OwnCloud Mobile Client" Publisher="pWare" BitsPerPixel="32" PublisherID="{2117b033-dde6-4d29-b510-ad1655376c61}">
     <IconPath IsRelative="true" IsResource="false">Assets\Icons\Icon_64.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_IDENTITY_DEVICE" />

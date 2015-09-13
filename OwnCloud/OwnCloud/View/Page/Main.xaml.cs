@@ -95,8 +95,16 @@ namespace OwnCloud
 
         private void EditAccountTap(object sender, EventArgs e)
         {
-            var currentAccount = App.DataContext.Accounts.First();
-            NavigationService.Navigate(new Uri("/View/Page/EditAccount.xaml?mode=edit&account=" + ((Account)currentAccount).GUID, UriKind.Relative));
+            if (App.DataContext.Accounts.Count() > 0)
+            {
+                var currentAccount = App.DataContext.Accounts.First();
+                NavigationService.Navigate(new Uri("/View/Page/EditAccount.xaml?mode=edit&account=" + ((Account)currentAccount).GUID, UriKind.Relative));
+            }
+            else
+            {
+                NavigationService.Navigate(new Uri("/View/Page/EditAccount.xaml", UriKind.Relative));
+            }
+            
         }
 
         private void CalendarPinToStart(object sender, RoutedEventArgs e)

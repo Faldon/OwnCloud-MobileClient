@@ -9,9 +9,9 @@ using System.Resources;
 [assembly: AssemblyTitle("OwnCloud")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Pulzer")]
 [assembly: AssemblyProduct("OwnCloud")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -21,7 +21,7 @@ using System.Resources;
 [assembly: ComVisible(false)]
 
 // Die folgende GUID ist für die ID der typelib, wenn dieses Projekt für COM verfügbar gemacht wird
-[assembly: Guid("b273a69d-04ea-4c1d-8e86-b1139eacc589")]
+[assembly: Guid("8b76fedd-314a-451b-b2a4-67d4b2de1ce9")]
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
 //

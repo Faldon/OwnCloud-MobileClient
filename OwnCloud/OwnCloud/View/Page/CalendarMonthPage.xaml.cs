@@ -122,7 +122,7 @@ namespace OwnCloud.View.Page
 
         private void GotoAppointmentView(object sender, EventArgs e)
         {
-            App.Current.RootFrame.Navigate(new Uri("/View/Page/AppointmentPage.xaml?uid=" + CcCalendar.AccountID.ToString(), UriKind.Relative));
+            App.Current.RootFrame.Navigate(new Uri("/View/Page/AppointmentDetailPage.xaml?uid=" + CcCalendar.AccountID.ToString(), UriKind.Relative));
         }
 
         private void CcCalendar_OnDateChanged(object sender, RoutedEventArgs e)

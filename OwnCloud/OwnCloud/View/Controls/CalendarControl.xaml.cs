@@ -497,7 +497,7 @@ namespace OwnCloud.View.Controls
             {
                 Grid dayEvent = new Grid()
                     {
-                        Name = tableEvent.GetETag
+                        Name = tableEvent.EventId.ToString()
                     };
                 switch (tableEvent.IsFullDayEvent)
                 {
@@ -573,6 +573,11 @@ namespace OwnCloud.View.Controls
                             VerticalAlignment = System.Windows.VerticalAlignment.Top,
                             Margin = new Thickness(10, 0, 10, 0)
                         };
+                        string loc = OwnCloud.Data.Calendar.Parsing.ParserICal.ParseLocation(tableEvent);
+                        if (loc.Length != 0)
+                        {
+                            durationText.Text += " (" + loc + ")";
+                        }
                         Grid.SetColumn(durationText, 2);
                         Grid.SetRow(durationText, 1);
 
@@ -603,8 +608,8 @@ namespace OwnCloud.View.Controls
 
         void OpenAppointmentPage(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            Grid dayEvent = (Grid)sender;
-            App.Current.RootFrame.Navigate(new Uri("/View/Page/AppointmentPage.xaml?eTag=" + dayEvent.Name + "&uid=" + AccountID.ToString(), UriKind.Relative));
+            Grid dayEvent = (Grid)sender;     
+            App.Current.RootFrame.Navigate(new Uri("/View/Page/AppointmentDetailPage.xaml?eid=" + dayEvent.Name + "&uid=" + AccountID.ToString(), UriKind.Relative));
         }
 
         void CloseDayDetails(object sender, System.Windows.Input.GestureEventArgs e)

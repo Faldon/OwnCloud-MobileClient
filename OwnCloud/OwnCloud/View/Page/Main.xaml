@@ -59,12 +59,19 @@
         
         <!-- ApplicationBar for Accounts -->
         <shell:ApplicationBar x:Key="AccountApplicationBar">
-            <shell:ApplicationBarIconButton IconUri="/Assets/Icons/edit.png" Text="ApplicationBarButton_Edit" Click="EditAccountTap"/>
+            <shell:ApplicationBarIconButton 
+                IconUri="/Assets/Icons/edit.png" 
+                Text="ApplicationBarButton_EditAccount" 
+                Click="EditAccountTap"/>
         </shell:ApplicationBar>
         
         <!-- Applicationbar for Files -->
         <shell:ApplicationBar x:Key="FilesApplicationBar">
-            <shell:ApplicationBarIconButton x:Name="FilesApplicationBarAccounts" IconUri="/Assets/Icons/Web.png" Text="ApplicationBarButton_ChooseAccount" Click="ChooseAccountTap"/>
+            <shell:ApplicationBarIconButton 
+                x:Name="FilesApplicationBarAccounts" 
+                IconUri="/Assets/Icons/Web.png" 
+                Text="ApplicationBarButton_ChooseAccount" 
+                Click="ChooseAccountTap"/>
         </shell:ApplicationBar>
         
         <!-- -->

@@ -133,7 +133,7 @@
     <value>OwnCloud Client</value>
   </data>
   <data name="EditAccountPage_AddAccount" xml:space="preserve">
-    <value>Konto hinzufügen</value>
+    <value>Konto</value>
   </data>
   <data name="EditAccountPage_Anonymous" xml:space="preserve">
     <value>Anonymer Zugriff</value>
@@ -302,7 +302,7 @@ Server Antwort: {1}</value>
   <data name="ApplicationBarButton_ChooseAccount" xml:space="preserve">
     <value>Konto wählen</value>
   </data>
-  <data name="ApplicationBarButton_Edit" xml:space="preserve">
+  <data name="ApplicationBarButton_EditAccount" xml:space="preserve">
     <value>Konto bearbeiten</value>
   </data>
   <data name="ApplicationBarButton_Unlock" xml:space="preserve">
@@ -409,5 +409,14 @@ Server Antwort: {1}</value>
   </data>
   <data name="ApplicationBarMenuItem_Month" xml:space="preserve">
     <value>Monat</value>
+  </data>
+  <data name="AppointmentPage_Location" xml:space="preserve">
+    <value>Ort</value>
+  </data>
+  <data name="AppointmentDetailPage_PageTitle" xml:space="preserve">
+    <value>Ereignisdetails</value>
+  </data>
+  <data name="ApplicationBarButton_Edit" xml:space="preserve">
+    <value>Bearbeiten</value>
   </data>
 </root>

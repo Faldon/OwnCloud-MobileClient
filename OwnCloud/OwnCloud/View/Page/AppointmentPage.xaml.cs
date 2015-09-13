@@ -66,6 +66,11 @@ namespace OwnCloud.View.Page
 
             CalendarPicker.ItemsSource = Context.Calendars;
 
+            if (NavigationContext.QueryString.ContainsKey("eid"))
+            {
+                LoadFromEventID(Int32.Parse(NavigationContext.QueryString["eid"]));
+            }
+
             if (NavigationContext.QueryString.ContainsKey("eTag"))
             {
                 LoadFromETag(NavigationContext.QueryString["eTag"]);
@@ -100,6 +105,7 @@ namespace OwnCloud.View.Page
                 DpTo.Value = storedEvent.To;
                 TpTo.Value = storedEvent.To;
                 TbDescription.Text = storedEvent.Description ?? "";
+                TbLocation.Text = storedEvent.Location ?? "";
                 CbFullDayEvent.IsChecked = storedEvent.IsFullDayEvent;
                 _url = dbEvent.Url;
 
@@ -116,6 +122,50 @@ namespace OwnCloud.View.Page
 
                 TpFrom.Value = storedEvent.From;
                 TpTo.Value = storedEvent.To;            
+            }
+        }
+
+        private void LoadFromEventID(int eid)
+        {
+            var dbEvent = Context.Events.SingleOrDefault(o => o.EventId == eid);
+            var calendar = Context.Calendars.SingleOrDefault(c => c.Id == dbEvent.CalendarId);
+            CalendarPicker.SelectedItem = calendar;
+
+            if (dbEvent == null) return;
+
+            var parser = new ParserICal();
+            using (var stream = new MemoryStream())
+            {
+                var writer = new StreamWriter(stream);
+                writer.Write(dbEvent.CalendarData);
+                writer.Flush();
+                stream.Seek(0, SeekOrigin.Begin);
+
+                var storedEvent = parser.Parse(stream).Events.First();
+
+                TbTitle.Text = storedEvent.Title ?? "";
+                DpFrom.Value = storedEvent.From;
+                TpFrom.Value = storedEvent.From;
+                DpTo.Value = storedEvent.To;
+                TpTo.Value = storedEvent.To;
+                TbDescription.Text = storedEvent.Description ?? "";
+                TbLocation.Text = storedEvent.Location ?? "";
+                CbFullDayEvent.IsChecked = storedEvent.IsFullDayEvent;
+                _url = dbEvent.Url;
+
+                if (!storedEvent.IsFullDayEvent)
+                {
+                    DpFrom.Value = storedEvent.From;
+                    DpTo.Value = storedEvent.To;
+                }
+                else
+                {
+                    DpFrom.Value = storedEvent.From.Date;
+                    DpTo.Value = storedEvent.To.Date.AddDays(-1);
+                }
+
+                TpFrom.Value = storedEvent.From;
+                TpTo.Value = storedEvent.To;
             }
         }
 
@@ -166,18 +216,18 @@ namespace OwnCloud.View.Page
             if (!merge)
             {
                 dbEvent.CalendarData = System.IO.File.OpenText("Assets/NewCalendar.ics").ReadToEnd();
-                CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, true);
+                CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, TbLocation.Text, true);
             }
             else
             {
                 if (CalendarPicker.SelectedItem == Context.Calendars.SingleOrDefault(c => c.Id == dbEvent.CalendarId))
                 {
-                    CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, false);
+                    CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, TbLocation.Text, false);
                 }
                 else
                 {
                     dbEvent.Url = (CalendarPicker.SelectedItem as TableCalendar).Url + dbEvent.Url.Substring(dbEvent.Url.LastIndexOf("/")).TrimStart('/');
-                    CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, true);
+                    CalendarDataUpdater.UpdateCalendarData(dbEvent, TbDescription.Text, TbLocation.Text, true);
                     DeleteExisting(false);
                 }
             }

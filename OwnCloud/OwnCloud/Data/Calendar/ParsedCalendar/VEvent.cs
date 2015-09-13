@@ -8,6 +8,7 @@ namespace OwnCloud.Data.Calendar.ParsedCalendar
     public class VEvent
     {
         private string _description = "";
+        private string _location;
 
         public string Title { get; set; }
 
@@ -15,6 +16,12 @@ namespace OwnCloud.Data.Calendar.ParsedCalendar
         {
             get { return _description; }
             set { _description = value; }
+        }
+
+        public string Location
+        {
+            get { return _location; }
+            set { _location = value; }
         }
 
         public DateTime From { get; set; }

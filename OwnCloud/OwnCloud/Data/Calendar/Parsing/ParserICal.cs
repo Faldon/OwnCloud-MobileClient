@@ -50,6 +50,8 @@ namespace OwnCloud.Data.Calendar.Parsing
                 cEvent.Title = refString;
             if ((refString = TryFindString(node, "DESCRIPTION")) != null)
                 cEvent.Description = refString;
+            if ((refString = TryFindString(node, "LOCATION")) != null)
+                cEvent.Location = refString;
             
             return cEvent;
         }
@@ -84,6 +86,28 @@ namespace OwnCloud.Data.Calendar.Parsing
                 }
             }
             return rules;
+        }
+
+        public static string ParseLocation(TableEvent eEvent)
+        {
+            ParserICal CalParser = new ParserICal();
+            string location = "";
+
+            using (var stream = new MemoryStream())
+            {
+                var writer = new StreamWriter(stream);
+                writer.Write(eEvent.CalendarData);
+                writer.Flush();
+
+                stream.Seek(0, SeekOrigin.Begin);
+                var nodeParser = new ParserNodeToken();
+                var rootNode = nodeParser.Parse(stream).Childs[0];
+                TokenNode node = CalParser.FindNextChild(rootNode, 0, "VEVENT");
+
+                if ((location = CalParser.TryFindString(node, "LOCATION")) == null)
+                    location = "";
+            }
+            return location;
         }
 
         private bool TryFindDate(TokenNode node, string tokenName, ref DateTime result, out bool isFullDayTime)

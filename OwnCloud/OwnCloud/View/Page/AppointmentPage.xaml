@@ -90,6 +90,10 @@
                         </toolkit:ListPicker.ItemTemplate>
                     </toolkit:ListPicker>
 
+                    <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_Location, Source={StaticResource LocalizedStrings}}"
+                               Style="{StaticResource PhoneTextSubtleStyle}"/>
+                    <TextBox x:Name="TbLocation"></TextBox>
+                    
                     <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_Description, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"/>
                     <TextBox x:Name="TbDescription" AcceptsReturn="True" Height="200"></TextBox>

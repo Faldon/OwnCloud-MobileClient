@@ -106,11 +106,20 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Edit Account.
+        ///   Looks up a localized string similar to Edit.
         /// </summary>
         public static string ApplicationBarButton_Edit {
             get {
                 return ResourceManager.GetString("ApplicationBarButton_Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit Account.
+        /// </summary>
+        public static string ApplicationBarButton_EditAccount {
+            get {
+                return ResourceManager.GetString("ApplicationBarButton_EditAccount", resourceCulture);
             }
         }
         
@@ -205,6 +214,15 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Appointment details.
+        /// </summary>
+        public static string AppointmentDetailPage_PageTitle {
+            get {
+                return ResourceManager.GetString("AppointmentDetailPage_PageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} hour{1} {2} minute{3}.
         /// </summary>
         public static string AppointmentDuration {
@@ -255,6 +273,15 @@ namespace OwnCloud.Resource.Localization {
         public static string AppointmentPage_FullDay {
             get {
                 return ResourceManager.GetString("AppointmentPage_FullDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        public static string AppointmentPage_Location {
+            get {
+                return ResourceManager.GetString("AppointmentPage_Location", resourceCulture);
             }
         }
         
@@ -385,7 +412,7 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add account.
+        ///   Looks up a localized string similar to Account.
         /// </summary>
         public static string EditAccountPage_AddAccount {
             get {
