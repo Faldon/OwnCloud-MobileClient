@@ -34,6 +34,7 @@ namespace OwnCloud.Data
 
         public void ItemLinked(object sender, ItemRealizationEventArgs e)
         {
+            e.Container.Content = Days.First();
             //var last = Days.Last();
 
             //if (e.Container.Content.Equals(last))

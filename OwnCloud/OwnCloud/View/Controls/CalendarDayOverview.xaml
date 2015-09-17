@@ -5,8 +5,10 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     mc:Ignorable="d"
-    shell:SystemTray.IsVisible="True" Loaded="CalendarDayOverview_OnLoaded" Width="450" Height="900">
+    shell:SystemTray.IsVisible="True" 
+    Loaded="CalendarDayOverview_OnLoaded" Width="450" Height="900">
 
     <Grid x:Name="LayoutRoot">
         <Grid.RowDefinitions>
@@ -14,7 +16,10 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Margin="5,15,0,5" Text="{Binding StringFormat=dd.MM.yyyy}" Style="{StaticResource PhoneTextNormalStyle}"></TextBlock>
+        <TextBlock x:Name="TbDay" 
+                   Margin="5,15,0,5" 
+                   Text="{Binding Path=Date, StringFormat=d}" 
+                   Style="{StaticResource PhoneTextNormalStyle}" />
 
         <Grid x:Name="BackgroundGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -30,9 +35,7 @@
             <!--Other Horizontal lines are added in code behind -->
         </Grid>
         <Grid x:Name="AppointmentGrid" Grid.Row="1" Margin="120,0,0,0">
-
         </Grid>
-
     </Grid>
 
 

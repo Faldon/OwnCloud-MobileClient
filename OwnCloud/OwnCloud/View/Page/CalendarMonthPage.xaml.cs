@@ -13,7 +13,7 @@ namespace OwnCloud.View.Page
 {
     public partial class CalendarMonthPage : PhoneApplicationPage
     {
-        
+
 
         public CalendarMonthPage()
         {
@@ -58,7 +58,7 @@ namespace OwnCloud.View.Page
                 if (_account == null)
                 {
                     _account = Context.Accounts.Single(o => o.GUID == _userId);
-                    if(_account.IsEncrypted)
+                    if (_account.IsEncrypted)
                         _account.RestoreCredentials();
                 }
                 return _account;
@@ -69,7 +69,7 @@ namespace OwnCloud.View.Page
         private DateTime? _selectedDate;
         public DateTime SelectedDate
         {
-            get { return (DateTime) (_selectedDate.HasValue ? _selectedDate.Value : (_selectedDate = DateTime.Now)); }
+            get { return (DateTime)(_selectedDate.HasValue ? _selectedDate.Value : (_selectedDate = DateTime.Now)); }
             set { _selectedDate = value; }
         }
 
@@ -81,11 +81,11 @@ namespace OwnCloud.View.Page
             //Get userid in query
             if (NavigationContext.QueryString.ContainsKey("uid"))
                 _userId = int.Parse(NavigationContext.QueryString["uid"]);
-            else throw new ArgumentNullException("uid",AppResources.Exception_NoUserID);
+            else throw new ArgumentNullException("uid", AppResources.Exception_NoUserID);
 
             CcCalendar.AccountID = _userId;
             CcCalendar.SelectedDate = SelectedDate;
-            
+
             ReloadAppointments();
 
             base.OnNavigatedTo(e);
@@ -102,6 +102,10 @@ namespace OwnCloud.View.Page
 
         void sync_SyncComplete(bool success)
         {
+            if (!success)
+            {
+                Dispatcher.BeginInvoke(() => { MessageBox.Show("Could not sync calendars"); });
+            }
             Dispatcher.BeginInvoke(() => { CcCalendar.RefreshAppointments(); UnlockPage(); UnsetLoading(); });
         }
 
@@ -167,6 +171,6 @@ namespace OwnCloud.View.Page
             if (SystemTray.ProgressIndicator != null)
                 SystemTray.ProgressIndicator.IsVisible = false;
         }
-        
+
     }
 }

@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using OwnCloud.Extensions;
 using OwnCloud.Data;
+using Microsoft.Phone.Controls;
 
 namespace OwnCloud.View.Controls
 {
@@ -40,7 +41,7 @@ namespace OwnCloud.View.Controls
                 };
                 var tb = new TextBlock
                 {
-                    Text = i.ToString().PadLeft(2, '0')+":00",
+                    Text = i.ToString().PadLeft(2, '0') + ":00",
                     VerticalAlignment = VerticalAlignment.Top,
                     Style = Application.Current.Resources["PhoneTextNormalStyle"] as Style
                 };
@@ -50,12 +51,11 @@ namespace OwnCloud.View.Controls
                 BackgroundGrid.Children.Add(r);
                 BackgroundGrid.Children.Add(tb);
             }
-
             UpdateEvents();
 
         }
 
-        private void UpdateEvents()
+        public void UpdateEvents()
         {
             var events =
                 EventSource.LoadEvents(this)
@@ -92,11 +92,9 @@ namespace OwnCloud.View.Controls
             }
         }
 
-
         public DateTime SelectedDate
         {
             get { return ((DateTime)DataContext).Date; }
         }
-
     }
 }

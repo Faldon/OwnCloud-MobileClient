@@ -36,40 +36,86 @@
             </toolkit:NavigationOutTransition.Forward>
         </toolkit:NavigationOutTransition>
     </toolkit:TransitionService.NavigationOutTransition>
-    
+    <UserControl.Resources>
+        <Storyboard x:Name="SlideLeftBegin" Completed="SlideLeftBegin_OnCompleted">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetX)" Storyboard.TargetName="GrdMovingPart">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="-90"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="GrdMovingPart">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="1"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="SlideLeftEnd">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetX)" Storyboard.TargetName="GrdMovingPart">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="90"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="GrdMovingPart">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="SlideRightBegin" Completed="SlideRightBegin_OnCompleted">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetX)" Storyboard.TargetName="GrdMovingPart">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="90"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="GrdMovingPart">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="1"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="SlideRightEnd">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetX)" Storyboard.TargetName="GrdMovingPart">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="-90"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="GrdMovingPart">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </UserControl.Resources>
+
     <!--LayoutRoot ist das Stammraster, in dem alle anderen Seiteninhalte platziert werden-->
     <Grid x:Name="LayoutRoot" Background="Transparent" Loaded="LayoutRoot_OnLoaded">
-        <!--Pivotsteuerelement-->
-        <controls:Pivot Title="{Binding Path=LocalizedResources.CalendarMonthPage_Title, Source={StaticResource LocalizedStrings}, Converter={StaticResource ToUppercaseConverter}}">
-            <controls:Pivot.TitleTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding}"
-                               Style="{StaticResource PageHeader}"
-                               Margin="0"/>
-                </DataTemplate>
-            </controls:Pivot.TitleTemplate>
-            <!--Pivotelement eins-->
-            <controls:PivotItem Header="Day">
+        <toolkit:GestureService.GestureListener>
+            <toolkit:GestureListener DragCompleted="GestureListener_OnDragCompleted"/>
+        </toolkit:GestureService.GestureListener>
+        <TextBlock Text="{Binding Path=LocalizedResources.CalendarMonthPage_Title, Source={StaticResource LocalizedStrings}, Converter={StaticResource ToUppercaseConverter}}"
+                       Style="{StaticResource PageHeader}" Margin="12,0,0,10" />
+        <Grid x:Name="GrdMovingPart">
+            <Grid.Projection>
+                <PlaneProjection/>
+            </Grid.Projection>
+            <!--TitlePanel enthält den Namen der Anwendung und den Seitentitel-->
+            <StackPanel Grid.Row="0" Margin="12,40,0,28">
+                <TextBlock Text="" x:Name="TbDateHeader" Margin="0,-7,0,0" Style="{StaticResource PhoneTextTitle3Style}" />
                 <Grid>
-                    <phone:LongListSelector Loaded="HookScrollViewer" x:Name="LlsDays" IsGroupingEnabled="False" ItemRealized="LongListSelector_OnLink" ItemsSource="{Binding Days}">
-                        <phone:LongListSelector.ItemTemplate>
-                            <DataTemplate>
-                                <cntrl:CalendarDayOverview>
-                                    <cntrl:CalendarDayOverview.EventSource>
-                                        <data:DynamicCalendarSource OnEventsRequested="DynamicCalendarSource_OnOnEventsRequested" />
-                                    </cntrl:CalendarDayOverview.EventSource>
-                                </cntrl:CalendarDayOverview>
-                            </DataTemplate>
-                        </phone:LongListSelector.ItemTemplate>
-                    </phone:LongListSelector>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" x:Name="TbTodayHeader" Margin="0" Style="{StaticResource PhoneTextExtraLargeStyle}" />
+                    <TextBlock Grid.Column="1" Text="" x:Name="TbTomorrowHeader" Style="{StaticResource PhoneTextExtraLargeStyle}" Foreground="Gray" />
                 </Grid>
-            </controls:PivotItem>
-
-            <!--Pivotelement zwei-->
-            <controls:PivotItem Header="Other stuff">
-                <Grid/>
-            </controls:PivotItem>
-        </controls:Pivot>
+            </StackPanel>
+            <Grid x:Name="ContentPanel" Margin="12,123,12,28">
+                <phone:LongListSelector Loaded="DayList_Loaded" x:Name="LlsDays" IsGroupingEnabled="False" ItemRealized="LongListSelector_OnLink" ItemsSource="{Binding Days}">
+                    <phone:LongListSelector.ItemTemplate>
+                        <DataTemplate>
+                            <cntrl:CalendarDayOverview>
+                                <cntrl:CalendarDayOverview.EventSource>
+                                    <data:DynamicCalendarSource OnEventsRequested="DynamicCalendarSource_OnOnEventsRequested" />
+                                </cntrl:CalendarDayOverview.EventSource>
+                            </cntrl:CalendarDayOverview>
+                        </DataTemplate>
+                    </phone:LongListSelector.ItemTemplate>
+                </phone:LongListSelector>
+            </Grid>
+        </Grid>
     </Grid>
 
 </phone:PhoneApplicationPage>

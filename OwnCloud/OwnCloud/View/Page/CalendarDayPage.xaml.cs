@@ -13,6 +13,7 @@ using Microsoft.Phone.Controls;
 using OwnCloud.Data;
 using System.Windows.Navigation;
 using OwnCloud.Resource.Localization;
+using OwnCloud.View.Controls;
 
 namespace OwnCloud.View.Page
 {
@@ -21,17 +22,23 @@ namespace OwnCloud.View.Page
         public CalendarDayPage()
         {
             InitializeComponent();
-
-            
-
         }
 
         private int _userId;
-        private ScrollViewer _dayScoller;
-        private DateTime _startDate;
+        private CalendarDayOverview _dayOverview;
+
+        public DateTime StartDate
+        {
+            get { return (DateTime)GetValue(StartDateProperty); }
+            set
+            {
+                SetValue(StartDateProperty, value);
+            }
+        }
 
 
-        public new CalendarDaysDataContext DataContext {
+        public new CalendarDaysDataContext DataContext
+        {
             get { return base.DataContext as CalendarDaysDataContext; }
         }
 
@@ -44,17 +51,86 @@ namespace OwnCloud.View.Page
 
             try
             {
-                _startDate = DateTime.Parse(NavigationContext.QueryString["startDate"]);
+                StartDate = DateTime.Parse(NavigationContext.QueryString["startDate"]);
             }
             catch
             {
-                _startDate = DateTime.Now;
+                StartDate = DateTime.Now;
             }
 
-            base.DataContext = new CalendarDaysDataContext(_startDate);
+            base.DataContext = new CalendarDaysDataContext(StartDate);
+            TbDateHeader.Text = StartDate.ToLongDateString();
+            TbTodayHeader.Text = StartDate.ToShortDateString();
+            TbTomorrowHeader.Text = StartDate.AddDays(1).ToShortDateString();
 
             base.OnNavigatedTo(e);
         }
+
+        public static readonly DependencyProperty StartDateProperty =
+            DependencyProperty.Register("StartDate", typeof(DateTime), typeof(CalendarDayPage), new PropertyMetadata(DateTime.MinValue, OnStartDateDateChanged));
+
+        private static void OnStartDateDateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            (sender as CalendarDayPage).StartDateChanged(e);
+        }
+
+        private void StartDateChanged(DependencyPropertyChangedEventArgs e)
+        {
+            OnDateChanging();
+
+            if ((DateTime)e.NewValue > (DateTime)e.OldValue)
+                SlideLeftBegin.Begin();
+            else SlideRightBegin.Begin();
+        }
+
+        private void SlideLeftBegin_OnCompleted(object sender, EventArgs e)
+        {
+            ChangeDate();
+            SlideLeftEnd.Begin();
+        }
+
+        private void SlideRightBegin_OnCompleted(object sender, EventArgs e)
+        {
+            ChangeDate();
+            SlideRightEnd.Begin();
+        }
+
+        public void ChangeDate()
+        {
+            OnDateChanged();
+
+            var dataContext = base.DataContext as CalendarDaysDataContext;
+            dataContext.Days = new System.Collections.ObjectModel.ObservableCollection<DateTime>();
+            dataContext.Days.Add(StartDate);
+            _dayOverview.AppointmentGrid.Children.Clear();
+
+            TbDateHeader.Text = StartDate.ToLongDateString();
+            TbTodayHeader.Text = StartDate.ToShortDateString();
+            TbTomorrowHeader.Text = StartDate.AddDays(1).ToShortDateString();
+
+            Dispatcher.BeginInvoke(() => { _dayOverview.UpdateEvents(); });
+        }
+
+        private void GestureListener_OnDragCompleted(object sender, DragCompletedGestureEventArgs e)
+        {
+            if (e.Direction == System.Windows.Controls.Orientation.Vertical) return;
+
+            StartDate = e.HorizontalChange > 0 ? StartDate.AddDays(-1) : StartDate.AddDays(1);
+        }
+
+        private void OnDateChanging()
+        {
+            if (DateChanging != null)
+                DateChanging(this, new RoutedEventArgs());
+        }
+        public event RoutedEventHandler DateChanging;
+
+        private void OnDateChanged()
+        {
+            if (DateChanged != null)
+                DateChanged(this, new RoutedEventArgs());
+        }
+        public event RoutedEventHandler DateChanged;
 
         private void LongListSelector_OnLink(object sender, ItemRealizationEventArgs e)
         {
@@ -66,11 +142,10 @@ namespace OwnCloud.View.Page
             //LlsDays.ScrollTo(_startDate);
         }
 
-        private void HookScrollViewer(object sender, RoutedEventArgs e)
+        private void DayList_Loaded(object sender, RoutedEventArgs e)
         {
-           // var element = (FrameworkElement)sender;
-           //_dayScoller = FindChildOfType<ScrollViewer>(element);
-           //_dayScoller.LayoutUpdated += _dayScoller_LayoutUpdated;
+            var element = (FrameworkElement)sender;
+            _dayOverview = FindChildOfType<OwnCloud.View.Controls.CalendarDayOverview>(element);
         }
 
         void _dayScoller_LayoutUpdated(object sender, EventArgs e)

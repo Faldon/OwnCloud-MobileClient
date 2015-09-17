@@ -234,16 +234,12 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Controls\CalendarControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Controls\CalendarDayControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Controls\CalendarDayOverview.xaml">
       <SubType>Designer</SubType>
