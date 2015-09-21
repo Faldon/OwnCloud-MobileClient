@@ -7,6 +7,7 @@
     <converter:ToUppercaseConverter x:Key="ToUppercaseConverter" />
     <converter:SyncButtonVisibilityConverter x:Key="SyncButtonVisibilityConverter" />
     <converter:CalendarColorConverter x:Key="CalendarColorConverter" />
+    <converter:DateToWeekOfYearConverter x:Key="DateToWeekOfYearConverter" />
 
     <System:Double x:Key="PhoneFontSizeExtraSmall">16</System:Double>
 

@@ -340,6 +340,15 @@ namespace OwnCloud.Resource.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Week {0}.
+        /// </summary>
+        public static string CalendarDayOverview_WeekOfYear {
+            get {
+                return ResourceManager.GetString("CalendarDayOverview_WeekOfYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Calendar Settings.
         /// </summary>
         public static string CalendarMonthPage_ListCalendars {
@@ -920,6 +929,15 @@ namespace OwnCloud.Resource.Localization {
         public static string SettingsPage_Title {
             get {
                 return ResourceManager.GetString("SettingsPage_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Syncing calendar data failed..
+        /// </summary>
+        public static string Sync_Error {
+            get {
+                return ResourceManager.GetString("Sync_Error", resourceCulture);
             }
         }
         

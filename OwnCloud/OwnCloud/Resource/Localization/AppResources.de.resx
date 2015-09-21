@@ -419,4 +419,10 @@ Server Antwort: {1}</value>
   <data name="ApplicationBarButton_Edit" xml:space="preserve">
     <value>Bearbeiten</value>
   </data>
+  <data name="Sync_Error" xml:space="preserve">
+    <value>Abgleich der Kalenderdaten fehlgeschlagen.</value>
+  </data>
+  <data name="CalendarDayOverview_WeekOfYear" xml:space="preserve">
+    <value>Week {0}</value>
+  </data>
 </root>

@@ -103,10 +103,12 @@ namespace OwnCloud.View.Page
             dataContext.Days = new System.Collections.ObjectModel.ObservableCollection<DateTime>();
             dataContext.Days.Add(StartDate);
             _dayOverview.AppointmentGrid.Children.Clear();
+            _dayOverview.FullDayEvents.Children.Clear();
+            _dayOverview.FullDayEvents.InvalidateMeasure();
 
-            TbDateHeader.Text = StartDate.ToLongDateString();
-            TbTodayHeader.Text = StartDate.ToShortDateString();
-            TbTomorrowHeader.Text = StartDate.AddDays(1).ToShortDateString();
+            TbDateHeader.Text = StartDate.ToShortDateString();
+            TbTodayHeader.Text = StartDate.ToString("dddd");
+            TbTomorrowHeader.Text = StartDate.AddDays(1).ToString("dddd");
 
             Dispatcher.BeginInvoke(() => { _dayOverview.UpdateEvents(); });
         }

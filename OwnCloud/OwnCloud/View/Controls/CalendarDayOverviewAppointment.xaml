@@ -14,11 +14,12 @@
 
     <!--LayoutRoot ist das Stammraster, in dem alle anderen Seiteninhalte platziert werden-->
     <Grid x:Name="LayoutRoot" Background="Transparent" >
-
-        <Rectangle RadiusX="8" RadiusY="8" Fill="Wheat" Stroke="#FFB99C66" StrokeThickness="1" />
-
-        <TextBlock Text="{Binding Title}" TextWrapping="Wrap" Foreground="Black" />
-        
+        <Rectangle x:Name="AppointmentBack" RadiusX="8" RadiusY="8" Stroke="White" StrokeThickness="1" />
+        <TextBlock Text="{Binding Title}" 
+                   Margin="10,10,0,0" 
+                   TextWrapping="Wrap" 
+                   Foreground="Black"
+                   FontWeight="Bold" />
     </Grid>
 
 </UserControl>

@@ -104,7 +104,7 @@ namespace OwnCloud.View.Page
         {
             if (!success)
             {
-                Dispatcher.BeginInvoke(() => { MessageBox.Show("Could not sync calendars"); });
+                Dispatcher.BeginInvoke(() => { MessageBox.Show(Resource.Localization.AppResources.Sync_Error); });
             }
             Dispatcher.BeginInvoke(() => { CcCalendar.RefreshAppointments(); UnlockPage(); UnsetLoading(); });
         }

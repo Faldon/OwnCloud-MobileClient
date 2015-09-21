@@ -15,19 +15,21 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
-        <TextBlock x:Name="TbDay" 
-                   Margin="5,15,0,5" 
-                   Text="{Binding Path=Date, StringFormat=d}" 
+        <StackPanel x:Name="ListHeader">
+            <TextBlock x:Name="TbWeek" 
+                   Margin="5,5,0,5"
+                   Text="{Binding Path=Date, Converter={StaticResource DateToWeekOfYearConverter}}" 
                    Style="{StaticResource PhoneTextNormalStyle}" />
-
+            <StackPanel x:Name="FullDayEvents"
+                    Margin="5,0,0,5" />
+        </StackPanel>
         <Grid x:Name="BackgroundGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="120" />
+                <RowDefinition Height="240" />
             </Grid.RowDefinitions>
 
             <Rectangle HorizontalAlignment="Right" Width="1" Grid.RowSpan="24" Fill="White"></Rectangle>

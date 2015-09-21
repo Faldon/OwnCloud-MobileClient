@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using OwnCloud.Data;
+using System.Windows;
 
 namespace OwnCloud.View.Controls
 {
@@ -8,6 +9,5 @@ namespace OwnCloud.View.Controls
         {
             InitializeComponent();
         }
-
     }
 }
