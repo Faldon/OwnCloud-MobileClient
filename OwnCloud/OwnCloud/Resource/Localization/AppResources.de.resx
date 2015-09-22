@@ -423,6 +423,6 @@ Server Antwort: {1}</value>
     <value>Abgleich der Kalenderdaten fehlgeschlagen.</value>
   </data>
   <data name="CalendarDayOverview_WeekOfYear" xml:space="preserve">
-    <value>Week {0}</value>
+    <value>Woche {0}</value>
   </data>
 </root>
