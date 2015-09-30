@@ -97,7 +97,7 @@ namespace OwnCloud
         {
             if (App.DataContext.Accounts.Count() > 0)
             {
-                var currentAccount = App.DataContext.Accounts.First();
+                var currentAccount = App.DataContext.Accounts.FirstOrDefault();
                 NavigationService.Navigate(new Uri("/View/Page/EditAccount.xaml?mode=edit&account=" + ((Account)currentAccount).GUID, UriKind.Relative));
             }
             else

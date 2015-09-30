@@ -63,15 +63,23 @@
                                Style="{StaticResource PhoneTextSubtleStyle}"></TextBlock>
                     <TextBox x:Name="TbTitle" />
 
+                    <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_Location, Source={StaticResource LocalizedStrings}}"
+                               Style="{StaticResource PhoneTextSubtleStyle}"/>
+                    <TextBox x:Name="TbLocation"></TextBox>
+                    
                     <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_From, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"></TextBlock>
-                    <toolkit:DatePicker x:Name="DpFrom" />
-                    <toolkit:TimePicker x:Name="TpFrom" />
+                    <StackPanel Orientation="Horizontal">
+                        <toolkit:DatePicker x:Name="DpFrom" />
+                        <toolkit:TimePicker x:Name="TpFrom" />
+                    </StackPanel>
 
                     <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_To, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"></TextBlock>
-                    <toolkit:DatePicker x:Name="DpTo" />
-                    <toolkit:TimePicker x:Name="TpTo" />
+                    <StackPanel Orientation="Horizontal">
+                        <toolkit:DatePicker x:Name="DpTo" />
+                        <toolkit:TimePicker x:Name="TpTo" />
+                    </StackPanel>
 
                     <CheckBox Content="{Binding Path=LocalizedResources.AppointmentPage_FullDay, Source={StaticResource LocalizedStrings}}" Checked="CbFullDayEventChanged" Unchecked="CbFullDayEventChanged" x:Name="CbFullDayEvent" />
 
@@ -90,14 +98,10 @@
                         </toolkit:ListPicker.ItemTemplate>
                     </toolkit:ListPicker>
 
-                    <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_Location, Source={StaticResource LocalizedStrings}}"
-                               Style="{StaticResource PhoneTextSubtleStyle}"/>
-                    <TextBox x:Name="TbLocation"></TextBox>
-                    
                     <TextBlock Text="{Binding Path=LocalizedResources.AppointmentPage_Description, Source={StaticResource LocalizedStrings}}"
                                Style="{StaticResource PhoneTextSubtleStyle}"/>
                     <TextBox x:Name="TbDescription" AcceptsReturn="True" Height="200"></TextBox>
-                    
+
                 </StackPanel>
             </ScrollViewer>
         </Grid>

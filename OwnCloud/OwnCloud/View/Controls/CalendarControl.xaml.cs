@@ -26,7 +26,6 @@ namespace OwnCloud.View.Controls
         public CalendarControl()
         {
             InitializeComponent();
-
             Unloaded += CalendarControl_Unloaded;
         }
 
@@ -83,9 +82,9 @@ namespace OwnCloud.View.Controls
 
         // Using a DependencyProperty as the backing store for SelectedDate.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedDateProperty =
-            DependencyProperty.Register("SelectedDate", typeof(DateTime), typeof(CalendarControl), new PropertyMetadata(DateTime.MinValue, OnSelectedDateChaged));
+            DependencyProperty.Register("SelectedDate", typeof(DateTime), typeof(CalendarControl), new PropertyMetadata(DateTime.MinValue, OnSelectedDateChanged));
 
-        private static void OnSelectedDateChaged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private static void OnSelectedDateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             (sender as CalendarControl).SelectedDateChanged(e);
         }
@@ -93,10 +92,15 @@ namespace OwnCloud.View.Controls
         private void SelectedDateChanged(DependencyPropertyChangedEventArgs e)
         {
             OnDateChanging();
+            if((DateTime)e.OldValue==DateTime.MinValue)
+            {
+                _firstDayOfCalendarMonth = ((DateTime)e.NewValue).FirstOfMonth().FirstDayOfWeek().Date;
+                _lastDayOfCalendarMonth = ((DateTime)e.NewValue).LastOfMonth().LastDayOfWeek().AddDays(1);
+            }
 
             if ((DateTime)e.NewValue > (DateTime)e.OldValue)
-                SlideLeftBegin.Begin();
-            else SlideRightBegin.Begin();
+                this.SlideLeftBegin.Begin();
+            else this.SlideRightBegin.Begin();
         }
 
 
