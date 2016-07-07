@@ -1,0 +1,28 @@
+﻿<ContentDialog
+    x:Class="Nextcloud.View.AddAccountPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Nextcloud.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Uid="AddAccountPage"
+    Title=""
+    PrimaryButtonText="sign in"  
+    SecondaryButtonText="cancel"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+
+    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <TextBox x:Uid="InputUsername" x:Name="email" Header=""/>
+        <PasswordBox x:Uid="InputPassword" x:Name="password" Header=""/>
+
+        <!-- Content body -->
+        <TextBlock x:Name="body" Style="{StaticResource MessageDialogContentStyle}" TextWrapping="Wrap">
+            <TextBlock.Text>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </TextBlock.Text>
+        </TextBlock>
+    </StackPanel>
+</ContentDialog>
