@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Nexcloud.Data
+namespace Nextcloud.Data
 {
     public class IEntity : INotifyPropertyChanged
     {

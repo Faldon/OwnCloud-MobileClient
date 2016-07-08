@@ -17,6 +17,8 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Nextcloud.Common;
 using Nextcloud.DataContext;
+using Nextcloud.Data;
+
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
 
@@ -111,17 +113,22 @@ namespace Nextcloud
                 rootFrame.ContentTransitions = null;
                 rootFrame.Navigated += this.RootFrame_FirstNavigated;
 #endif
-
-                // When the navigation stack isn't restored navigate to the first page,
+                // When no account is present navigate to the acount adding page, else,
+                // when the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (!rootFrame.Navigate(typeof(HubPage), e.Arguments))
+                if (dataContext.GetConnection().Table<Account>().ToList().Count == 0) {
+#if WINDOWS_PHONE_APP
+                    rootFrame.Navigate(typeof(View.AddAccountPage), e.Arguments);
+#else
+
+#endif
+                } else if (!rootFrame.Navigate(typeof(HubPage), e.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
                 }
             }
 
-            //if (dataContext.GetConnection().Table<Account>().First())
             // Ensure the current window is active
             Window.Current.Activate();
         }

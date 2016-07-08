@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SQLite.Net;
 using Windows.Storage;
-using Nexcloud.Data;
+using Nextcloud.Data;
 
 namespace Nextcloud.DataContext
 {

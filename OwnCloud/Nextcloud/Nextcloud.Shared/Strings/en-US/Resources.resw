@@ -274,31 +274,37 @@
   <data name="NavigationFailedExceptionMessage" xml:space="preserve">
     <value>Navigation failed.</value>
   </data>
-  <data name="LabelCalendar.Text" xml:space="preserve">
+  <data name="AddAccountPage_Calendar.Content" xml:space="preserve">
     <value>Enable Calendar?</value>
   </data>
-  <data name="InputPassword.Header" xml:space="preserve">
+  <data name="AddAccountPage_Password.Header" xml:space="preserve">
     <value>Password</value>
   </data>
-  <data name="LabelServer.Text" xml:space="preserve">
+  <data name="AddAccountPage_Servername.Header" xml:space="preserve">
     <value>Servername</value>
   </data>
-  <data name="LabelSSL.Text" xml:space="preserve">
+  <data name="AddAccountPage_SSL.Content" xml:space="preserve">
     <value>Use SSL?</value>
   </data>
-  <data name="InputUsername.Header" xml:space="preserve">
+  <data name="AddAccountPage_Username.Header" xml:space="preserve">
     <value>Username</value>
   </data>
-  <data name="AddAccountPage.Title" xml:space="preserve">
-    <value>Add User Account</value>
+  <data name="AddAccountPage_PageTitle.Text" xml:space="preserve">
+    <value>Add Account</value>
   </data>
-  <data name="Button_Cancel" xml:space="preserve">
+  <data name="AppName.Text" xml:space="preserve">
+    <value>Nextcloud Client</value>
+  </data>
+  <data name="Button_Cancel.Content" xml:space="preserve">
     <value>Cancel</value>
   </data>
-  <data name="Button_OK" xml:space="preserve">
+  <data name="Button_OK.Content" xml:space="preserve">
     <value>OK</value>
   </data>
-  <data name="Button_Save" xml:space="preserve">
+  <data name="Button_Save.Content" xml:space="preserve">
     <value>Save</value>
+  </data>
+  <data name="AddAccountPage_Protocol.Header" xml:space="preserve">
+    <value>Protocol</value>
   </data>
 </root>

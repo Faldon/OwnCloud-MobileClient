@@ -1,5 +1,5 @@
 ﻿using Nextcloud.Common;
-using Nexcloud.Data;
+using Nextcloud.Data;
 
 using System;
 using System.Collections.Generic;

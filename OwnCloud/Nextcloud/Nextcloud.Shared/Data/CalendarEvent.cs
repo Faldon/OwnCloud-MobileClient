@@ -4,7 +4,7 @@ using System.Text;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
-namespace Nexcloud.Data
+namespace Nextcloud.Data
 {
     [Table("CalendarEvents")]
     class CalendarEvent
