@@ -119,7 +119,7 @@ namespace Nextcloud
                 // parameter
                 if (dataContext.GetConnection().Table<Account>().ToList().Count == 0) {
 #if WINDOWS_PHONE_APP
-                    rootFrame.Navigate(typeof(View.AddAccountPage), e.Arguments);
+                    rootFrame.Navigate(typeof(View.EditAccountPage), e.Arguments);
 #else
 
 #endif

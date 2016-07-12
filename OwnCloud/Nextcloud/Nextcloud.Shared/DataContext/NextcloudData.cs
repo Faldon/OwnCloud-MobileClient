@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using SQLite.Net;
+using SQLiteNetExtensions.Extensions;
 using Windows.Storage;
 using Nextcloud.Data;
 
@@ -20,6 +21,10 @@ namespace Nextcloud.DataContext
 
         public SQLiteConnection GetConnection() {
             return db;
+        }
+
+        public void StoreAccount(Account newOrUpdatedAccount) {
+            db.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server);
         }
 
         private void InitializeSchema(SQLiteConnection db) {

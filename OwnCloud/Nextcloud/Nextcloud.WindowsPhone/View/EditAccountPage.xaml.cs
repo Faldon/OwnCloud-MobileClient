@@ -1,4 +1,5 @@
 ﻿using Nextcloud.Common;
+using Nextcloud.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,12 +23,13 @@ namespace Nextcloud.View {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class AddAccountPage : Page {
+    public sealed partial class EditAccountPage : Page {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        public AddAccountPage() {
+        public EditAccountPage() {
             this.InitializeComponent();
+            DataContext = new AccountViewModel(new Data.Account());
 
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
@@ -100,7 +102,8 @@ namespace Nextcloud.View {
         #endregion
 
         private void OnSaveClick(object sender, RoutedEventArgs e) {
-
+            AccountViewModel _model = DataContext as AccountViewModel;
+            _model.SaveAccount();
         }
 
         private void OnCancelClick(object sender, RoutedEventArgs e) {

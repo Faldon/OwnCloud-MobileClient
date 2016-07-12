@@ -7,7 +7,7 @@ using SQLiteNetExtensions.Attributes;
 namespace Nextcloud.Data
 {
     [Table("Servers")]
-    class Server : IEntity
+    public class Server : IEntity
     {
         [PrimaryKey]
         public string FQDN { get; set; }
@@ -21,12 +21,13 @@ namespace Nextcloud.Data
         [NotNull]
         public string CalDAVPath { get; set; }
 
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<Account> Accounts { get; set; }
 
-        public Server(string FQDN, string Protocol="https", string WebDAVPath="/remote.php/webdav/", string CalDAVPath="/remote.php/caldav/") {
-            this.FQDN = FQDN;
-            this.Protocol = Protocol;
-            this.WebDAVPath = WebDAVPath;
-            this.CalDAVPath = CalDAVPath;
+
+        public Server() {
+            this.WebDAVPath = "/remote.php/webdav/";
+            this.CalDAVPath = "/remote.php/caldav/";
         }
 
     }
