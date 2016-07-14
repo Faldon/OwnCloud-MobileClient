@@ -24,12 +24,15 @@ namespace Nextcloud.DataContext
         }
 
         public void StoreAccount(Account newOrUpdatedAccount) {
-            db.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server);
+            db.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server, true);
         }
 
         private void InitializeSchema(SQLiteConnection db) {
             object dbVersion;
             ApplicationDataContainer dbsettings = ApplicationData.Current.LocalSettings.CreateContainer("DATABASE", ApplicationDataCreateDisposition.Always);
+#if DEBUG
+            dbsettings.Values["DATABASE_VERSION"] = null;
+#endif
             if (!dbsettings.Values.TryGetValue("DATABASE_VERSION", out dbVersion)) {
                 try {
                     db.CreateTable<Server>();
@@ -43,7 +46,6 @@ namespace Nextcloud.DataContext
                     ReplaceDatabaseFile("nextcloud.db");
                 }
             };
-            
         }
 
         private async void CreateDatabaseFile(string filename) {

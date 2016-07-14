@@ -1,0 +1,192 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using System.Text;
+using System.Security;
+using System.IO;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.DataProtection;
+using Windows.Storage.Streams;
+using System.Threading.Tasks;
+
+namespace Nextcloud
+{
+    class Utility
+    {
+        static public string FormatBytes(long input)
+        {
+            string postfix = "";
+            string format_code = "{0:0.0} {1:g}";
+            int c = 1;
+            double size = (double)input;
+
+            if (size < 1024)
+            {
+                postfix = "KB";
+                format_code = "{0:0} {1:g}";
+                c = 1;
+                size = 1;
+            }
+            else if (size >= 1024 && size < 1048576)
+            {
+                postfix = "KB";
+                c = 1024;
+            }
+            else if (size >= 1048576 && size < 1073741824)
+            {
+                postfix = "MB";
+                c = 1048576;
+            }
+            else
+            {
+                postfix = "GB";
+                c = 1073741824;
+            }
+
+            return String.Format(format_code, size / c, postfix);
+        }
+
+        public static async Task<string> EncryptString(string input)
+        {
+            if (input == null) return "";
+            var a = input.ToCharArray();
+            DataProtectionProvider p = new DataProtectionProvider("LOCAL=user");
+            IBuffer binaryUnprotected = CryptographicBuffer.ConvertStringToBinary(input, BinaryStringEncoding.Utf8);
+            IBuffer binaryProtected = await p.ProtectAsync(binaryUnprotected);
+
+            return CryptographicBuffer.EncodeToHexString(binaryProtected);
+        }
+
+        public static async Task<string> DecryptString(string input)
+        {
+            if (input == null) return "";
+            DataProtectionProvider p = new DataProtectionProvider();
+            IBuffer binaryProtected = CryptographicBuffer.DecodeFromHexString(input);
+            IBuffer binaryUnprotected = await p.UnprotectAsync(binaryProtected);
+
+            return CryptographicBuffer.ConvertBinaryToString(BinaryStringEncoding.Utf8, binaryUnprotected);
+        }
+
+        static public void Debug(string input)
+        {
+            var max = 100;
+            for (int index = 0; index < input.Length; index += max)
+            {
+                System.Diagnostics.Debug.WriteLine(input.Substring(index, Math.Min(max, input.Length - index)));
+            }
+        }
+
+        static public void Debug(byte[] input)
+        {
+            var max = 100;
+            for (int index = 0; index < input.Length; index += max)
+            {
+                var str = Encoding.UTF8.GetString(input, index, Math.Min(max, input.Length - index));
+                System.Diagnostics.Debug.WriteLine(str);
+            }
+        }
+
+        static public void DebugBytes(byte[] input)
+        {
+            System.Diagnostics.Debug.WriteLine("\n-------------------------------");
+            System.Diagnostics.Debug.WriteLine("Debug Bytes Length: " + input.Length);
+            string bytes = "";
+            string text = "";
+
+            for (int index = 0; index < input.Length; ++index)
+            {
+                bytes += String.Format("{0:x2}", input[index]) + " ";
+
+                if (input[index] >= 0x21 && input[index] <= 0x7e)
+                {
+                    text += Encoding.UTF8.GetString(input, index, 1);
+                }
+                else
+                {
+                    text += ".";
+                }
+
+                if (index > 0 && (index + 1) % 8 == 0)
+                {
+                    bytes += " ";
+                    text += " ";
+                }
+                if (index > 0 && (index + 1) % 16 == 0)
+                {
+                    System.Diagnostics.Debug.WriteLine(bytes + "  " + text);
+                    text = "";
+                    bytes = "";
+                }
+            }
+            if (bytes.Length > 0) System.Diagnostics.Debug.WriteLine(bytes.PadRight(50, ' ') + "  " + text);
+            System.Diagnostics.Debug.WriteLine("-------------------------------");
+        }
+
+        //static public void DebugXML(object xml)
+        //{
+        //    System.Diagnostics.Debug.WriteLine("\n-------------------------------");
+        //    System.Diagnostics.Debug.WriteLine("Debug XML");
+        //    System.Diagnostics.Debug.WriteLine("-------------------------------");
+        //    MemoryStream stream = null;
+        //    if (xml.GetType() == typeof(MemoryStream))
+        //    {
+        //        stream = xml as MemoryStream;
+        //    }
+        //    if (xml.GetType() == typeof(Stream))
+        //    {
+        //        stream = new MemoryStream();
+        //        if ((stream as Stream).CanSeek) (stream as Stream).Seek(0, SeekOrigin.Begin);
+        //        (stream as Stream).CopyTo(stream);
+        //    }
+        //    else if (xml.GetType() == typeof(String))
+        //    {
+        //        stream = new MemoryStream();
+        //        var writer = new StreamWriter(stream);
+        //        writer.Write(xml as string);
+        //    }
+
+        //    if (stream != null)
+        //    {
+        //        stream.Seek(0, SeekOrigin.Begin);
+        //    }
+
+        //    XDocument doc = null;
+
+        //    try
+        //    {
+        //        doc = XDocument.Load(stream);
+        //        stream = new MemoryStream();
+        //        doc.Save(stream);
+        //        stream.Seek(0, SeekOrigin.Begin);
+        //        string[] lines = new StreamReader(stream).ReadToEnd().Split('\n');
+        //        foreach (var s in lines)
+        //        {
+        //            System.Diagnostics.Debug.WriteLine(s.TrimEnd('\r'));
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Utility.Debug("XML Exception: " + e.Message);
+        //        Utility.Debug(stream.GetBuffer());
+        //    }
+        //    System.Diagnostics.Debug.WriteLine("-------------------------------");
+        //}
+
+        //public static System.String GetRandomString(System.Int32 length)
+        //{
+        //    System.Byte[] seedBuffer = new System.Byte[4];
+        //    var rngCryptoServiceProvider = new System.Security.Cryptography.RNGCryptoServiceProvider();
+        //    rngCryptoServiceProvider.GetBytes(seedBuffer);
+        //    System.String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        //    System.Random random = new System.Random(System.BitConverter.ToInt32(seedBuffer, 0));
+        //    return new System.String(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+        //}
+
+        //public static string SHA1Hash(string input)
+        //{
+        //    var hash = (new SHA1Managed()).ComputeHash(Encoding.UTF8.GetBytes(input));
+        //    return string.Join("", hash.Select(b => b.ToString("x2").ToLower()).ToArray());
+        //}
+    }
+}

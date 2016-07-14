@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Data\File.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\SampleDataSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Server.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\Utility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\IViewModel.cs" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\LightGray.png" />

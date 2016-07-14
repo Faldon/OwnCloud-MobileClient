@@ -18,6 +18,8 @@ using Windows.UI.Xaml.Navigation;
 using Nextcloud.Common;
 using Nextcloud.DataContext;
 using Nextcloud.Data;
+using SQLiteNetExtensions.Extensions;
+using Windows.ApplicationModel.Resources;
 
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
@@ -30,6 +32,7 @@ namespace Nextcloud
     public sealed partial class App : Application
     {
         private static NextcloudData dataContext = null;
+        private static ResourceLoader ressourceLoader = null;
 #if WINDOWS_PHONE_APP
         private TransitionCollection transitions;
 #endif
@@ -43,10 +46,15 @@ namespace Nextcloud
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
             dataContext = new NextcloudData();
+            ressourceLoader = new ResourceLoader();
         }
 
         public static NextcloudData GetDatacontext() {
             return dataContext?? (dataContext = new NextcloudData());
+        }
+
+        public static ResourceLoader Localization() {
+            return ressourceLoader;
         }
 
         /// <summary>
@@ -119,14 +127,21 @@ namespace Nextcloud
                 // parameter
                 if (dataContext.GetConnection().Table<Account>().ToList().Count == 0) {
 #if WINDOWS_PHONE_APP
-                    rootFrame.Navigate(typeof(View.EditAccountPage), e.Arguments);
+                    rootFrame.Navigate(typeof(View.EditAccountPage), null);
 #else
 
 #endif
-                } else if (!rootFrame.Navigate(typeof(HubPage), e.Arguments))
-                {
-                    throw new Exception("Failed to create initial page");
+                } else {
+                    Account currentAccount = dataContext.GetConnection().Table<Account>().First();
+                    dataContext.GetConnection().GetChildren<Account>(currentAccount, true);
+#if WINDOWS_PHONE_APP
+                    rootFrame.Navigate(typeof(View.EditAccountPage), currentAccount);
+#endif
                 }
+                //else if (!rootFrame.Navigate(typeof(HubPage), e.Arguments))
+                //{
+                //    throw new Exception("Failed to create initial page");
+                //}
             }
 
             // Ensure the current window is active

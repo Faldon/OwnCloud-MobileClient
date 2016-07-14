@@ -274,22 +274,22 @@
   <data name="NavigationFailedExceptionMessage" xml:space="preserve">
     <value>Navigation failed.</value>
   </data>
-  <data name="AddAccountPage_Calendar.Content" xml:space="preserve">
+  <data name="EditAccountPage_Calendar.Content" xml:space="preserve">
     <value>Enable Calendar?</value>
   </data>
-  <data name="AddAccountPage_Password.Header" xml:space="preserve">
+  <data name="EditAccountPage_Password.Header" xml:space="preserve">
     <value>Password</value>
   </data>
-  <data name="AddAccountPage_Servername.Header" xml:space="preserve">
+  <data name="EditAccountPage_Servername.Header" xml:space="preserve">
     <value>Servername</value>
   </data>
-  <data name="AddAccountPage_SSL.Content" xml:space="preserve">
+  <data name="EditAccountPage_SSL.Content" xml:space="preserve">
     <value>Use SSL?</value>
   </data>
-  <data name="AddAccountPage_Username.Header" xml:space="preserve">
+  <data name="EditAccountPage_Username.Header" xml:space="preserve">
     <value>Username</value>
   </data>
-  <data name="AddAccountPage_PageTitle.Text" xml:space="preserve">
+  <data name="EditAccountPage_PageTitle.Text" xml:space="preserve">
     <value>Add Account</value>
   </data>
   <data name="AppName.Text" xml:space="preserve">
@@ -304,7 +304,25 @@
   <data name="Button_Save.Content" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="AddAccountPage_Protocol.Header" xml:space="preserve">
+  <data name="EditAccountPage_Protocol.Header" xml:space="preserve">
     <value>Protocol</value>
+  </data>
+  <data name="Button_Close.Content" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="EditAccountPage_CancelFailed" xml:space="preserve">
+    <value>Please provide at least one user account.</value>
+  </data>
+  <data name="EditAccountPage_CancelWarning" xml:space="preserve">
+    <value>Changes will be lost! Really cancel account editing?</value>
+  </data>
+  <data name="EditAccountPage_SaveFailed" xml:space="preserve">
+    <value>Please provide Username, Password and Servername before saving the account.</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
   </data>
 </root>

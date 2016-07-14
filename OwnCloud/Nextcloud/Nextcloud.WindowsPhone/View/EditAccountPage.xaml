@@ -27,7 +27,7 @@
                        Text="" 
                        Style="{ThemeResource TitleTextBlockStyle}" 
                        Margin="0,12,0,0"/>
-            <TextBlock x:Uid="AddAccountPage_PageTitle" 
+            <TextBlock x:Uid="EditAccountPage_PageTitle" 
                        Text="" 
                        Margin="0,-6.5,0,26.5" 
                        Style="{ThemeResource HeaderTextBlockStyle}" 
@@ -35,26 +35,26 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" x:Name="ContentRoot" Margin="19,0,0,0">
-            <TextBox x:Uid="AddAccountPage_Username" 
+            <TextBox x:Uid="EditAccountPage_Username" 
                      x:Name="Username"  
                      Margin="0,0,10,0"
-                     Text="{Binding Path=Username}"></TextBox>
-            <PasswordBox x:Uid="AddAccountPage_Password" 
+                     Text="{Binding Path=Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <PasswordBox x:Uid="EditAccountPage_Password" 
                          x:Name="Password" 
                          Margin="0,25,10,0"
-                         Password="{Binding Path=Password}"></PasswordBox>
-            <TextBox x:Uid="AddAccountPage_Servername" 
+                         Password="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></PasswordBox>
+            <TextBox x:Uid="EditAccountPage_Servername" 
                      x:Name="Servername"
                      Margin="0,25,10,0"
-                     Text="{Binding Path=Servername}"></TextBox>
-            <CheckBox x:Uid="AddAccountPage_SSL" 
+                     Text="{Binding Path=Servername, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <CheckBox x:Uid="EditAccountPage_SSL" 
                       x:Name="SSL" 
                       Content=""
-                      IsChecked="{Binding Path=UseSSL}"></CheckBox>
-            <CheckBox x:Uid="AddAccountPage_Calendar" 
+                      IsChecked="{Binding Path=UseSSL, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
+            <CheckBox x:Uid="EditAccountPage_Calendar" 
                       x:Name="Calendar" 
                       Content=""
-                      IsChecked="{Binding Path=EnableCalendar}"></CheckBox>
+                      IsChecked="{Binding Path=EnableCalendar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
             <Grid Margin="0,25,10,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -71,7 +71,6 @@
                         Margin="10,0,0,0"
                         Click="OnCancelClick"></Button>
             </Grid>
-            
         </StackPanel>
     </Grid>
 </Page>

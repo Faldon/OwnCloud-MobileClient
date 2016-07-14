@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Nextcloud.ViewModel
 {
-    class IViewModel
+    class ViewModel : INotifyPropertyChanged
     {
         #region Interface implimentations
 

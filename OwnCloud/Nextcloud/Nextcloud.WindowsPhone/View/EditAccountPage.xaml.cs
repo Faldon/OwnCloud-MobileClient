@@ -16,6 +16,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Nextcloud.Data;
+using Windows.UI.Popups;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -29,7 +31,6 @@ namespace Nextcloud.View {
 
         public EditAccountPage() {
             this.InitializeComponent();
-            DataContext = new AccountViewModel(new Data.Account());
 
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
@@ -63,6 +64,12 @@ namespace Nextcloud.View {
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
         private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e) {
+            Account dataModel = e.NavigationParameter as Account;
+            if(dataModel == null) {
+                LayoutRoot.DataContext = new AccountViewModel(new Account());
+            } else {
+                LayoutRoot.DataContext = new AccountViewModel(dataModel);
+            }
         }
 
         /// <summary>
@@ -101,13 +108,32 @@ namespace Nextcloud.View {
 
         #endregion
 
-        private void OnSaveClick(object sender, RoutedEventArgs e) {
-            AccountViewModel _model = DataContext as AccountViewModel;
-            _model.SaveAccount();
+        private async void OnSaveClick(object sender, RoutedEventArgs e) {
+            if ((LayoutRoot.DataContext as AccountViewModel).CanSave()) {
+                AccountViewModel viewModel = LayoutRoot.DataContext as AccountViewModel;
+                viewModel.SaveAccount();
+            } else {
+                var alert = new MessageDialog(App.Localization().GetString("EditAccountPage_SaveFailed"));
+                var command = await alert.ShowAsync();
+            }
+            
         }
 
-        private void OnCancelClick(object sender, RoutedEventArgs e) {
+        private async void OnCancelClick(object sender, RoutedEventArgs e) {
+            if( (LayoutRoot.DataContext as AccountViewModel).CanCancel()) {
+                var alert = new MessageDialog(App.Localization().GetString("EditAccountPage_CancelWarning"));
+                alert.Commands.Add(new UICommand(App.Localization().GetString("Yes"), OnCancelConfirmed));
+                alert.Commands.Add(new UICommand(App.Localization().GetString("No")));
+                alert.CancelCommandIndex = 1;
+                var command = await alert.ShowAsync();
+            } else {
+                var alert = new MessageDialog(App.Localization().GetString("EditAccountPage_CancelFailed"));
+                var command = await alert.ShowAsync();
+            }
+        }
 
+        private void OnCancelConfirmed(IUICommand command) {
+            Frame.Navigate(typeof(HubPage), null);
         }
     }
 }
