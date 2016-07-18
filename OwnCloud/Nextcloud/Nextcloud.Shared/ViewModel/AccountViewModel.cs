@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Nextcloud.Data;
+using System;
+using System.Net;
 
 namespace Nextcloud.ViewModel {
     class AccountViewModel : ViewModel {
@@ -85,8 +87,6 @@ namespace Nextcloud.ViewModel {
         }
 
         public async void SaveAccount() {
-            _checkingConnection = true;
-            OnPropertyChanged("CheckingConnection");
             _account.Username = await Utility.EncryptString(_username);
             _account.Password = await Utility.EncryptString(_password);
             //App.GetDatacontext().StoreAccount(_account);
@@ -104,6 +104,16 @@ namespace Nextcloud.ViewModel {
 
         public bool CanCancel() {
             return App.GetDatacontext().GetConnection().Table<Account>().Count() > 0;
+        }
+
+        public Uri GetWebDAVRoot()
+        {
+            return new Uri(_account.Server.Protocol + "://" + _account.Server.FQDN.TrimEnd('/') + _account.Server.WebDAVPath, UriKind.Absolute);
+        }
+
+        public NetworkCredential GetCredential()
+        {
+            return new NetworkCredential(_username, _password);
         }
     }
 }

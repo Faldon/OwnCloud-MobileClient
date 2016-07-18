@@ -7,7 +7,7 @@ using SQLiteNetExtensions.Attributes;
 namespace Nextcloud.Data
 {
     [Table("Calendars")]
-    class Calendar : IEntity
+    public class Calendar : IEntity
     {
         [PrimaryKey, AutoIncrement]
         public int CalendarId { get; set; }

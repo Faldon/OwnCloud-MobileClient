@@ -1,36 +1,33 @@
 ﻿using Nextcloud.Common;
 using Nextcloud.ViewModel;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Nextcloud.Data;
 using Windows.UI.Popups;
+using Nextcloud.DAV;
+using Windows.UI.Core;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
-namespace Nextcloud.View {
+namespace Nextcloud.View
+{
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class EditAccountPage : Page {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private StatusBarProgressIndicator progress;
+        private CoreDispatcher dispatcher;
 
         public EditAccountPage() {
             this.InitializeComponent();
+            ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
+            progress = StatusBar.GetForCurrentView().ProgressIndicator;
+            progress.Text = App.Localization().GetString("Progress_ConnectionCheck");
 
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
@@ -110,14 +107,36 @@ namespace Nextcloud.View {
 
         private async void OnSaveClick(object sender, RoutedEventArgs e) {
             if ((LayoutRoot.DataContext as AccountViewModel).CanSave()) {
+                dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
                 AccountViewModel viewModel = LayoutRoot.DataContext as AccountViewModel;
-                viewModel.SaveAccount();
-                //Frame.Navigate(typeof(AccountHubPage), null);
+                WebDAV client = new WebDAV(viewModel.GetWebDAVRoot(), viewModel.GetCredential());
+                client.StartRequest(DAVRequestHeader.CreateListing(), DAVRequestBody.CreateAllPropertiesListing(), null, OnConnectionCheckFinished);
+                await progress.ShowAsync();
             } else {
                 var alert = new MessageDialog(App.Localization().GetString("EditAccountPage_SaveFailed"));
                 var command = await alert.ShowAsync();
             }
             
+        }
+
+        private async void OnConnectionCheckFinished(DAVRequestResult result, object userObject)
+        {
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await progress.HideAsync());
+            if (!result.IsMultiState) {
+                var alert = new MessageDialog(String.Format(App.Localization().GetString("EditAccountPage_ConnectionFailed"), result.Request.LastException.Message));
+                alert.Commands.Add(new UICommand(App.Localization().GetString("Yes"), OnOverrideSave));
+                alert.Commands.Add(new UICommand(App.Localization().GetString("No")));
+                alert.CancelCommandIndex = 1;
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await alert.ShowAsync());
+
+            } else {
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => SaveAccount());
+            }
+        }
+
+        private async void OnOverrideSave(IUICommand command)
+        {
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => SaveAccount());
         }
 
         private async void OnCancelClick(object sender, RoutedEventArgs e) {
@@ -142,6 +161,13 @@ namespace Nextcloud.View {
 
         private void OnQuitConfirmed(IUICommand command) {
             App.Current.Exit();
+        }
+
+        private void SaveAccount()
+        {
+            AccountViewModel viewModel = LayoutRoot.DataContext as AccountViewModel;
+            viewModel.SaveAccount();
+            Frame.Navigate(typeof(AccountHubPage), null);
         }
     }
 }

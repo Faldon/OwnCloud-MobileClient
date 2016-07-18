@@ -331,4 +331,11 @@
   <data name="Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="Progress_ConnectionCheck" xml:space="preserve">
+    <value>Checking connection...</value>
+  </data>
+  <data name="EditAccountPage_ConnectionFailed" xml:space="preserve">
+    <value>Unable to connect to server. Error: {0}
+Save account anyway?</value>
+  </data>
 </root>

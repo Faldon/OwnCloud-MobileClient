@@ -91,7 +91,7 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountHubPage.xaml.cs">
+    <Compile Include="View\AccountHubPage.xaml.cs">
       <DependentUpon>AccountHubPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -101,7 +101,6 @@
     <Compile Include="ItemPage.xaml.cs">
       <DependentUpon>ItemPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tests\WebDAVTest.cs" />
     <Compile Include="View\EditAccountPage.xaml.cs">
       <DependentUpon>EditAccountPage.xaml</DependentUpon>
     </Compile>
@@ -122,7 +121,7 @@
     <Content Include="Assets\HubBackground.theme-light.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="AccountHubPage.xaml">
+    <Page Include="View\AccountHubPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

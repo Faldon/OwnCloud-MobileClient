@@ -7,7 +7,7 @@ using SQLiteNetExtensions.Attributes;
 namespace Nextcloud.Data
 {
     [Table("Files")]
-    class File : IEntity
+    public class File : IEntity
     {
         [PrimaryKey, AutoIncrement]
         public int FileId { get; set; }
@@ -26,5 +26,10 @@ namespace Nextcloud.Data
         public bool IsDirectory { get; set; }
 
         public string ETag { get; set; }
+
+        public DateTime FileLastModified { get; set; }
+
+        public DateTime FileCreated { get; set; }
+
     }
 }
