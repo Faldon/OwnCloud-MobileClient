@@ -61,7 +61,20 @@ namespace Nextcloud.ViewModel {
             }
         }
 
+        private bool _checkingConnection;
+        public string CheckingConnection {
+            get
+            {
+                return _checkingConnection ? "Visible" : "Collapsed";
+            }
+            set
+            {
+                _checkingConnection = value == "Visible";
+            } 
+        }
+
         public AccountViewModel(Account currentAccount) {
+            _checkingConnection = false;
             _account = currentAccount;
             if (_account.Server == null) {
                 _account.Server = new Server() {
@@ -72,9 +85,11 @@ namespace Nextcloud.ViewModel {
         }
 
         public async void SaveAccount() {
+            _checkingConnection = true;
+            OnPropertyChanged("CheckingConnection");
             _account.Username = await Utility.EncryptString(_username);
             _account.Password = await Utility.EncryptString(_password);
-            App.GetDatacontext().StoreAccount(_account);
+            //App.GetDatacontext().StoreAccount(_account);
         }
 
         public async void LoadAccount() {

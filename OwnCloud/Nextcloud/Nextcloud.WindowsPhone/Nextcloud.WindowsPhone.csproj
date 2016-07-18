@@ -91,8 +91,8 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HubPage.xaml.cs">
-      <DependentUpon>HubPage.xaml</DependentUpon>
+    <Compile Include="AccountHubPage.xaml.cs">
+      <DependentUpon>AccountHubPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SectionPage.xaml.cs">
@@ -101,6 +101,7 @@
     <Compile Include="ItemPage.xaml.cs">
       <DependentUpon>ItemPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\WebDAVTest.cs" />
     <Compile Include="View\EditAccountPage.xaml.cs">
       <DependentUpon>EditAccountPage.xaml</DependentUpon>
     </Compile>
@@ -121,7 +122,7 @@
     <Content Include="Assets\HubBackground.theme-light.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="HubPage.xaml">
+    <Page Include="AccountHubPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -164,6 +165,7 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>

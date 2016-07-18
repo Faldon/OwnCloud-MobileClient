@@ -26,6 +26,7 @@ namespace Nextcloud.Data
 
 
         public Server() {
+            this.Protocol = "http";
             this.WebDAVPath = "/remote.php/webdav/";
             this.CalDAVPath = "/remote.php/caldav/";
         }

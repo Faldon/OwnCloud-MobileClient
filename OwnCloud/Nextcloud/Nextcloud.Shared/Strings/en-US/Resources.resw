@@ -325,4 +325,10 @@
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>
   </data>
+  <data name="Quit" xml:space="preserve">
+    <value>Quit</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>

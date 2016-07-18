@@ -23,7 +23,16 @@
     <Compile Include="$(MSBuildThisFileDirectory)Data\File.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\SampleDataSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Server.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DAV\Locking.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DAV\Reference.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DAV\RequestBody.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DAV\RequestHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DAV\RequestResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DAV\WebDAV.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DAV\XmlNamespaces.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\Utility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\WebClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\WebDAVClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\IViewModel.cs" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\LightGray.png" />

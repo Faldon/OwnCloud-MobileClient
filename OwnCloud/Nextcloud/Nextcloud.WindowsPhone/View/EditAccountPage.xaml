@@ -9,7 +9,6 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid x:Name="LayoutRoot">
-
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -23,6 +22,10 @@
 
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
+            <ProgressBar x:Name="CheckingConnection" 
+                         Height="20"
+                         IsIndeterminate="True"
+            Visibility="{Binding Path=CheckingConnection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></ProgressBar>
             <TextBlock x:Uid="AppName" 
                        Text="" 
                        Style="{ThemeResource TitleTextBlockStyle}" 

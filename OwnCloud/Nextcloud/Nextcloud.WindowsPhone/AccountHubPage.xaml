@@ -1,12 +1,12 @@
 ﻿<Page
-    x:Class="Nextcloud.HubPage"
+    x:Class="Nextcloud.AccountHubPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Nextcloud"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
-    d:DataContext="{Binding Source={d:DesignData Source=../Nextcloud.Shared/DataModel/SampleData.json, Type=data:SampleDataSource}}"
+    d:DataContext="{Binding Source={d:DesignData Source=../Nextcloud.Shared/Data/SampleData.json, Type=data:SampleDataSource}}"
     xmlns:data="using:Nextcloud.Data"
     mc:Ignorable="d">
 
@@ -71,23 +71,14 @@
     </Page.Resources>
 
     <Grid x:Name="LayoutRoot">
-        <Hub x:Name="Hub" x:Uid="Hub" Header="application name" Background="{ThemeResource HubBackgroundImageBrush}">
-            <HubSection x:Uid="HubSection1" Header="SECTION 1" DataContext="{Binding Groups}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
+        <Hub x:Name="Hub" x:Uid="Hub" Header="application name">
+            <HubSection x:Uid="HubSection1" Header="SECTION 1">
                 <DataTemplate>
-                    <ListView
-                        ItemsSource="{Binding}"
-                        IsItemClickEnabled="True"
-                        ItemClick="GroupSection_ItemClick"
-                        ContinuumNavigationTransitionInfo.ExitElementContainer="True">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Margin="0,0,0,27.5">
-                                    <TextBlock Text="{Binding Title}" Style="{ThemeResource ListViewItemTextBlockStyle}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                    <Button Click="Button_Click">
+
+                    </Button>
                 </DataTemplate>
+               
             </HubSection>
 
             <HubSection x:Uid="HubSection2" Header="SECTION 2" Width="Auto"

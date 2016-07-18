@@ -112,6 +112,7 @@ namespace Nextcloud.View {
             if ((LayoutRoot.DataContext as AccountViewModel).CanSave()) {
                 AccountViewModel viewModel = LayoutRoot.DataContext as AccountViewModel;
                 viewModel.SaveAccount();
+                //Frame.Navigate(typeof(AccountHubPage), null);
             } else {
                 var alert = new MessageDialog(App.Localization().GetString("EditAccountPage_SaveFailed"));
                 var command = await alert.ShowAsync();
@@ -128,12 +129,19 @@ namespace Nextcloud.View {
                 var command = await alert.ShowAsync();
             } else {
                 var alert = new MessageDialog(App.Localization().GetString("EditAccountPage_CancelFailed"));
+                alert.Commands.Add(new UICommand(App.Localization().GetString("Quit"), OnQuitConfirmed));
+                alert.Commands.Add(new UICommand(App.Localization().GetString("Close")));
+                alert.CancelCommandIndex = 1;
                 var command = await alert.ShowAsync();
             }
         }
 
         private void OnCancelConfirmed(IUICommand command) {
-            Frame.Navigate(typeof(HubPage), null);
+            Frame.Navigate(typeof(AccountHubPage), null);
+        }
+
+        private void OnQuitConfirmed(IUICommand command) {
+            App.Current.Exit();
         }
     }
 }

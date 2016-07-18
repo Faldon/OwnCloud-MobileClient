@@ -1,6 +1,6 @@
 ﻿using Nextcloud.Common;
 using Nextcloud.Data;
-
+using Nextcloud.Tests;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,13 +28,13 @@ namespace Nextcloud
     /// <summary>
     /// A page that displays a grouped collection of items.
     /// </summary>
-    public sealed partial class HubPage : Page
+    public sealed partial class AccountHubPage : Page
     {
         private readonly NavigationHelper navigationHelper;
         private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
         private readonly ResourceLoader resourceLoader = ResourceLoader.GetForCurrentView("Resources");
 
-        public HubPage()
+        public AccountHubPage()
         {
             this.InitializeComponent();
 
@@ -149,5 +149,11 @@ namespace Nextcloud
         }
 
         #endregion
+
+        private void Button_Click(object sender, RoutedEventArgs e) {
+            var test = new WebDAVTest();
+
+
+        }
     }
 }
