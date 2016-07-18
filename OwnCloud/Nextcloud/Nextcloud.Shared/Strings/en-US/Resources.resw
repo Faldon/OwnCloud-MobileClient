@@ -338,4 +338,10 @@
     <value>Unable to connect to server. Error: {0}
 Save account anyway?</value>
   </data>
+  <data name="AccountHubPage.Header" xml:space="preserve">
+    <value>Nextcloud Client</value>
+  </data>
+  <data name="AccountHubPage_AccountSection.Header" xml:space="preserve">
+    <value>Accounts</value>
+  </data>
 </root>

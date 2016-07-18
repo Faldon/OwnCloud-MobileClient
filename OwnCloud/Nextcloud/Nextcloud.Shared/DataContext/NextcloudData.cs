@@ -30,9 +30,6 @@ namespace Nextcloud.DataContext
         private void InitializeSchema(SQLiteConnection db) {
             object dbVersion;
             ApplicationDataContainer dbsettings = ApplicationData.Current.LocalSettings.CreateContainer("DATABASE", ApplicationDataCreateDisposition.Always);
-#if DEBUG
-            dbsettings.Values["DATABASE_VERSION"] = null;
-#endif
             if (!dbsettings.Values.TryGetValue("DATABASE_VERSION", out dbVersion)) {
                 try {
                     db.CreateTable<Server>();

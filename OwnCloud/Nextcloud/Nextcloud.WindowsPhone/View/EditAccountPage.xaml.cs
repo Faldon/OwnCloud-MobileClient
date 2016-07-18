@@ -163,10 +163,10 @@ namespace Nextcloud.View
             App.Current.Exit();
         }
 
-        private void SaveAccount()
+        private async void SaveAccount()
         {
             AccountViewModel viewModel = LayoutRoot.DataContext as AccountViewModel;
-            viewModel.SaveAccount();
+            var success = await viewModel.SaveAccount();
             Frame.Navigate(typeof(AccountHubPage), null);
         }
     }

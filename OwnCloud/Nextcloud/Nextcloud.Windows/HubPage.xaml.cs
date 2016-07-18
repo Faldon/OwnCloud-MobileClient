@@ -22,7 +22,7 @@ namespace Nextcloud
     /// <summary>
     /// A page that displays a grouped collection of items.
     /// </summary>
-    public sealed partial class HubPage : Page
+    public sealed partial class AccountHubPage : Page
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
@@ -43,7 +43,7 @@ namespace Nextcloud
             get { return this.defaultViewModel; }
         }
 
-        public HubPage()
+        public AccountHubPage()
         {
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);

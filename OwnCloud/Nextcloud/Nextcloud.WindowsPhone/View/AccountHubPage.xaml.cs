@@ -1,11 +1,15 @@
 ﻿using Nextcloud.Common;
 using Nextcloud.Data;
+using Nextcloud.ViewModel;
 using System;
+using System.Collections.Generic;
 using Windows.ApplicationModel.Resources;
 using Windows.Graphics.Display;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using SQLite.Net;
+using SQLiteNetExtensions.Extensions;
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
 
@@ -64,6 +68,13 @@ namespace Nextcloud.View
         /// session.  The state will be null the first time a page is visited.</param>
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
+            List<Account> dataModel = e.NavigationParameter as List<Account>;
+            if (dataModel == null) {
+                dataModel = App.GetDataContext().GetConnection().GetAllWithChildren<Account>(recursive:true);
+                LayoutRoot.DataContext = new AccountHubViewModel(dataModel);
+            } else {
+                LayoutRoot.DataContext = new AccountHubViewModel(dataModel);
+            }
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
             var sampleDataGroups = await SampleDataSource.GetGroupsAsync();
             this.DefaultViewModel["Groups"] = sampleDataGroups;
@@ -136,10 +147,5 @@ namespace Nextcloud.View
 
         #endregion
 
-        private void Button_Click(object sender, RoutedEventArgs e) {
-            var test = new WebDAVTest();
-
-
-        }
     }
 }

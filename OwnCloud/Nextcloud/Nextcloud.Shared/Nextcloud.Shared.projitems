@@ -33,8 +33,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\Utility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\WebClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\WebDAVClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountHubViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\IViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\ViewModel.cs" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\LightGray.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\MediumGray.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\DarkGray.png" />

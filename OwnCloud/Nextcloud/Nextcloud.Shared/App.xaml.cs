@@ -1,24 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Nextcloud.Common;
 using Nextcloud.DataContext;
 using Nextcloud.Data;
-using SQLiteNetExtensions.Extensions;
 using Windows.ApplicationModel.Resources;
 
 
@@ -49,7 +39,7 @@ namespace Nextcloud
             ressourceLoader = new ResourceLoader();
         }
 
-        public static NextcloudData GetDatacontext() {
+        public static NextcloudData GetDataContext() {
             return dataContext?? (dataContext = new NextcloudData());
         }
 
@@ -131,17 +121,14 @@ namespace Nextcloud
 #else
 
 #endif
-                } else {
-                    Account currentAccount = dataContext.GetConnection().Table<Account>().First();
-                    dataContext.GetConnection().GetChildren<Account>(currentAccount, true);
-#if WINDOWS_PHONE_APP
-                    rootFrame.Navigate(typeof(View.EditAccountPage), currentAccount);
-#endif
                 }
-                //else if (!rootFrame.Navigate(typeof(HubPage), e.Arguments))
-                //{
-                //    throw new Exception("Failed to create initial page");
-                //}
+#if WINDOWS_PHONE_APP
+                else if (!rootFrame.Navigate(typeof(View.AccountHubPage), e.Arguments)) {
+#else
+                else if (!rootFrame.Navigate(typeof(AccountHubPage), e.Arguments)) {
+#endif
+                    throw new Exception("Failed to create initial page");
+                }
             }
 
             // Ensure the current window is active
