@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Windows.Web.Http;
 
-namespace Nextcloud.Extensions
+namespace Nextcloud.Converter
 {
     class WebDAVClient
     {

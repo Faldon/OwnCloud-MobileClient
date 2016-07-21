@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
-namespace Nextcloud.Extensions
+namespace Nextcloud.Converter
 {
     class WebClient
     {

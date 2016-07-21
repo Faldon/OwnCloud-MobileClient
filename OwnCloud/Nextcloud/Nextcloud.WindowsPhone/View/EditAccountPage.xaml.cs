@@ -157,6 +157,7 @@ namespace Nextcloud.View
 
         private void OnCancelConfirmed(IUICommand command) {
             Frame.Navigate(typeof(AccountHubPage), null);
+            Frame.BackStack.RemoveAt(Frame.BackStackDepth-1);
         }
 
         private void OnQuitConfirmed(IUICommand command) {
@@ -168,6 +169,7 @@ namespace Nextcloud.View
             AccountViewModel viewModel = LayoutRoot.DataContext as AccountViewModel;
             var success = await viewModel.SaveAccount();
             Frame.Navigate(typeof(AccountHubPage), null);
+            Frame.BackStack.RemoveAt(Frame.BackStackDepth-1);
         }
     }
 }

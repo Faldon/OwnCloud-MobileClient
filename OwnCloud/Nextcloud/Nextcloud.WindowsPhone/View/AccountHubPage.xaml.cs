@@ -10,6 +10,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using SQLite.Net;
 using SQLiteNetExtensions.Extensions;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
 
@@ -144,8 +146,20 @@ namespace Nextcloud.View
         {
             this.navigationHelper.OnNavigatedFrom(e);
         }
-
         #endregion
 
+        private void OnAccountItemHold(object sender, HoldingRoutedEventArgs e) {
+            FrameworkElement s = sender as FrameworkElement;
+            FlyoutBase.GetAttachedFlyout(s).ShowAt(s);
+        }
+
+        private void OnMenuEditClick(object sender, RoutedEventArgs e) {
+            Account selectedAccount = (Account)(sender as MenuFlyoutItem).DataContext;
+            Frame.Navigate(typeof(EditAccountPage), selectedAccount);
+        }
+
+        private void OnMenuDeleteClick(object sender, RoutedEventArgs e) {
+
+        }
     }
 }

@@ -344,4 +344,10 @@ Save account anyway?</value>
   <data name="AccountHubPage_AccountSection.Header" xml:space="preserve">
     <value>Accounts</value>
   </data>
+  <data name="AccountHubPage_DeleteAccount.Text" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="AccountHubPage_EditAccount.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
 </root>
