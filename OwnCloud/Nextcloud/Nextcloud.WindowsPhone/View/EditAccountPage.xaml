@@ -23,11 +23,9 @@
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
             <TextBlock x:Uid="AppName"
-                       Text="" 
                        Style="{ThemeResource TitleTextBlockStyle}" 
                        Margin="0,12,0,0"/>
             <TextBlock x:Uid="EditAccountPage_PageTitle" 
-                       Text="" 
                        Margin="0,-6.5,0,26.5" 
                        Style="{ThemeResource HeaderTextBlockStyle}" 
                        CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>

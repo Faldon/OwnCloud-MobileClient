@@ -15,14 +15,15 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Converter\PossessiveCaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\PrefixValueConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataContext\DatabaseUpdater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataContext\NextcloudData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Account.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Calendar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\CalendarEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\IEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\File.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Data\SampleDataSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Server.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DAV\Locking.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DAV\Reference.cs" />
@@ -36,6 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\WebDAVClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountHubViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\FileListViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\ViewModel.cs" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\LightGray.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\MediumGray.png" />
@@ -44,7 +46,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\RelayCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\SuspensionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\ObservableDictionary.cs" />
-    <Content Include="$(MSBuildThisFileDirectory)Data\SampleData.json" />
     <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en-US\Resources.resw" />
   </ItemGroup>
 </Project>

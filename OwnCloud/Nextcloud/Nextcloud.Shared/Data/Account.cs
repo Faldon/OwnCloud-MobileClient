@@ -1,6 +1,5 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Text;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
@@ -32,5 +31,8 @@ namespace Nextcloud.Data
 
         [ManyToOne]
         public Server Server { get; set; }
+
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<File> Files { get; set; }
     }
 }

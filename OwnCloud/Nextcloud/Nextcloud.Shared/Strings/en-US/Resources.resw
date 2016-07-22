@@ -350,4 +350,22 @@ Save account anyway?</value>
   <data name="AccountHubPage_EditAccount.Text" xml:space="preserve">
     <value>Edit</value>
   </data>
+  <data name="AccountHubPage_AppBarButton_Add.Label" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AccountHubPage_DeleteAccountFailed" xml:space="preserve">
+    <value>The last account cannot be deleted. Please add a second account first.</value>
+  </data>
+  <data name="AccountHubPage_DeleteAccountWarning" xml:space="preserve">
+    <value>Warning: All data will be destroyed! Really delete account {0}?</value>
+  </data>
+  <data name="FileListPage_PageTitle.Text" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="GenitiveSymbol" xml:space="preserve">
+    <value>s</value>
+  </data>
+  <data name="PossessiveCaseDelimiter" xml:space="preserve">
+    <value>'</value>
+  </data>
 </root>

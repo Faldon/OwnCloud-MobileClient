@@ -31,5 +31,11 @@ namespace Nextcloud.Data
 
         public DateTime FileCreated { get; set; }
 
+        [ForeignKey(typeof(Account))]
+        public int AccountId { get; set; }
+
+        [ManyToOne]
+        public Account Account { get; set; }
+
     }
 }

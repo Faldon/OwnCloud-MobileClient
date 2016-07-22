@@ -7,7 +7,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
-    d:DataContext="{Binding Source={d:DesignData Source=../Nextcloud.Shared/Data/SampleData.json, Type=data:SampleDataSource}}"
     xmlns:data="using:Nextcloud.Data"
     mc:Ignorable="d">
 
@@ -54,6 +53,14 @@
             </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
+
+    <Page.BottomAppBar>
+        <CommandBar x:Name="BottomAppBar">
+            <AppBarButton x:Uid="AccountHubPage_AppBarButton_Add" 
+                          Icon="Add"
+                          Click="OnAddAccountClick"/>
+        </CommandBar>
+    </Page.BottomAppBar>
 
     <Grid x:Name="LayoutRoot">
         <Hub x:Name="Hub" x:Uid="AccountHubPage" Header="">

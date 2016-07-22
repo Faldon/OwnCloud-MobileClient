@@ -12,11 +12,13 @@ namespace Nextcloud.DataContext
     {
         private SQLiteConnection db;
         private StorageFile database;
+        private const int DATABASE_VERSION = 2;
 
         public NextcloudData() {
             CreateDatabaseFile("nextcloud.db");
             db = new SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), database.Path);
             InitializeSchema(db);
+            UpdateSchema(db);
         }
 
         public SQLiteConnection GetConnection() {
@@ -27,17 +29,21 @@ namespace Nextcloud.DataContext
             db.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server, true);
         }
 
+        public void RemoveAccount(Account account) {
+            db.Delete(account);
+        }
+
         private void InitializeSchema(SQLiteConnection db) {
             object dbVersion;
-            ApplicationDataContainer dbsettings = ApplicationData.Current.LocalSettings.CreateContainer("DATABASE", ApplicationDataCreateDisposition.Always);
-            if (!dbsettings.Values.TryGetValue("DATABASE_VERSION", out dbVersion)) {
+            ApplicationDataContainer dbSettings = ApplicationData.Current.LocalSettings.CreateContainer("DATABASE", ApplicationDataCreateDisposition.Always);
+            if (!dbSettings.Values.TryGetValue("DATABASE_VERSION", out dbVersion)) {
                 try {
                     db.CreateTable<Server>();
                     db.CreateTable<Account>();
                     db.CreateTable<File>();
                     db.CreateTable<Calendar>();
                     db.CreateTable<CalendarEvent>();
-                    dbsettings.Values["DATABASE_VERSION"] = 1;
+                    dbSettings.Values["DATABASE_VERSION"] = 1;
                 } catch (SQLiteException ex) {
                     System.Diagnostics.Debug.WriteLine(ex.Message);
                     ReplaceDatabaseFile("nextcloud.db");
@@ -51,6 +57,14 @@ namespace Nextcloud.DataContext
 
         private async void ReplaceDatabaseFile(string filename) {
             database = await ApplicationData.Current.LocalFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
+        }
+
+        private void UpdateSchema(SQLiteConnection db) {
+            ApplicationDataContainer dbSettings = ApplicationData.Current.LocalSettings.CreateContainer("DATABASE", ApplicationDataCreateDisposition.Always);
+            int dbVersion = (int)dbSettings.Values["DATABASE_VERSION"];
+            while(dbVersion < DATABASE_VERSION) {
+                dbVersion = DatabaseUpdater.FromVersion(dbVersion, db);
+            }
         }
     }
 }

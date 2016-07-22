@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Nextcloud.ViewModel
 {
@@ -25,6 +26,16 @@ namespace Nextcloud.ViewModel
         public AccountHubViewModel(List<Account> accountList)
         {
             _accountCollection = new ObservableCollection<Account>(accountList);
+        }
+
+        public bool CanDelete(Account account) {
+            return _accountCollection.Count > 1;
+        }
+
+        public bool DeleteAccount(Account account) {
+            AccountCollection.Remove(account);
+            App.GetDataContext().RemoveAccount(account);
+            return true;
         }
     }
 }
