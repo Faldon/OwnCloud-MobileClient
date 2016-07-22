@@ -11,10 +11,10 @@ namespace Nextcloud.DataContext
         public static int FromVersion(int version, SQLiteConnection db) {
             switch (version) {
                 case 1:
-                    var sql = "UPDATE Files ADD(AccountId INTEGER NOT NULL)";
-                    db.CreateCommand(sql).ExecuteNonQuery();
+                    var sql = "ALTER TABLE Files ADD AccountId INTEGER";
+                    db.Execute(sql);
                     sql = "CREATE INDEX Files_AccountId ON Files(AccountId);";
-                    db.CreateCommand(sql).ExecuteNonQuery();
+                    db.Execute(sql);
                     break;
                 default:
                     break;

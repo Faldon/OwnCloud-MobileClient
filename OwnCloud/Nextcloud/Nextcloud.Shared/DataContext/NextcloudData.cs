@@ -65,6 +65,7 @@ namespace Nextcloud.DataContext
             while(dbVersion < DATABASE_VERSION) {
                 dbVersion = DatabaseUpdater.FromVersion(dbVersion, db);
             }
+            dbSettings.Values["DATABASE_VERSION"] = dbVersion;
         }
     }
 }
