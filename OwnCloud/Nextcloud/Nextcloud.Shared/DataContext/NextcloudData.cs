@@ -48,7 +48,7 @@ namespace Nextcloud.DataContext
                     System.Diagnostics.Debug.WriteLine(ex.Message);
                     ReplaceDatabaseFile("nextcloud.db");
                 }
-            };
+            }
         }
 
         private async void CreateDatabaseFile(string filename) {

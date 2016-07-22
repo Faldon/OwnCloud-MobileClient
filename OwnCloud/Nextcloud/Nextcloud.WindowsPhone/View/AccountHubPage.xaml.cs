@@ -148,5 +148,23 @@ namespace Nextcloud.View
         private void OnAddAccountClick(object sender, RoutedEventArgs e) {
             Frame.Navigate(typeof(EditAccountPage), null);
         }
+
+        private void OnAccountListTapped(object sender, TappedRoutedEventArgs e)
+        {
+            ListView accountList = (sender as ListView);
+            if(e.GetPosition(accountList).X < 10) {
+                accountList.ItemTemplate = App.Current.Resources["AccountItemSelectTemplate"] as DataTemplate;
+                var a = accountList.ItemTemplate;
+            }
+            System.Diagnostics.Debug.WriteLine(e.GetPosition(accountList));
+
+        }
+
+        private void OnAccountItemTapped(object sender, TappedRoutedEventArgs e)
+        {
+            FrameworkElement s = (sender as FrameworkElement);
+            Account account = s.DataContext as Account;
+            Frame.Navigate(typeof(FileListPage), account);
+        }
     }
 }

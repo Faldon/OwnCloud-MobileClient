@@ -368,4 +368,10 @@ Save account anyway?</value>
   <data name="PossessiveCaseDelimiter" xml:space="preserve">
     <value>'</value>
   </data>
+  <data name="AppBarButton_Cancel.Label" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="AppBarButton_Save.Label" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>

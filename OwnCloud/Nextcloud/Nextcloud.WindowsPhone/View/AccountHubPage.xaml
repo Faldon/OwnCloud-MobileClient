@@ -23,7 +23,8 @@
             <converter:PrefixValueConverter x:Key="PrefixValueConverter" />
 
             <DataTemplate x:Key="AccountItemTemplate">
-                <Grid Holding="OnAccountItemHold">
+                <Grid Holding="OnAccountItemHold"
+                      Tapped="OnAccountItemTapped">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -37,7 +38,13 @@
                         </MenuFlyout>
                     </FlyoutBase.AttachedFlyout>
 
-                    <Border Background="{ThemeResource PhoneAccentBrush}" Padding="0,0,0,10" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="80" Width="80">
+                    <Border Background="{ThemeResource PhoneAccentBrush}" 
+                            Padding="0,0,0,10" 
+                            Grid.Column="0" 
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top" 
+                            Height="80" 
+                            Width="80">
                         <Viewbox Stretch="Uniform">
                             <TextBlock Foreground="{ThemeResource PhoneForegroundBrush}" Text="{Binding ElementName=Username, Path=Text, Converter={StaticResource PrefixValueConverter}, ConverterParameter=1}"></TextBlock>
                         </Viewbox>
@@ -76,7 +83,6 @@
                         ContinuumNavigationTransitionInfo.ExitElementContainer="True">
                     </ListView>
                 </DataTemplate>
-
             </HubSection>
         </Hub>
     </Grid>

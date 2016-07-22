@@ -52,22 +52,16 @@
                       x:Name="Calendar" 
                       Content=""
                       IsChecked="{Binding Path=EnableCalendar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
-            <Grid Margin="0,25,10,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button x:Uid="Button_Save" 
-                        Grid.Column="0"
-                        HorizontalAlignment="Stretch"
-                        Margin="0,0,10,0"
-                        Click="OnSaveClick"></Button>
-                <Button x:Uid="Button_Cancel" 
-                        Grid.Column="1" 
-                        HorizontalAlignment="Stretch"
-                        Margin="10,0,0,0"
-                        Click="OnCancelClick"></Button>
-            </Grid>
         </StackPanel>
     </Grid>
+    <Page.BottomAppBar>
+        <CommandBar x:Name="BottomAppBar">
+            <AppBarButton x:Uid="AppBarButton_Save" 
+                          Icon="Save"
+                          Click="OnSaveClick"/>
+            <AppBarButton x:Uid="AppBarButton_Cancel" 
+                          Icon="Cancel"
+                          Click="OnCancelClick"/>
+        </CommandBar>
+    </Page.BottomAppBar>
 </Page>
