@@ -17,8 +17,7 @@ namespace Nextcloud.DataContext
         public NextcloudData() {
             CreateDatabaseFile("nextcloud.db");
             db = new SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), database.Path);
-            InitializeSchema(db);
-            UpdateSchema(db);
+            InitializeDatabase(db);
         }
 
         public SQLiteConnection GetConnection() {
@@ -33,7 +32,7 @@ namespace Nextcloud.DataContext
             db.Delete(account);
         }
 
-        private void InitializeSchema(SQLiteConnection db) {
+        private void InitializeDatabase(SQLiteConnection db) {
             object dbVersion;
             ApplicationDataContainer dbSettings = ApplicationData.Current.LocalSettings.CreateContainer("DATABASE", ApplicationDataCreateDisposition.Always);
             if (!dbSettings.Values.TryGetValue("DATABASE_VERSION", out dbVersion)) {
@@ -43,11 +42,16 @@ namespace Nextcloud.DataContext
                     db.CreateTable<File>();
                     db.CreateTable<Calendar>();
                     db.CreateTable<CalendarEvent>();
-                    dbSettings.Values["DATABASE_VERSION"] = 1;
+                    dbSettings.Values["DATABASE_VERSION"] = DATABASE_VERSION;
                 } catch (SQLiteException ex) {
                     System.Diagnostics.Debug.WriteLine(ex.Message);
                     ReplaceDatabaseFile("nextcloud.db");
                 }
+            } else {
+                while ((int)dbVersion < DATABASE_VERSION) {
+                    dbVersion = DatabaseUpdater.FromVersion((int)dbVersion, db);
+                }
+                dbSettings.Values["DATABASE_VERSION"] = dbVersion;
             }
         }
 
@@ -57,15 +61,6 @@ namespace Nextcloud.DataContext
 
         private async void ReplaceDatabaseFile(string filename) {
             database = await ApplicationData.Current.LocalFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
-        }
-
-        private void UpdateSchema(SQLiteConnection db) {
-            ApplicationDataContainer dbSettings = ApplicationData.Current.LocalSettings.CreateContainer("DATABASE", ApplicationDataCreateDisposition.Always);
-            int dbVersion = (int)dbSettings.Values["DATABASE_VERSION"];
-            while(dbVersion < DATABASE_VERSION) {
-                dbVersion = DatabaseUpdater.FromVersion(dbVersion, db);
-            }
-            dbSettings.Values["DATABASE_VERSION"] = dbVersion;
         }
     }
 }
