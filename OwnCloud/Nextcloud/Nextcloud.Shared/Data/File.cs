@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
+using Windows.ApplicationModel.Resources;
+using Windows.Storage;
 
 namespace Nextcloud.Data
 {
@@ -50,5 +52,42 @@ namespace Nextcloud.Data
         [ManyToOne]
         public Account Account { get; set; }
 
+        static Dictionary<string, string> _iconCache;
+
+        [Ignore]
+        public string FileIcon
+        {
+            get
+            {
+                if (IsDirectory) {
+                    if (IsRootItem) {
+                        return _iconCache["up"];
+                    } else {
+                        return _iconCache["folder"];
+                    }
+                } else {
+                    if (_iconCache.ContainsKey(Filetype.Replace("/", "_"))) {
+                        return _iconCache[Filetype.Replace("/", "_")];
+                    }
+                    if (_iconCache.ContainsKey(Filetype.Split('/')[0])) {
+                        return _iconCache[Filetype.Split('/')[0]];
+                    }
+                    return _iconCache["file"];
+                }
+            }
+        }
+
+        public static async void FillIconCache() {
+            _iconCache = _iconCache ?? new Dictionary<string, string>();
+            StorageFolder installationFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            StorageFolder assetsFolder = await installationFolder.GetFolderAsync("Assets");
+            StorageFolder fileIconsFolder = await assetsFolder.GetFolderAsync("FileIcons");
+            IReadOnlyList<StorageFile> fileIcons = await fileIconsFolder.GetFilesAsync();
+            foreach(StorageFile fileIcon in fileIcons) {
+                if(!_iconCache.ContainsKey(fileIcon.DisplayName)) {
+                    _iconCache.Add(fileIcon.DisplayName, "/Assets/FileIcons/" + fileIcon.DisplayName + fileIcon.FileType);
+                }
+            }
+        }
     }
 }

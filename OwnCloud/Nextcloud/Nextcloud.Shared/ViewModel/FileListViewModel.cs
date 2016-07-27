@@ -106,6 +106,9 @@ namespace Nextcloud.ViewModel
                 int delayStart = 0;
                 int delayStep = 50; // ms
 
+#if DEBUG
+                App.GetDataContext().GetConnection().DeleteAll(typeof(File));
+#endif
                 foreach (DAVRequestResult.Item item in result.Items) {
                     File fileItem = new File()
                     {
@@ -136,13 +139,14 @@ namespace Nextcloud.ViewModel
                     }
                     if(display) {
                         //if(!App.GetDataContext().IsFileFetched(fileItem)) {
-                            App.GetDataContext().StoreFile(fileItem);
+                        App.GetDataContext().StoreFile(fileItem);
                         //}
                         await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Add(fileItem));
                     }
                     
                     //FileCollection.Add(fileItem);
                 }
+                //await dispatcher.RunAsync(CoreDispatcherPriority.Low, () => App.GetDataContext().UpdateFileTable(FileCollection));
 
             } else {
                 _lastError = result.StatusText;

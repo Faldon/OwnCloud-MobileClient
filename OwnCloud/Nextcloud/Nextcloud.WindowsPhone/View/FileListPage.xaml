@@ -16,15 +16,18 @@
             <DataTemplate x:Key="FileItemTemplate">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="60"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
+                    <Image Source="{Binding FileIcon}" />
                     <StackPanel Grid.Column="1" 
                                 Margin="14.5,0,0,0">
-                        <TextBlock x:Name="Filename" Text="{Binding Filename}" Style="{ThemeResource ListViewItemTextBlockStyle}"/>
-                        <TextBlock Text="{Binding Filepath}" 
-                                   Style="{ThemeResource ListViewItemSubheaderTextBlockStyle}"
+                        <TextBlock x:Name="Filename" 
+                                   Text="{Binding Filename}"
+                                   Style="{ThemeResource ListViewItemTextBlockStyle}"/>
+                        <TextBlock Text="{Binding FileLastModified}" 
+                                   Style="{ThemeResource ListViewItemContentTextBlockStyle}"
                                    Foreground="{ThemeResource PhoneMidBrush}" />
                     </StackPanel>
                 </Grid>
@@ -44,7 +47,7 @@
         </Grid.RowDefinitions>
 
         <!-- Title Panel -->
-        <StackPanel Grid.Row="0" Margin="19,0,0,0">
+        <StackPanel Grid.Row="0" Margin="19,0,0,-20">
             <TextBlock x:Uid="AppName"
                        Style="{ThemeResource TitleTextBlockStyle}" 
                        Margin="0,12,0,0"/>
@@ -54,10 +57,13 @@
                            Text="{Binding Path=Username, Converter={StaticResource PossessiveCaseConverter}}"
                            Style="{ThemeResource HeaderTextBlockStyle}" />
                 <TextBlock x:Uid="FileListPage_PageTitle" 
-                           Margin="10,-6.5,0,26.5"
+                           Margin="20,-6.5,0,26.5"
                            Style="{ThemeResource HeaderTextBlockStyle}" 
                            CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
             </StackPanel>
+            <TextBlock Text="{Binding CurrentPath}"
+                       Style="{ThemeResource TitleTextBlockStyle}"
+                       Margin="0,-15,0,26.5" />
         </StackPanel>
 
         <!--TODO: Content should be placed within the following grid-->

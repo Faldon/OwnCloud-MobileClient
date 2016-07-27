@@ -37,6 +37,7 @@ namespace Nextcloud
             this.Suspending += this.OnSuspending;
             dataContext = new NextcloudData();
             ressourceLoader = new ResourceLoader();
+            File.FillIconCache();
         }
 
         public static NextcloudData GetDataContext() {
