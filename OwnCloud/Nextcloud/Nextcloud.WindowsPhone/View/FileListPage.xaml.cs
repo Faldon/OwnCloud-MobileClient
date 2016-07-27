@@ -9,6 +9,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -27,9 +28,14 @@ namespace Nextcloud.View {
     public sealed partial class FileListPage : Page {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private StatusBarProgressIndicator progress;
+        private CoreDispatcher dispatcher;
 
         public FileListPage() {
             this.InitializeComponent();
+            ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
+            progress = StatusBar.GetForCurrentView().ProgressIndicator;
+            progress.Text = App.Localization().GetString("Progress_FetchingFiles");
 
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;

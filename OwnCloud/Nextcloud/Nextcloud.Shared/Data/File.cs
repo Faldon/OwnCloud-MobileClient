@@ -18,12 +18,25 @@ namespace Nextcloud.Data
         [NotNull]
         public string Filepath { get; set; }
 
+        [Ignore]
+        public string ParentFilepath
+        {
+            get
+            {
+                string p = Filepath.TrimEnd('/');
+                return p.Substring(0, p.LastIndexOf('/')) + '/';
+            }
+        }
+
         public long Filesize { get; set; }
 
-        public string FileType { get; set; }
+        public string Filetype { get; set; }
 
         [NotNull]
         public bool IsDirectory { get; set; }
+
+        [NotNull]
+        public bool IsRootItem { get; set; }
 
         public string ETag { get; set; }
 

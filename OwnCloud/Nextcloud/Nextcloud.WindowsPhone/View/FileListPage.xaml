@@ -8,15 +8,30 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    
+
     <Page.Resources>
         <ResourceDictionary>
             <converter:PossessiveCaseConverter x:Key="PossessiveCaseConverter" />
+
+            <DataTemplate x:Key="FileItemTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="1" 
+                                Margin="14.5,0,0,0">
+                        <TextBlock x:Name="Filename" Text="{Binding Filename}" Style="{ThemeResource ListViewItemTextBlockStyle}"/>
+                        <TextBlock Text="{Binding Filepath}" 
+                                   Style="{ThemeResource ListViewItemSubheaderTextBlockStyle}"
+                                   Foreground="{ThemeResource PhoneMidBrush}" />
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
-
     <Grid x:Name="LayoutRoot">
-
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -34,18 +49,28 @@
                        Style="{ThemeResource TitleTextBlockStyle}" 
                        Margin="0,12,0,0"/>
             <StackPanel Orientation="Horizontal">
-                <TextBlock x:Name="Username" 
-                           Text="{Binding Path=Username, Converter={StaticResource PossessiveCaseConverter}}" />
+                <TextBlock x:Name="Username"
+                           Margin="0,-6.5,0,26.5"
+                           Text="{Binding Path=Username, Converter={StaticResource PossessiveCaseConverter}}"
+                           Style="{ThemeResource HeaderTextBlockStyle}" />
                 <TextBlock x:Uid="FileListPage_PageTitle" 
-                           Margin="0,-6.5,0,26.5" 
+                           Margin="10,-6.5,0,26.5"
                            Style="{ThemeResource HeaderTextBlockStyle}" 
                            CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
             </StackPanel>
         </StackPanel>
 
         <!--TODO: Content should be placed within the following grid-->
-        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
-
+        <Grid Grid.Row="1" Margin="19,9.5,19,0">
+            <ListView 
+                        AutomationProperties.AutomationId="AccountSection"
+                        AutomationProperties.Name="List accounts"
+                        SelectionMode="None"
+                        IsItemClickEnabled="True"
+                        ItemsSource="{Binding FileCollection}"
+                        ItemTemplate="{StaticResource FileItemTemplate}"
+                        ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+            </ListView>
         </Grid>
     </Grid>
 </Page>

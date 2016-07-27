@@ -374,4 +374,7 @@ Save account anyway?</value>
   <data name="AppBarButton_Save.Label" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="Progress_FetchingFiles" xml:space="preserve">
+    <value>Fetching files...</value>
+  </data>
 </root>

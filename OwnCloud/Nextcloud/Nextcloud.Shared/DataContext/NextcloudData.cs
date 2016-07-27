@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using SQLite.Net;
+using SQLite.Net.Async;
 using SQLiteNetExtensions.Extensions;
 using Windows.Storage;
 using Nextcloud.Data;
+using System.Threading.Tasks;
 
 namespace Nextcloud.DataContext
 {
@@ -28,8 +30,24 @@ namespace Nextcloud.DataContext
             db.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server, true);
         }
 
+        public async void StoreFile(File newOrUpdatedFile) {
+            if (!await IsFileFetched(newOrUpdatedFile)) {
+                db.InsertOrReplaceWithChildren(newOrUpdatedFile, true);
+            }
+        }
+
         public void RemoveAccount(Account account) {
             db.Delete(account);
+        }
+
+        public async Task<bool> IsFileFetched(File file) {
+            SQLiteAsyncConnection conn = new SQLiteAsyncConnection(() => (SQLiteConnectionWithLock)db);
+            var fetchedFile = conn.Table<File>().Where(f => (
+            f.Filename == file.Filename &&
+            f.Filepath == file.Filepath &&
+            f.AccountId == file.AccountId
+            ));
+            return await fetchedFile.FirstOrDefaultAsync() != null;
         }
 
         private void InitializeDatabase(SQLiteConnection db) {

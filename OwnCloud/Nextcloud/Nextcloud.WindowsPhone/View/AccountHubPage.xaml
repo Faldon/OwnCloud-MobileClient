@@ -46,7 +46,8 @@
                             Height="80" 
                             Width="80">
                         <Viewbox Stretch="Uniform">
-                            <TextBlock Foreground="{ThemeResource PhoneForegroundBrush}" Text="{Binding ElementName=Username, Path=Text, Converter={StaticResource PrefixValueConverter}, ConverterParameter=1}"></TextBlock>
+                            <TextBlock Foreground="{ThemeResource PhoneForegroundBrush}" 
+                                       Text="{Binding ElementName=Username, Path=Text, Converter={StaticResource PrefixValueConverter}, ConverterParameter=1}"></TextBlock>
                         </Viewbox>
                     </Border>
                     <StackPanel Grid.Column="1" 

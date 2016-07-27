@@ -115,17 +115,17 @@ namespace Nextcloud
                 // when the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (dataContext.GetConnection().Table<Account>().ToList().Count == 0) {
-#if WINDOWS_PHONE_APP
-                    rootFrame.Navigate(typeof(View.EditAccountPage), null);
-#else
+//                if (dataContext.GetConnection().Table<Account>().ToList().Count == 0) {
+//#if WINDOWS_PHONE_APP
+//                    rootFrame.Navigate(typeof(View.EditAccountPage), null);
+//#else
 
-#endif
-                }
+//#endif
+//                }
 #if WINDOWS_PHONE_APP
-                else if (!rootFrame.Navigate(typeof(View.AccountHubPage), e.Arguments)) {
+                if(!rootFrame.Navigate(typeof(View.AccountHubPage), e.Arguments)) {
 #else
-                else if (!rootFrame.Navigate(typeof(AccountHubPage), e.Arguments)) {
+                if (!rootFrame.Navigate(typeof(AccountHubPage), e.Arguments)) {
 #endif
                     throw new Exception("Failed to create initial page");
                 }

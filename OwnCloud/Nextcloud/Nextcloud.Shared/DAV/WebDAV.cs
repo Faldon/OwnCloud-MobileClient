@@ -72,9 +72,6 @@ namespace Nextcloud.DAV
             _relativeHost = new Uri(_host + header.RequestedResource);
 
             header.Headers[Header.Host] = _host.DnsSafeHost;
-            // this is needed to modify some headers
-            //HttpWebRequest.RegisterPrefix("http", System.Net.HttpWebRequest);
-            //HttpWebRequest.RegisterPrefix("https", WebRequest);
             HttpWebRequest request = HttpWebRequest.CreateHttp(_host + header.RequestedResource);
             request.AllowReadStreamBuffering = false;
             request.Method = header.RequestedMethod.ToString();

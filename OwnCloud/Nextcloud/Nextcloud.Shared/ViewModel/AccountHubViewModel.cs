@@ -28,10 +28,6 @@ namespace Nextcloud.ViewModel
             _accountCollection = new ObservableCollection<Account>(accountList);
         }
 
-        public bool CanDelete(Account account) {
-            return _accountCollection.Count > 1;
-        }
-
         public bool DeleteAccount(Account account) {
             AccountCollection.Remove(account);
             App.GetDataContext().RemoveAccount(account);

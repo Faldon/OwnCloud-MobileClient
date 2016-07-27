@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Nextcloud.Data
 {
@@ -32,7 +35,19 @@ namespace Nextcloud.Data
         [ManyToOne]
         public Server Server { get; set; }
 
-        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        //[OneToMany(CascadeOperations = CascadeOperation.All)]
+        [Ignore]
         public List<File> Files { get; set; }
+
+        public Uri GetWebDAVRoot()
+        {
+            return new Uri(Server.Protocol + "://" + Server.FQDN.TrimEnd('/') + Server.WebDAVPath, UriKind.Absolute);
+        }
+
+        public async Task<NetworkCredential> GetCredential()
+        {
+            var _password = await Utility.DecryptString(Password);
+            return new NetworkCredential(Username, _password);
+        }
     }
 }

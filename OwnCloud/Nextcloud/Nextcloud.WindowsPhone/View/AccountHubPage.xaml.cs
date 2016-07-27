@@ -27,8 +27,7 @@ namespace Nextcloud.View
         private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
         private readonly ResourceLoader resourceLoader = ResourceLoader.GetForCurrentView("Resources");
 
-        public AccountHubPage()
-        {
+        public AccountHubPage() {
             this.InitializeComponent();
 
             // Hub is only supported in Portrait orientation
@@ -69,11 +68,10 @@ namespace Nextcloud.View
         /// <see cref="Frame.Navigate(Type, object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
-        {
+        private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e) {
             List<Account> dataModel = e.NavigationParameter as List<Account>;
             if (dataModel == null) {
-                dataModel = App.GetDataContext().GetConnection().GetAllWithChildren<Account>(recursive:true);
+                dataModel = App.GetDataContext().GetConnection().GetAllWithChildren<Account>(recursive: true);
                 LayoutRoot.DataContext = new AccountHubViewModel(dataModel);
             } else {
                 LayoutRoot.DataContext = new AccountHubViewModel(dataModel);
@@ -88,8 +86,7 @@ namespace Nextcloud.View
         /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
         /// <param name="e">Event data that provides an empty dictionary to be populated with
         /// serializable state.</param>
-        private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e)
-        {
+        private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e) {
             // TODO: Save the unique state of the page here.
         }
         #region NavigationHelper registration
@@ -106,13 +103,11 @@ namespace Nextcloud.View
         /// </para>
         /// </summary>
         /// <param name="e">Event data that describes how this page was reached.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
+        protected override void OnNavigatedTo(NavigationEventArgs e) {
             this.navigationHelper.OnNavigatedTo(e);
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
+        protected override void OnNavigatedFrom(NavigationEventArgs e) {
             this.navigationHelper.OnNavigatedFrom(e);
         }
         #endregion
@@ -129,19 +124,14 @@ namespace Nextcloud.View
 
         private async void OnMenuDeleteClick(object sender, RoutedEventArgs e) {
             Account selectedAccount = (Account)(sender as MenuFlyoutItem).DataContext;
-            if ((LayoutRoot.DataContext as AccountHubViewModel).CanDelete(selectedAccount)) {
-                var alert = new MessageDialog(String.Format(App.Localization().GetString("AccountHubPage_DeleteAccountWarning"), selectedAccount.Username));
-                alert.Commands.Add(new UICommand(App.Localization().GetString("Yes")));
-                alert.Commands.Add(new UICommand(App.Localization().GetString("No")));
-                alert.CancelCommandIndex = 1;
-                var command = await alert.ShowAsync();
-                if (command.Label.Equals(App.Localization().GetString("Yes"))) {
-                    AccountHubViewModel viewModel = LayoutRoot.DataContext as AccountHubViewModel;
-                    viewModel.DeleteAccount(selectedAccount);
-                }
-            } else {
-                var alert = new MessageDialog(App.Localization().GetString("AccountHubPage_DeleteAccountFailed"));
-                var command = await alert.ShowAsync();
+            var alert = new MessageDialog(String.Format(App.Localization().GetString("AccountHubPage_DeleteAccountWarning"), selectedAccount.Username));
+            alert.Commands.Add(new UICommand(App.Localization().GetString("Yes")));
+            alert.Commands.Add(new UICommand(App.Localization().GetString("No")));
+            alert.CancelCommandIndex = 1;
+            var command = await alert.ShowAsync();
+            if (command.Label.Equals(App.Localization().GetString("Yes"))) {
+                AccountHubViewModel viewModel = LayoutRoot.DataContext as AccountHubViewModel;
+                viewModel.DeleteAccount(selectedAccount);
             }
         }
 
@@ -149,10 +139,9 @@ namespace Nextcloud.View
             Frame.Navigate(typeof(EditAccountPage), null);
         }
 
-        private void OnAccountListTapped(object sender, TappedRoutedEventArgs e)
-        {
+        private void OnAccountListTapped(object sender, TappedRoutedEventArgs e) {
             ListView accountList = (sender as ListView);
-            if(e.GetPosition(accountList).X < 10) {
+            if (e.GetPosition(accountList).X < 10) {
                 accountList.ItemTemplate = App.Current.Resources["AccountItemSelectTemplate"] as DataTemplate;
                 var a = accountList.ItemTemplate;
             }
@@ -160,8 +149,7 @@ namespace Nextcloud.View
 
         }
 
-        private void OnAccountItemTapped(object sender, TappedRoutedEventArgs e)
-        {
+        private void OnAccountItemTapped(object sender, TappedRoutedEventArgs e) {
             FrameworkElement s = (sender as FrameworkElement);
             Account account = s.DataContext as Account;
             Frame.Navigate(typeof(FileListPage), account);
