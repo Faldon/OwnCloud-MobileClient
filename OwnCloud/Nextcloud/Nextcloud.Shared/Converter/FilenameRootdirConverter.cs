@@ -8,20 +8,20 @@ namespace Nextcloud.Converter
 {
     class FilenameRootdirConverter : DependencyObject, IValueConverter
     {
-        public bool IsRoot
+        public string RootDir
         {
-            get { return (bool)GetValue(IsRootProperty); }
-            set { SetValue(IsRootProperty, value); }
+            get { return (string)GetValue(RootDirProperty); }
+            set { SetValue(RootDirProperty, value); }
         }
 
-        public static readonly DependencyProperty IsRootProperty = DependencyProperty.Register("IsRoot", typeof(bool), typeof(FilenameRootdirConverter), new PropertyMetadata(false));
+        public static readonly DependencyProperty RootDirProperty = DependencyProperty.Register("RootDir", typeof(string), typeof(FilenameRootdirConverter), new PropertyMetadata(""));
 
         public object Convert(object value, Type targetType, object parameter, string language) {
-            var rootItem = GetValue(IsRootProperty) as bool?;
-            if (rootItem?? false) {
+            var itemPath = value.ToString();
+            if(RootDir.TrimEnd('/').EndsWith(itemPath)) {
                 return "..";
             } else {
-                return value.ToString();
+                return itemPath;
             }
         }
 

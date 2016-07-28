@@ -69,13 +69,8 @@ namespace Nextcloud.View
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
         private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e) {
-            List<Account> dataModel = e.NavigationParameter as List<Account>;
-            if (dataModel == null) {
-                dataModel = App.GetDataContext().GetConnection().GetAllWithChildren<Account>(recursive: true);
-                LayoutRoot.DataContext = new AccountHubViewModel(dataModel);
-            } else {
-                LayoutRoot.DataContext = new AccountHubViewModel(dataModel);
-            }
+            List<Account> dataModel = App.GetDataContext().GetConnection().GetAllWithChildren<Account>(recursive: true);
+            LayoutRoot.DataContext = new AccountHubViewModel(dataModel);
         }
 
         /// <summary>

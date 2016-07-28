@@ -146,7 +146,6 @@ namespace Nextcloud.ViewModel
                         }    
                     }
                 });
-                //await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => LastError = result.StatusText);
             }
         }
     }

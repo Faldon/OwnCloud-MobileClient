@@ -12,11 +12,12 @@
     <Page.Resources>
         <ResourceDictionary>
             <converter:PossessiveCaseConverter x:Key="PossessiveCaseConverter" />
-            <converter:FilenameRootdirConverter 
-                x:Key="FilenameRootdirConverter"
-                IsRoot="{Binding IsRootItem, Source=FileItemTemplate}" />
+            <converter:FilenameRootdirConverter x:Key="FilenameRootdirConverter"
+                                                RootDir="{Binding ElementName=CurrentPath, Path=Text}" />
+            <converter:FileModifiedDateVisibilityConverter x:Key="FileModifiedDateVisibilityConverter" />
 
-            <DataTemplate x:Key="FileItemTemplate">
+
+            <DataTemplate x:Key="FileItemTemplate" x:Name="FileItem">
                 <Grid Tapped="OnFileItemTapped">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60"/>
@@ -29,7 +30,9 @@
                         <TextBlock x:Name="Filename" 
                                    Text="{Binding Filename, Converter={StaticResource FilenameRootdirConverter}}"
                                    Style="{ThemeResource ListViewItemTextBlockStyle}"/>
-                        <TextBlock Text="{Binding FileLastModified}" 
+                        <TextBlock x:Name="FileLastModified"
+                                   Text="{Binding FileLastModified}"
+                                   Visibility="{Binding ElementName=Filename, Path=Text, Converter={StaticResource FileModifiedDateVisibilityConverter}}"
                                    Style="{ThemeResource ListViewItemContentTextBlockStyle}"
                                    Foreground="{ThemeResource PhoneMidBrush}" />
                     </StackPanel>
@@ -64,7 +67,8 @@
                            Style="{ThemeResource HeaderTextBlockStyle}" 
                            CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
             </StackPanel>
-            <TextBlock Text="{Binding CurrentPath}"
+            <TextBlock x:Name="CurrentPath"
+                       Text="{Binding CurrentPath}"
                        Style="{ThemeResource TitleTextBlockStyle}"
                        Margin="0,-15,0,26.5" />
         </StackPanel>
