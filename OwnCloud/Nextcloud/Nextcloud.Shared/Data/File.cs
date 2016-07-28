@@ -12,7 +12,7 @@ namespace Nextcloud.Data
     public class File : IEntity
     {
         [PrimaryKey, AutoIncrement]
-        public int FileId { get; set; }
+        public int? FileId { get; set; }
 
         [NotNull]
         public string Filename { get; set; }

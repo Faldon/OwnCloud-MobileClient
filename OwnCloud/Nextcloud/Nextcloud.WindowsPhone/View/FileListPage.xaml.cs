@@ -10,6 +10,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -28,12 +29,44 @@ namespace Nextcloud.View {
     public sealed partial class FileListPage : Page {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
-        private StatusBarProgressIndicator progress;
-        private CoreDispatcher dispatcher;
+        private static StatusBarProgressIndicator progress;
+        private static CoreDispatcher dispatcher;
+
+        public static readonly DependencyProperty IsProgressVisibleProperty = DependencyProperty.Register("IsFetching", typeof(bool), typeof(FileListPage), new PropertyMetadata(false, OnIsFetchingChanged));
+        public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register("Error", typeof(string), typeof(FileListPage), new PropertyMetadata("", OnErrorChanged));
+
+        public bool IsProgressVisible
+        {
+            get { return (bool)GetValue(IsProgressVisibleProperty); }
+            set { SetValue(IsProgressVisibleProperty, value); }
+        }
+
+        public string ErrorMessage
+        {
+            get { return (string)GetValue(ErrorMessageProperty); }
+            set { SetValue(ErrorMessageProperty, value); }
+        }
+
+        private static async void OnIsFetchingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if((bool)e.NewValue) {
+                await progress.ShowAsync();
+            } else {
+                await progress.HideAsync();
+            }
+        }
+
+        private static async void OnErrorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if((e.NewValue as string).Length > 0) {
+                var alert = new MessageDialog(String.Format(App.Localization().GetString("FileListPage_FetchingFailed"), (string)e.NewValue));
+                alert.CancelCommandIndex = 1;
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await alert.ShowAsync());
+            }
+        }
 
         public FileListPage() {
             this.InitializeComponent();
             ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
+            dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             progress = StatusBar.GetForCurrentView().ProgressIndicator;
             progress.Text = App.Localization().GetString("Progress_FetchingFiles");
 
@@ -73,6 +106,26 @@ namespace Nextcloud.View {
         private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e) {
             Account dataModel = e.NavigationParameter as Account;
             LayoutRoot.DataContext = new FileListViewModel(dataModel);
+
+            var progressBinding = new Binding {
+                Path = new PropertyPath("IsFetching"),
+                Source = LayoutRoot.DataContext,
+                RelativeSource = new RelativeSource {
+                    Mode = RelativeSourceMode.Self
+                }
+            };
+            SetBinding(IsProgressVisibleProperty, progressBinding);
+
+            var errorBinding = new Binding {
+                Path = new PropertyPath("LastError"),
+                Source = LayoutRoot.DataContext,
+                RelativeSource = new RelativeSource {
+                    Mode = RelativeSourceMode.Self
+                }
+            };
+            SetBinding(ErrorMessageProperty, errorBinding);
+
+            (LayoutRoot.DataContext as FileListViewModel).StartFetching();
         }
 
         /// <summary>
@@ -110,5 +163,16 @@ namespace Nextcloud.View {
         }
 
         #endregion
+
+        private void OnFileItemTapped(object sender, TappedRoutedEventArgs e) {
+            File tappedItem = (File)(sender as FrameworkElement).DataContext;
+            if(tappedItem.IsDirectory) {
+                FetchStructure(tappedItem.Filepath.Remove(0, tappedItem.Account.Server.WebDAVPath.Length-1));
+            }
+        }
+
+        private void FetchStructure(string path) {
+            (LayoutRoot.DataContext as FileListViewModel).StartFetching(path);
+        }
     }
 }

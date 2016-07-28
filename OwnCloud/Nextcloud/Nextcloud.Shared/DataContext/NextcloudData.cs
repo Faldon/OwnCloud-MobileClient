@@ -20,7 +20,7 @@ namespace Nextcloud.DataContext
 
         public NextcloudData() {
             CreateDatabaseFile("nextcloud.db");
-            connection = new SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), database.Path);
+            connection = new SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), database.Path, storeDateTimeAsTicks: false);
             asyncConnection = null;
             InitializeDatabase(connection);
         }
@@ -31,7 +31,7 @@ namespace Nextcloud.DataContext
 
         public SQLiteAsyncConnection GetConnectionAsync() {
             if (asyncConnection == null) {
-                var connectionString = new SQLiteConnectionString(database.Path, false);
+                var connectionString = new SQLiteConnectionString(database.Path, storeDateTimeAsTicks: false);
                 var connectionWithLock = new SQLiteConnectionWithLock(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), connectionString);
                 asyncConnection = new SQLiteAsyncConnection(() => connectionWithLock);
             }
@@ -43,34 +43,17 @@ namespace Nextcloud.DataContext
         }
 
         public async void StoreFile(File newOrUpdatedFile) {
+            List<File> fileList = await GetConnectionAsync().Table<File>().Where(f => (f.Filename == newOrUpdatedFile.Filename && f.Filepath == newOrUpdatedFile.Filepath && f.AccountId == newOrUpdatedFile.AccountId)).ToListAsync();
+            if(fileList.Count==1) {
+                newOrUpdatedFile.FileId = fileList[0].FileId;
+            } else {
+                newOrUpdatedFile.FileId = null;
+            }
             int result = await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedFile);
-            //var fetchedFile = asyncConnection.Table<File>().Where(f => (
-            //    f.Filename == newOrUpdatedFile.Filename &&
-            //    f.Filepath == newOrUpdatedFile.Filepath &&
-            //    f.AccountId == newOrUpdatedFile.AccountId
-            //));
-            //File stored = await fetchedFile.FirstOrDefaultAsync();
-            //bool needsUpdate = await NeedsUpdate(newOrUpdatedFile);
-            //if (stored == null) {
-                
-            //    //db.InsertOrReplaceWithChildren(newOrUpdatedFile, true);
-            //}
         }
 
         public void RemoveAccount(Account account) {
             connection.Delete(account);
-        }
-
-        public async Task<bool> NeedsUpdate(File file) {
-            var connectionFactory = new Func<SQLiteConnectionWithLock>(() => new SQLiteConnectionWithLock(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), new SQLiteConnectionString(database.Path, storeDateTimeAsTicks: false)));
-            var asyncConnection = new SQLiteAsyncConnection(connectionFactory);
-            var fetchedFile = asyncConnection.Table<File>().Where(f => (
-            f.Filename == file.Filename &&
-            f.Filepath == file.Filepath &&
-            f.AccountId == file.AccountId
-            ));
-            File stored = await fetchedFile.FirstOrDefaultAsync();
-            return (stored == null);
         }
 
         private void InitializeDatabase(SQLiteConnection db) {
@@ -104,10 +87,5 @@ namespace Nextcloud.DataContext
             database = await ApplicationData.Current.LocalFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
         }
 
-        public async void UpdateFileTable(ObservableCollection<File> fileCollection) {
-            var connectionFactory = new Func<SQLiteConnectionWithLock>(() => new SQLiteConnectionWithLock(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), new SQLiteConnectionString(database.Path, storeDateTimeAsTicks: false)));
-            var asyncConnection = new SQLiteAsyncConnection(connectionFactory);
-            int result = await asyncConnection.InsertOrReplaceAllAsync(fileCollection);
-        }
     }
 }

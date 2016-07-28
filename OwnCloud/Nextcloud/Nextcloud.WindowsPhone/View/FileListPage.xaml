@@ -12,9 +12,12 @@
     <Page.Resources>
         <ResourceDictionary>
             <converter:PossessiveCaseConverter x:Key="PossessiveCaseConverter" />
+            <converter:FilenameRootdirConverter 
+                x:Key="FilenameRootdirConverter"
+                IsRoot="{Binding IsRootItem, Source=FileItemTemplate}" />
 
             <DataTemplate x:Key="FileItemTemplate">
-                <Grid>
+                <Grid Tapped="OnFileItemTapped">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60"/>
                         <ColumnDefinition Width="*"/>
@@ -24,7 +27,7 @@
                     <StackPanel Grid.Column="1" 
                                 Margin="14.5,0,0,0">
                         <TextBlock x:Name="Filename" 
-                                   Text="{Binding Filename}"
+                                   Text="{Binding Filename, Converter={StaticResource FilenameRootdirConverter}}"
                                    Style="{ThemeResource ListViewItemTextBlockStyle}"/>
                         <TextBlock Text="{Binding FileLastModified}" 
                                    Style="{ThemeResource ListViewItemContentTextBlockStyle}"

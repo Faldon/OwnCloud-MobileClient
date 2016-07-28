@@ -35,8 +35,7 @@ namespace Nextcloud.Data
         [ManyToOne]
         public Server Server { get; set; }
 
-        //[OneToMany(CascadeOperations = CascadeOperation.All)]
-        [Ignore]
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<File> Files { get; set; }
 
         public Uri GetWebDAVRoot()

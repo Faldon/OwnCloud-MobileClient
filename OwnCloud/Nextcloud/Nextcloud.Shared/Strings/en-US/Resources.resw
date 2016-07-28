@@ -336,6 +336,7 @@
   </data>
   <data name="EditAccountPage_ConnectionFailed" xml:space="preserve">
     <value>Unable to connect to server. Error: {0}
+
 Save account anyway?</value>
   </data>
   <data name="AccountHubPage.Header" xml:space="preserve">
@@ -376,5 +377,8 @@ Save account anyway?</value>
   </data>
   <data name="Progress_FetchingFiles" xml:space="preserve">
     <value>Fetching files...</value>
+  </data>
+  <data name="FileListPage_FetchingFailed" xml:space="preserve">
+    <value>Unable to fetch files: Error {0}</value>
   </data>
 </root>
