@@ -114,6 +114,34 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\FileIcons\Dark\application_zip.png" />
+    <Content Include="Assets\FileIcons\Dark\up.png" />
+    <Content Include="Assets\FileIcons\Dark\folder.png" />
+    <Content Include="Assets\FileIcons\Dark\application_vnd.ms-excel.png" />
+    <Content Include="Assets\FileIcons\Dark\image_gif.png" />
+    <Content Include="Assets\FileIcons\Dark\image.png" />
+    <Content Include="Assets\FileIcons\Dark\image_jpeg.png" />
+    <Content Include="Assets\FileIcons\Dark\audio.png" />
+    <Content Include="Assets\FileIcons\Dark\application_pdf.png" />
+    <Content Include="Assets\FileIcons\Dark\file.png" />
+    <Content Include="Assets\FileIcons\Dark\image_png.png" />
+    <Content Include="Assets\FileIcons\Dark\text.png" />
+    <Content Include="Assets\FileIcons\Dark\application_vnd.ms-word.png" />
+    <Content Include="Assets\FileIcons\Dark\text_xml.png" />
+    <Content Include="Assets\FileIcons\Light\file.png" />
+    <Content Include="Assets\FileIcons\Light\application_zip.png" />
+    <Content Include="Assets\FileIcons\Light\up.png" />
+    <Content Include="Assets\FileIcons\Light\folder.png" />
+    <Content Include="Assets\FileIcons\Light\application_vnd.ms-excel.png" />
+    <Content Include="Assets\FileIcons\Light\image_gif.png" />
+    <Content Include="Assets\FileIcons\Light\image.png" />
+    <Content Include="Assets\FileIcons\Light\image_jpeg.png" />
+    <Content Include="Assets\FileIcons\Light\audio.png" />
+    <Content Include="Assets\FileIcons\Light\application_pdf.png" />
+    <Content Include="Assets\FileIcons\Light\image_png.png" />
+    <Content Include="Assets\FileIcons\Light\text.png" />
+    <Content Include="Assets\FileIcons\Light\application_vnd.ms-word.png" />
+    <Content Include="Assets\FileIcons\Light\text_xml.png" />
     <Content Include="Assets\Logo.scale-240.png" />
     <Content Include="Assets\SmallLogo.scale-240.png" />
     <Content Include="Assets\SplashScreen.scale-240.png" />

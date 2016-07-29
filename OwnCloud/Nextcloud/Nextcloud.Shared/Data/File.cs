@@ -82,10 +82,18 @@ namespace Nextcloud.Data
             StorageFolder installationFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
             StorageFolder assetsFolder = await installationFolder.GetFolderAsync("Assets");
             StorageFolder fileIconsFolder = await assetsFolder.GetFolderAsync("FileIcons");
+#if WINDOWS_PHONE_APP
+            string theme = App.Current.RequestedTheme.ToString();
+            fileIconsFolder = await fileIconsFolder.GetFolderAsync(theme);
+#endif
             IReadOnlyList<StorageFile> fileIcons = await fileIconsFolder.GetFilesAsync();
             foreach(StorageFile fileIcon in fileIcons) {
                 if(!_iconCache.ContainsKey(fileIcon.DisplayName)) {
+#if WINDOWS_PHONE_APP
+                    _iconCache.Add(fileIcon.DisplayName, "/Assets/FileIcons/" + theme + "/" + fileIcon.DisplayName + fileIcon.FileType);
+#else
                     _iconCache.Add(fileIcon.DisplayName, "/Assets/FileIcons/" + fileIcon.DisplayName + fileIcon.FileType);
+#endif
                 }
             }
         }
