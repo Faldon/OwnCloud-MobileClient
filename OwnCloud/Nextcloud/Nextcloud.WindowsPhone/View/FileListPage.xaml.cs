@@ -5,10 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.Networking.BackgroundTransfer;
+using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
@@ -164,15 +170,73 @@ namespace Nextcloud.View {
 
         #endregion
 
-        private void OnFileItemTapped(object sender, TappedRoutedEventArgs e) {
+        private async void OnFileItemTapped(object sender, TappedRoutedEventArgs e) {
             File tappedItem = (File)(sender as FrameworkElement).DataContext;
             if(tappedItem.IsDirectory) {
                 FetchStructure(tappedItem.Filepath.Remove(0, tappedItem.Account.Server.WebDAVPath.Length-1));
+            } else {
+                Uri uriToDownload = new Uri(tappedItem.Account.Server.Protocol + "://" + tappedItem.Account.Server.FQDN + tappedItem.Filepath, UriKind.Absolute);
+                bool result = await DownloadFileAsync(uriToDownload, tappedItem.Filename, tappedItem.FileLastModified, new CancellationToken(false));
             }
         }
 
         private void FetchStructure(string path) {
             (LayoutRoot.DataContext as FileListViewModel).StartFetching(path);
         }
+
+        private async Task<bool> DownloadFileAsync(Uri uriToDownload, string fileName, DateTime lastModificationDate, CancellationToken cToken) {
+            try {
+                FileListViewModel viewModel = LayoutRoot.DataContext as FileListViewModel;
+                //var localPath = _workingAccount.ServerDomain + "\\" + _workingAccount.DisplayUserName + "\\" + _workingPath.Remove(0, _workingAccount.WebDAVPath.Length).Replace("/", "\\");
+                // var userFile = localPath + fileName;
+                StorageFolder localStorage = ApplicationData.Current.LocalFolder;
+                StorageFolder server = await localStorage.CreateFolderAsync(viewModel.Servername, CreationCollisionOption.OpenIfExists);
+                StorageFolder user = await server.CreateFolderAsync(viewModel.Username, CreationCollisionOption.OpenIfExists);
+                StorageFolder cwd = user;
+
+                foreach (string folder in viewModel.CurrentPath.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries)) {
+                    cwd = await cwd.CreateFolderAsync(folder, CreationCollisionOption.OpenIfExists);
+                }
+
+                StorageFile localFile;
+                try {
+                    localFile = await cwd.GetFileAsync(fileName);
+                    if (localFile.DateCreated > lastModificationDate) {
+                        return true;
+                    }
+                } catch (Exception e) {
+                    localFile = await cwd.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
+                }
+                BackgroundDownloader loader = new BackgroundDownloader();
+                var cred = await viewModel.Account.GetCredential();
+                loader.ServerCredential = new Windows.Security.Credentials.PasswordCredential(viewModel.Servername, cred.UserName, cred.Password);
+                DownloadOperation dl = loader.CreateDownload(uriToDownload, localFile);
+                var dloperation = await Task.Run(() => { return dl.StartAsync(); });
+                dloperation.Completed = delegate (IAsyncOperationWithProgress<DownloadOperation, DownloadOperation> dlCompleted) {
+
+                };
+                //dloperation.Completed += new AsyncOperationWithProgressCompletedHandler<DownloadOperation, DownloadOperation>(IAsyncOperationWithProgress<DownloadOperation, DownloadOperation>, dloperation)
+
+                return true;
+            } catch (Exception e) {
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                return false;
+            }
+        }
+
+
+        //private static Task<System.IO.Stream> DownloadFile(Uri url, NetworkCredential credentials) {
+        //    var tcs = new TaskCompletionSource<System.IO.Stream>();
+        //    var wc = new HttpClient();
+            
+        //    wc.Credentials = credentials;
+        //    wc.OpenReadCompleted += (s, e) => {
+        //        if (e.Error != null) tcs.TrySetException(e.Error);
+        //        else if (e.Cancelled) tcs.TrySetCanceled();
+        //        else tcs.TrySetResult(e.Result);
+        //    };
+        //    wc.OpenReadAsync(url);
+        //    return tcs.Task;
+        //}
     }
 }

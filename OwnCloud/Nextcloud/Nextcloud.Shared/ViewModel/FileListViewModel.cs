@@ -25,11 +25,38 @@ namespace Nextcloud.ViewModel
         }
 
         private Account _account;
+        public Account Account
+        {
+            get
+            {
+                return _account;
+            }
+            set { }
+        }
+
         public string Username
         {
             get
             {
                 return _account.Username;
+            }
+            set { }
+        }
+
+        public string Servername
+        {
+            get
+            {
+                return _account.Server.FQDN;
+            }
+            set { }
+        }
+
+        public string WebDAVRoot
+        {
+            get
+            {
+                return _account.Server.WebDAVPath;
             }
             set { }
         }
@@ -81,7 +108,6 @@ namespace Nextcloud.ViewModel
             _account = account;
             _currentPath = "/";
             _fileCollection = new ObservableCollection<File>();
-            //StartFetching();
         }
 
         public async void StartFetching(string path=null)
@@ -141,7 +167,7 @@ namespace Nextcloud.ViewModel
                     IsFetching = false;
                     LastError = result.Request.LastException.Message;
                     foreach(File fileFromDatabase in _account.Files) {
-                        if(fileFromDatabase.Filepath.StartsWith(_account.Server.WebDAVPath.TrimEnd('/')+_currentPath)) {
+                        if(fileFromDatabase.Filepath.StartsWith(WebDAVRoot.TrimEnd('/')+_currentPath)) {
                             FileCollection.Add(fileFromDatabase);
                         }    
                     }
