@@ -2,6 +2,7 @@
 using Nextcloud.DAV;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
 using Windows.UI.Core;
 
@@ -156,8 +157,14 @@ namespace Nextcloud.ViewModel
                         }
                     }
                     if(display) {
-                        App.GetDataContext().StoreFile(fileItem);
-                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Add(fileItem));
+                        File storedFile = _account.Files.Find(f => f.Filename == fileItem.Filename && f.Filepath == fileItem.Filepath);
+                        if(storedFile == null || storedFile.ETag != fileItem.ETag) {
+                            fileItem.IsDownloaded = false;
+                            App.GetDataContext().StoreFile(fileItem);
+                            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Add(fileItem));
+                        } else {
+                            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Add(storedFile));
+                        }
                     }
                 }
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsFetching = false);
@@ -166,10 +173,8 @@ namespace Nextcloud.ViewModel
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     IsFetching = false;
                     LastError = result.Request.LastException.Message;
-                    foreach(File fileFromDatabase in _account.Files) {
-                        if(fileFromDatabase.Filepath.StartsWith(WebDAVRoot.TrimEnd('/')+_currentPath)) {
-                            FileCollection.Add(fileFromDatabase);
-                        }    
+                    foreach(File fileFromDatabase in _account.Files.Where(f => (f.Filepath.TrimEnd('/') == _currentPath + f.Filename) || (_currentPath.TrimEnd('/') == f.Filepath + f.Filename))) {
+                        FileCollection.Add(fileFromDatabase);
                     }
                 });
             }

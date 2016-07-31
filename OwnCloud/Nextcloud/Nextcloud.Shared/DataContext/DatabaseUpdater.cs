@@ -14,6 +14,9 @@ namespace Nextcloud.DataContext
                     db.Execute("ALTER TABLE Files ADD AccountId INTEGER");
                     db.Execute("CREATE INDEX Files_AccountId ON Files(AccountId)");
                     break;
+                case 2:
+                    db.Execute("ALTER TABLE Files ADD IsDownloaded NOT NULL DEFAULT FALSE");
+                    break;
                 default:
                     break;
             }

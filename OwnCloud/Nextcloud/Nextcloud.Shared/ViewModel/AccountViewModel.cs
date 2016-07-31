@@ -85,7 +85,7 @@ namespace Nextcloud.ViewModel {
         }
 
         public bool CanSave() {
-            return (Username.Length != 0 && _password.Length != 0 && Servername.Length != 0);
+            return (Username.Length != 0 && _password.Length != 0 && Servername != null && Servername.Length != 0);
         }
 
         public bool CanCancel() {

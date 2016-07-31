@@ -40,6 +40,9 @@ namespace Nextcloud.Data
         [NotNull]
         public bool IsRootItem { get; set; }
 
+        [NotNull]
+        public bool IsDownloaded { get; set; }
+
         public string ETag { get; set; }
 
         public DateTime FileLastModified { get; set; }
@@ -74,6 +77,19 @@ namespace Nextcloud.Data
                     }
                     return _iconCache["file"];
                 }
+            }
+        }
+
+        [Ignore]
+        public string Size
+        {
+            get
+            {
+                if(!IsDirectory) {
+                    return Utility.FormatBytes(Filesize);
+                } else {
+                    return "";
+                } 
             }
         }
 

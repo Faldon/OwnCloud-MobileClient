@@ -376,9 +376,15 @@ Save account anyway?</value>
     <value>Save</value>
   </data>
   <data name="Progress_FetchingFiles" xml:space="preserve">
-    <value>Fetching files...</value>
+    <value>Downloading file...</value>
   </data>
   <data name="FileListPage_FetchingFailed" xml:space="preserve">
     <value>Unable to fetch files: Error {0}</value>
+  </data>
+  <data name="Progress_FetchingStructure" xml:space="preserve">
+    <value>Fetching structure...</value>
+  </data>
+  <data name="FileListPage_DownloadCompleted" xml:space="preserve">
+    <value>Download completed.</value>
   </data>
 </root>

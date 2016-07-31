@@ -16,7 +16,7 @@ namespace Nextcloud.DataContext
         private SQLiteConnection connection;
         private SQLiteAsyncConnection asyncConnection;
         private StorageFile database;
-        private const int DATABASE_VERSION = 2;
+        private const int DATABASE_VERSION = 3;
 
         public NextcloudData() {
             CreateDatabaseFile("nextcloud.db");
@@ -43,13 +43,22 @@ namespace Nextcloud.DataContext
         }
 
         public async void StoreFile(File newOrUpdatedFile) {
-            List<File> fileList = await GetConnectionAsync().Table<File>().Where(f => (f.Filename == newOrUpdatedFile.Filename && f.Filepath == newOrUpdatedFile.Filepath && f.AccountId == newOrUpdatedFile.AccountId)).ToListAsync();
-            if(fileList.Count==1) {
-                newOrUpdatedFile.FileId = fileList[0].FileId;
-            } else {
-                newOrUpdatedFile.FileId = null;
-            }
-            int result = await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedFile);
+            await GetConnectionAsync().FindAsync<File>(f => (f.Filename == newOrUpdatedFile.Filename && f.Filepath == newOrUpdatedFile.Filepath && f.AccountId == newOrUpdatedFile.AccountId)).ContinueWith(async f => {
+                if (f.Result == null) {
+                    newOrUpdatedFile.FileId = null;
+                    await GetConnectionAsync().InsertAsync(newOrUpdatedFile);
+                } else if (newOrUpdatedFile.ETag != f.Result.ETag) {
+                    newOrUpdatedFile.FileId = f.Result.FileId;
+                    await GetConnectionAsync().UpdateAsync(newOrUpdatedFile);
+                }
+            });
+        }
+
+        public async void UpdateFile(File updatedFile) {
+            await GetConnectionAsync().FindAsync<File>(f => (f.Filename == updatedFile.Filename && f.Filepath == updatedFile.Filepath && f.AccountId == updatedFile.AccountId)).ContinueWith(async f => {
+                updatedFile.FileId = f.Result.FileId;
+                await GetConnectionAsync().UpdateAsync(updatedFile);
+            });
         }
 
         public void RemoveAccount(Account account) {
