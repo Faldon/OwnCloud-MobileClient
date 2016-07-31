@@ -2,10 +2,17 @@
 using Nextcloud.Data;
 using Nextcloud.ViewModel;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.Graphics.Display;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
 using Windows.UI.Core;
@@ -13,14 +20,15 @@ using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
-namespace Nextcloud.View
-{
+namespace Nextcloud.View {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -48,11 +56,10 @@ namespace Nextcloud.View
         public FileListPage() {
             this.InitializeComponent();
             ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
+
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             progress = StatusBar.GetForCurrentView().ProgressIndicator;
             progress.Text = App.Localization().GetString("Progress_FetchingStructure");
-
-            App.Current.Resources["DownloadOverlayIcon"] = "/Assets/Icons/" + App.Current.RequestedTheme.ToString() + "/appbar.cloud.download.png";
 
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
@@ -148,24 +155,6 @@ namespace Nextcloud.View
 
         #endregion
 
-        private async void OnFileItemTapped(object sender, TappedRoutedEventArgs e) {
-            File tappedItem = (File)(sender as FrameworkElement).DataContext;
-            if(tappedItem.IsDirectory) {
-                FetchStructure(tappedItem.Filepath.Remove(0, tappedItem.Account.Server.WebDAVPath.Length-1));
-            } else {
-                Uri uriToDownload = new Uri(tappedItem.Account.Server.Protocol + "://" + tappedItem.Account.Server.FQDN + tappedItem.Filepath, UriKind.Absolute);
-                progress.Text = App.Localization().GetString("Progress_FetchingFiles");
-                (LayoutRoot.DataContext as FileListViewModel).IsFetching = true;
-                bool result = await DownloadFileAsync(uriToDownload, tappedItem.Filename, tappedItem.FileLastModified, new CancellationToken(false));
-                if(result) {
-                    tappedItem.IsDownloaded = true;
-                    App.GetDataContext().UpdateFile(tappedItem);
-                }
-                (LayoutRoot.DataContext as FileListViewModel).IsFetching = false;
-                progress.Text = App.Localization().GetString("Progress_FetchingStructure");
-            }
-        }
-
         private static async void OnIsFetchingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             if ((bool)e.NewValue) {
                 await progress.ShowAsync();
@@ -179,6 +168,22 @@ namespace Nextcloud.View
                 var alert = new MessageDialog(String.Format(App.Localization().GetString("FileListPage_FetchingFailed"), (string)e.NewValue));
                 alert.CancelCommandIndex = 1;
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await alert.ShowAsync());
+            }
+        }
+
+        private async void OnFileItemTapped(object sender, TappedRoutedEventArgs e) {
+            File tappedItem = (File)(sender as FrameworkElement).DataContext;
+            if(tappedItem.IsDirectory) {
+                FetchStructure(tappedItem.Filepath.Remove(0, tappedItem.Account.Server.WebDAVPath.Length-1));
+            } else {
+                Uri uriToDownload = new Uri(tappedItem.Account.Server.Protocol + "://" + tappedItem.Account.Server.FQDN + tappedItem.Filepath, UriKind.Absolute);
+                progress.Text = App.Localization().GetString("Progress_FetchingFiles");
+                IsProgressVisible = true;
+                bool result = await DownloadFileAsync(uriToDownload, tappedItem.Filename, tappedItem.FileLastModified, new CancellationToken(false));
+                if(result) {
+                    tappedItem.IsDownloaded = true;
+                    App.GetDataContext().UpdateFile(tappedItem);
+                }
             }
         }
 
@@ -205,7 +210,7 @@ namespace Nextcloud.View
                         await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await Windows.System.Launcher.LaunchFileAsync(localFile));
                         return true;
                     }
-                } catch (FileNotFoundException) {
+                } catch (Exception e) {
                     localFile = await cwd.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
                 }
                 BackgroundDownloader loader = new BackgroundDownloader();
@@ -215,6 +220,7 @@ namespace Nextcloud.View
                 var dlOperation = await Task.Run(() => { return dl.StartAsync(); });
 
                 dlOperation.Completed = async delegate (IAsyncOperationWithProgress<DownloadOperation, DownloadOperation> dlCompleted, AsyncStatus status) {
+                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsProgressVisible = false);
                     if (dlCompleted.ErrorCode == null) {
                         await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await Windows.System.Launcher.LaunchFileAsync(localFile));
                     } else {
@@ -223,9 +229,25 @@ namespace Nextcloud.View
                     }
                 };
                 return dlOperation.ErrorCode == null;
-            } catch (Exception) {
+            } catch (Exception e) {
+                System.Diagnostics.Debug.WriteLine(e.Message);
                 return false;
             }
         }
+
+
+        //private static Task<System.IO.Stream> DownloadFile(Uri url, NetworkCredential credentials) {
+        //    var tcs = new TaskCompletionSource<System.IO.Stream>();
+        //    var wc = new HttpClient();
+            
+        //    wc.Credentials = credentials;
+        //    wc.OpenReadCompleted += (s, e) => {
+        //        if (e.Error != null) tcs.TrySetException(e.Error);
+        //        else if (e.Cancelled) tcs.TrySetCanceled();
+        //        else tcs.TrySetResult(e.Result);
+        //    };
+        //    wc.OpenReadAsync(url);
+        //    return tcs.Task;
+        //}
     }
 }

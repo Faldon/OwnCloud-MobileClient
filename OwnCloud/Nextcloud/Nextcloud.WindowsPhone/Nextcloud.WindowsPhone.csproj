@@ -114,7 +114,7 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Icons\Light\appbar.cloud.download.png" />
+    <Content Include="Assets\Icons\download.overlay.icon.png" />
     <Content Include="Assets\FileIcons\Dark\application_zip.png" />
     <Content Include="Assets\FileIcons\Dark\up.png" />
     <Content Include="Assets\FileIcons\Dark\folder.png" />
@@ -129,7 +129,6 @@
     <Content Include="Assets\FileIcons\Dark\text.png" />
     <Content Include="Assets\FileIcons\Dark\application_vnd.ms-word.png" />
     <Content Include="Assets\FileIcons\Dark\text_xml.png" />
-    <Content Include="Assets\Icons\Dark\appbar.cloud.download.png" />
     <Content Include="Assets\FileIcons\Light\file.png" />
     <Content Include="Assets\FileIcons\Light\application_zip.png" />
     <Content Include="Assets\FileIcons\Light\up.png" />
@@ -201,7 +200,10 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Assets\Icons\Dark\" />
+    <Folder Include="Assets\Icons\Light\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
