@@ -6,7 +6,7 @@ using Windows.UI.Xaml.Data;
 
 namespace Nextcloud.Converter
 {
-    class DownloadOverlayIconVisibilityConverter : IValueConverter
+    class BoolVisibiltyConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language) {
             if((bool)value) {

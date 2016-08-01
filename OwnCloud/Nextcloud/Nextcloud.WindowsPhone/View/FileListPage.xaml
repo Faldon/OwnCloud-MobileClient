@@ -15,11 +15,11 @@
             <converter:FilenameRootdirConverter x:Key="FilenameRootdirConverter"
                                                 RootDir="{Binding ElementName=CurrentPath, Path=Text}" />
             <converter:FileModifiedDateVisibilityConverter x:Key="FileModifiedDateVisibilityConverter" />
-            <converter:DownloadOverlayIconVisibilityConverter x:Key="DownloadOverlayIconVisibilityConverter" />
-
+            <converter:BoolVisibiltyConverter x:Key="BoolVisibiltyConverter" />
 
             <DataTemplate x:Key="FileItemTemplate" x:Name="FileItem">
-                <Grid Tapped="OnFileItemTapped">
+                <Grid x:Name="FileItemGrid" 
+                      Tapped="OnFileItemTapped">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60"/>
                         <ColumnDefinition Width="*"/>
@@ -32,14 +32,14 @@
                                 Height="20"
                                 VerticalAlignment="Bottom"
                                 HorizontalAlignment="Right"
-                                Visibility="{Binding IsDownloaded, Converter={StaticResource DownloadOverlayIconVisibilityConverter}}" >
+                                Visibility="{Binding IsDownloaded, Converter={StaticResource BoolVisibiltyConverter}}" >
                             <BitmapIcon UriSource="/Assets/Icons/download.overlay.icon.png"
                                         Width="27"
                                         Height="27"
                                         VerticalAlignment="Bottom"
                                         HorizontalAlignment="Right"
                                         Foreground="{ThemeResource PhoneAccentBrush}"
-                                    Visibility="{Binding IsDownloaded, Converter={StaticResource DownloadOverlayIconVisibilityConverter}}"/>
+                                    Visibility="{Binding IsDownloaded, Converter={StaticResource BoolVisibiltyConverter}}"/>
                         </Border>
                     </Grid>
                     <StackPanel Grid.Column="1" 
@@ -49,12 +49,12 @@
                                    Style="{ThemeResource ListViewItemTextBlockStyle}"
                                    FontSize="{ThemeResource TextStyleLargeFontSize}" />
                         <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="FileLastModified"
+                            <TextBlock x:Name="FileLastModified"
                                    Text="{Binding FileLastModified}"
                                    Visibility="{Binding ElementName=Filename, Path=Text, Converter={StaticResource FileModifiedDateVisibilityConverter}}"
                                    Style="{ThemeResource ListViewItemContentTextBlockStyle}"
                                    Foreground="{ThemeResource PhoneMidBrush}" />
-                        <TextBlock x:Name="Size"
+                            <TextBlock x:Name="Size"
                                    Text="{Binding Size}"
                                    Visibility="{Binding ElementName=Filename, Path=Text, Converter={StaticResource FileModifiedDateVisibilityConverter}}"
                                    Style="{ThemeResource ListViewItemContentTextBlockStyle}"
@@ -66,6 +66,7 @@
             </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
+    
     <Grid x:Name="LayoutRoot">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
@@ -101,15 +102,45 @@
 
         <!--TODO: Content should be placed within the following grid-->
         <Grid Grid.Row="1" Margin="19,9.5,19,0">
-            <ListView 
+            <ListView x:Name="FileListView"
                         AutomationProperties.AutomationId="AccountSection"
                         AutomationProperties.Name="List accounts"
                         SelectionMode="None"
                         IsItemClickEnabled="True"
                         ItemsSource="{Binding FileCollection}"
                         ItemTemplate="{StaticResource FileItemTemplate}"
-                        ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+                        ContinuumNavigationTransitionInfo.ExitElementContainer="True"
+                      Visibility="Visible">
             </ListView>
         </Grid>
     </Grid>
+    <Page.BottomAppBar>
+        <CommandBar x:Name="BottomAppBar">
+            <AppBarButton x:Uid="AppBarButton_Select" 
+                          Icon="List"
+                          Click="OnSelectClick" />
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Uid="AppBarButton_SelectAll"
+                              x:Name="SelectAll"
+                              Visibility="Collapsed"
+                              Click="OnSelectAllClick"
+                              FontSize="{ThemeResource TextStyleMediumFontSize}" />
+                <AppBarButton x:Uid="AppBarButton_DeleteRemote"
+                              x:Name="DeleteRemote"
+                              Visibility="Collapsed"
+                              Click="OnDeleteRemoteClick"
+                              FontSize="{ThemeResource TextStyleMediumFontSize}" />
+                <AppBarButton x:Uid="AppBarButton_DeleteLocal"
+                              x:Name="DeleteLocal"
+                              Visibility="Collapsed"
+                              Click="OnDeleteLocalClick"
+                              FontSize="{ThemeResource TextStyleMediumFontSize}" />
+                <AppBarButton x:Uid="AppBarButton_DeleteBoth"
+                              x:Name="DeleteBoth"
+                              Visibility="Collapsed"
+                              Click="OnDeleteBothClick"
+                              FontSize="{ThemeResource TextStyleMediumFontSize}" />
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
 </Page>

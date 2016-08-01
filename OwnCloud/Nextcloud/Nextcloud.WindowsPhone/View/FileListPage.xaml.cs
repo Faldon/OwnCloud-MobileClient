@@ -2,6 +2,8 @@
 using Nextcloud.Data;
 using Nextcloud.ViewModel;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -44,9 +46,12 @@ namespace Nextcloud.View
             set { SetValue(ErrorMessageProperty, value); }
         }
 
+        private bool _isSelectView;
+
         public FileListPage() {
             this.InitializeComponent();
             ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
+            _isSelectView = false;
 
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             progress = StatusBar.GetForCurrentView().ProgressIndicator;
@@ -163,6 +168,9 @@ namespace Nextcloud.View
         }
 
         private async void OnFileItemTapped(object sender, TappedRoutedEventArgs e) {
+            if(_isSelectView) {
+                return;
+            }
             File tappedItem = (File)(sender as FrameworkElement).DataContext;
             if(tappedItem.IsDirectory) {
                 FetchStructure(tappedItem.Filepath.Remove(0, tappedItem.Account.Server.WebDAVPath.Length-1));
@@ -224,6 +232,46 @@ namespace Nextcloud.View
                 System.Diagnostics.Debug.WriteLine(e.Message);
                 return false;
             }
+        }
+
+        private void ToggleSecondaryCommands(bool isVisible) {
+            if (isVisible) {
+                foreach (ICommandBarElement command in BottomAppBar.SecondaryCommands.ToList()) {
+                    (command as AppBarButton).Visibility = Visibility.Visible;
+                }
+            } else {
+                foreach (ICommandBarElement command in BottomAppBar.SecondaryCommands.ToList()) {
+                    (command as AppBarButton).Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private void OnSelectClick(object sender, RoutedEventArgs e) {
+            if(_isSelectView) {
+                FileListView.SelectionMode = ListViewSelectionMode.None;
+            } else {
+                FileListView.SelectionMode = ListViewSelectionMode.Multiple;
+                FileListView.IsItemClickEnabled = false;
+            }
+            ToggleSecondaryCommands(!_isSelectView);
+            _isSelectView = !_isSelectView;
+        }
+
+        private void OnSelectAllClick(object sender, RoutedEventArgs e) {
+            
+        }
+
+        private void OnDeleteRemoteClick(object sender, RoutedEventArgs e) {
+
+        }
+
+        private void OnDeleteLocalClick(object sender, RoutedEventArgs e) {
+            List<object> c = FileListView.SelectedItems.ToList();
+            OnSelectClick(null, null);
+        }
+
+        private void OnDeleteBothClick(object sender, RoutedEventArgs e) {
+
         }
     }
 }

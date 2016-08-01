@@ -387,4 +387,19 @@ Save account anyway?</value>
   <data name="FileListPage_DownloadCompleted" xml:space="preserve">
     <value>Download completed.</value>
   </data>
+  <data name="AppBarButton_Select.Label" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="AppBarButton_DeleteBoth.Label" xml:space="preserve">
+    <value>Delete local and on server</value>
+  </data>
+  <data name="AppBarButton_DeleteLocal.Label" xml:space="preserve">
+    <value>Delete local</value>
+  </data>
+  <data name="AppBarButton_DeleteRemote.Label" xml:space="preserve">
+    <value>Delete on server</value>
+  </data>
+  <data name="AppBarButton_SelectAll.Label" xml:space="preserve">
+    <value>Select all</value>
+  </data>
 </root>
