@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SQLite.Net;
 using SQLite.Net.Async;
+using System.Linq;
 using SQLiteNetExtensions.Extensions;
 using Windows.Storage;
 using Nextcloud.Data;
@@ -42,16 +43,29 @@ namespace Nextcloud.DataContext
             connection.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server, true);
         }
 
-        public async void StoreFile(File newOrUpdatedFile) {
-            await GetConnectionAsync().FindAsync<File>(f => (f.Filename == newOrUpdatedFile.Filename && f.Filepath == newOrUpdatedFile.Filepath && f.AccountId == newOrUpdatedFile.AccountId)).ContinueWith(async f => {
-                if (f.Result == null) {
-                    newOrUpdatedFile.FileId = null;
-                    await GetConnectionAsync().InsertAsync(newOrUpdatedFile);
-                } else if (newOrUpdatedFile.ETag != f.Result.ETag) {
-                    newOrUpdatedFile.FileId = f.Result.FileId;
-                    await GetConnectionAsync().UpdateAsync(newOrUpdatedFile);
-                }
-            });
+        public Account LoadAccount(int id) {
+            return connection.GetWithChildren<Account>(id, recursive: true);
+        }
+
+        public List<File> GetUserfilesInPath(Account user, string path) {
+            List<File> currentFilesInDatabase = connection.GetAllWithChildren<File>(f => f.AccountId == user.AccountId && (f.Filepath.StartsWith(path) || path.StartsWith(f.Filepath+f.Filename)), recursive:true).ToList();
+            return currentFilesInDatabase;
+        }
+
+        public int StoreFile(File newOrUpdatedFile) {
+            File inDatabase = connection.Table<File>().Where(f => (f.Filename == newOrUpdatedFile.Filename && f.Filepath == newOrUpdatedFile.Filepath && f.AccountId == newOrUpdatedFile.AccountId)).FirstOrDefault();
+            if(inDatabase == null) {
+                connection.InsertWithChildren(newOrUpdatedFile, recursive: true);
+            } else {
+                connection.UpdateWithChildren(newOrUpdatedFile);
+            }
+            return newOrUpdatedFile.FileId?? 0;
+        }
+
+        public File LoadFile(int id) {
+            File f = connection.GetWithChildren<File>(id, recursive: true);
+            f.Account = connection.GetWithChildren<Account>(f.AccountId, recursive: true);
+            return f;
         }
 
         public async void UpdateFile(File updatedFile) {
@@ -59,6 +73,11 @@ namespace Nextcloud.DataContext
                 updatedFile.FileId = f.Result.FileId;
                 await GetConnectionAsync().UpdateAsync(updatedFile);
             });
+        }
+
+        public async void RemoveFile(File file) {
+            File fileInDatabase = connection.Get<File>(file.FileId);
+            await GetConnectionAsync().DeleteAsync(fileInDatabase);
         }
 
         public void RemoveAccount(Account account) {

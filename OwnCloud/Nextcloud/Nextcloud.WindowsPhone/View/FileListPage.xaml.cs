@@ -2,17 +2,9 @@
 using Nextcloud.Data;
 using Nextcloud.ViewModel;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
 using Windows.UI.Core;
@@ -20,15 +12,14 @@ using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
-namespace Nextcloud.View {
+namespace Nextcloud.View
+{
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -234,20 +225,5 @@ namespace Nextcloud.View {
                 return false;
             }
         }
-
-
-        //private static Task<System.IO.Stream> DownloadFile(Uri url, NetworkCredential credentials) {
-        //    var tcs = new TaskCompletionSource<System.IO.Stream>();
-        //    var wc = new HttpClient();
-            
-        //    wc.Credentials = credentials;
-        //    wc.OpenReadCompleted += (s, e) => {
-        //        if (e.Error != null) tcs.TrySetException(e.Error);
-        //        else if (e.Cancelled) tcs.TrySetCanceled();
-        //        else tcs.TrySetResult(e.Result);
-        //    };
-        //    wc.OpenReadAsync(url);
-        //    return tcs.Task;
-        //}
     }
 }

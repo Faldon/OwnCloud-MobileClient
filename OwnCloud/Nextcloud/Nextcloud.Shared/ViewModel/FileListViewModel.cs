@@ -1,9 +1,11 @@
 ﻿using Nextcloud.Data;
 using Nextcloud.DAV;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Windows.UI.Core;
 
 namespace Nextcloud.ViewModel
@@ -11,6 +13,7 @@ namespace Nextcloud.ViewModel
     class FileListViewModel : ViewModel
     {
         private CoreDispatcher dispatcher;
+        private List<File> remoteFilesInCurrentPath;
         private ObservableCollection<File> _fileCollection;
         public ObservableCollection<File> FileCollection
         {
@@ -109,6 +112,7 @@ namespace Nextcloud.ViewModel
             _account = account;
             _currentPath = "/";
             _fileCollection = new ObservableCollection<File>();
+            remoteFilesInCurrentPath = new List<File>();
         }
 
         public async void StartFetching(string path=null)
@@ -118,13 +122,17 @@ namespace Nextcloud.ViewModel
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             NetworkCredential cred = await _account.GetCredential();
             var webdav = new WebDAV(_account.GetWebDAVRoot(), cred);
-            FileCollection.Clear();
+            FileCollection.Clear();            
+            foreach (File fileFromDatabase in _account.Files.Where(f => (f.Filepath.TrimEnd('/') == (_account.Server.WebDAVPath.TrimEnd('/') + _currentPath + f.Filename)) || ((_account.Server.WebDAVPath.TrimEnd('/') + _currentPath.TrimEnd('/')) == f.Filepath + f.Filename)).ToList()) {
+                FileCollection.Add(fileFromDatabase);
+            }
             webdav.StartRequest(DAVRequestHeader.CreateListing(_currentPath), DAVRequestBody.CreateAllPropertiesListing(), null, FetchingComplete);
         }
 
         private async void FetchingComplete(DAVRequestResult result, object userObj)
         {
             if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured && result.Items.Count > 0) {
+                remoteFilesInCurrentPath.Clear();
                 bool _firstItem = false;
                 foreach (DAVRequestResult.Item item in result.Items) {
                     File fileItem = new File()
@@ -160,24 +168,44 @@ namespace Nextcloud.ViewModel
                         File storedFile = _account.Files.Find(f => f.Filename == fileItem.Filename && f.Filepath == fileItem.Filepath);
                         if(storedFile == null || storedFile.ETag != fileItem.ETag) {
                             fileItem.IsDownloaded = false;
-                            App.GetDataContext().StoreFile(fileItem);
-                            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Add(fileItem));
-                        } else {
-                            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Add(storedFile));
+                            int id = App.GetDataContext().StoreFile(fileItem);
+                            File updatedFile = App.GetDataContext().LoadFile(id);
+                            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => UpdateFilelist(updatedFile));
                         }
+                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => remoteFilesInCurrentPath.Add(fileItem));
                     }
                 }
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsFetching = false);
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { IsFetching = false; CleanupFiles(); });
             } else {
                 System.Diagnostics.Debug.WriteLine(result.Status);
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     IsFetching = false;
                     LastError = result.Request.LastException.Message;
-                    foreach(File fileFromDatabase in _account.Files.Where(f => (f.Filepath.TrimEnd('/') == _currentPath + f.Filename) || (_currentPath.TrimEnd('/') == f.Filepath + f.Filename))) {
-                        FileCollection.Add(fileFromDatabase);
-                    }
                 });
             }
+        }
+
+        private void UpdateFilelist(File updatedFile) {
+            File currentFile = FileCollection.Where(f => f.FileId == updatedFile.FileId).FirstOrDefault();
+            if(currentFile != null) {
+                FileCollection.Remove(currentFile);
+            }
+            FileCollection.Add(updatedFile);
+            NotifyPropertyChanged("FileCollection");
+        }
+
+        private void CleanupFiles() {
+            string absoluteCurrentPath = _account.Server.WebDAVPath.TrimEnd('/') + _currentPath;
+            List<File> filesInDatabase = App.GetDataContext().GetUserfilesInPath(_account, absoluteCurrentPath);
+            filesInDatabase = filesInDatabase.Where(f => f.ParentFilepath == absoluteCurrentPath || (f.Filepath + f.Filename) == absoluteCurrentPath.TrimEnd('/')).ToList();
+            foreach(File storedFile in filesInDatabase) {
+                if (remoteFilesInCurrentPath.Where(f => storedFile.Filename == f.Filename).FirstOrDefault() == null) {
+                    App.GetDataContext().RemoveFile(storedFile);
+                    FileCollection.Remove(FileCollection.Where(f => f.FileId == storedFile.FileId).First());
+                    NotifyPropertyChanged("FileCollection");
+                };
+            }
+            _account = App.GetDataContext().LoadAccount(_account.AccountId);
         }
     }
 }
