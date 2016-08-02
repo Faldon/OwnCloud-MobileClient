@@ -66,7 +66,7 @@
             </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
-    
+
     <Grid x:Name="LayoutRoot">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
@@ -124,11 +124,6 @@
                               x:Name="SelectAll"
                               Visibility="Collapsed"
                               Click="OnSelectAllClick"
-                              FontSize="{ThemeResource TextStyleMediumFontSize}" />
-                <AppBarButton x:Uid="AppBarButton_DeleteRemote"
-                              x:Name="DeleteRemote"
-                              Visibility="Collapsed"
-                              Click="OnDeleteRemoteClick"
                               FontSize="{ThemeResource TextStyleMediumFontSize}" />
                 <AppBarButton x:Uid="AppBarButton_DeleteLocal"
                               x:Name="DeleteLocal"

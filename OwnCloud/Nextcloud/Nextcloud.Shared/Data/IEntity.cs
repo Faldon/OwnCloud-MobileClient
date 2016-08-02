@@ -10,12 +10,12 @@ namespace Nextcloud.Data
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        public virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        public virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             OnPropertyChanged(propertyName);
         }

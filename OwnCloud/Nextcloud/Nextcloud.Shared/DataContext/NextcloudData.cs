@@ -57,6 +57,7 @@ namespace Nextcloud.DataContext
             if(inDatabase == null) {
                 connection.InsertWithChildren(newOrUpdatedFile, recursive: true);
             } else {
+                newOrUpdatedFile.FileId = inDatabase.FileId;
                 connection.UpdateWithChildren(newOrUpdatedFile);
             }
             return newOrUpdatedFile.FileId?? 0;

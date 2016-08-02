@@ -151,6 +151,23 @@ namespace Nextcloud.View
 
         #endregion
 
+        private void FetchStructure(string path) {
+            (LayoutRoot.DataContext as FileListViewModel).StartFetching(path);
+        }
+
+       private void ToggleSecondaryCommands(bool isVisible) {
+            if (isVisible) {
+                foreach (ICommandBarElement command in BottomAppBar.SecondaryCommands.ToList()) {
+                    (command as AppBarButton).Visibility = Visibility.Visible;
+                }
+            } else {
+                foreach (ICommandBarElement command in BottomAppBar.SecondaryCommands.ToList()) {
+                    (command as AppBarButton).Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        #region event handling
         private static async void OnIsFetchingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             if ((bool)e.NewValue) {
                 await progress.ShowAsync();
@@ -168,80 +185,21 @@ namespace Nextcloud.View
         }
 
         private async void OnFileItemTapped(object sender, TappedRoutedEventArgs e) {
-            if(_isSelectView) {
+            if (_isSelectView) {
                 return;
             }
             File tappedItem = (File)(sender as FrameworkElement).DataContext;
-            if(tappedItem.IsDirectory) {
-                FetchStructure(tappedItem.Filepath.Remove(0, tappedItem.Account.Server.WebDAVPath.Length-1));
+            if (tappedItem.IsDirectory) {
+                progress.Text = App.Localization().GetString("Progress_FetchingStructure");
+                FetchStructure(tappedItem.Filepath.Remove(0, tappedItem.Account.Server.WebDAVPath.Length - 1));
             } else {
                 Uri uriToDownload = new Uri(tappedItem.Account.Server.Protocol + "://" + tappedItem.Account.Server.FQDN + tappedItem.Filepath, UriKind.Absolute);
                 progress.Text = App.Localization().GetString("Progress_FetchingFiles");
-                IsProgressVisible = true;
-                bool result = await DownloadFileAsync(uriToDownload, tappedItem.Filename, tappedItem.FileLastModified, new CancellationToken(false));
-                if(result) {
+                bool result = await (LayoutRoot.DataContext as FileListViewModel).DownloadFileAsync(uriToDownload, tappedItem.Filename, tappedItem.FileLastModified, new CancellationToken(false));
+                if (result) {
                     tappedItem.IsDownloaded = true;
                     App.GetDataContext().UpdateFile(tappedItem);
-                }
-            }
-        }
-
-        private void FetchStructure(string path) {
-            (LayoutRoot.DataContext as FileListViewModel).StartFetching(path);
-        }
-
-        private async Task<bool> DownloadFileAsync(Uri uriToDownload, string fileName, DateTime lastModificationDate, CancellationToken cToken) {
-            try {
-                FileListViewModel viewModel = LayoutRoot.DataContext as FileListViewModel;
-                StorageFolder localStorage = ApplicationData.Current.LocalFolder;
-                StorageFolder server = await localStorage.CreateFolderAsync(viewModel.Servername, CreationCollisionOption.OpenIfExists);
-                StorageFolder user = await server.CreateFolderAsync(viewModel.Username, CreationCollisionOption.OpenIfExists);
-                StorageFolder cwd = user;
-
-                foreach (string folder in viewModel.CurrentPath.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries)) {
-                    cwd = await cwd.CreateFolderAsync(folder, CreationCollisionOption.OpenIfExists);
-                }
-
-                StorageFile localFile;
-                try {
-                    localFile = await cwd.GetFileAsync(fileName);
-                    if (localFile.DateCreated > lastModificationDate) {
-                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await Windows.System.Launcher.LaunchFileAsync(localFile));
-                        return true;
-                    }
-                } catch (Exception e) {
-                    localFile = await cwd.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
-                }
-                BackgroundDownloader loader = new BackgroundDownloader();
-                var cred = await viewModel.Account.GetCredential();
-                loader.ServerCredential = new Windows.Security.Credentials.PasswordCredential(viewModel.Servername, cred.UserName, cred.Password);
-                DownloadOperation dl = loader.CreateDownload(uriToDownload, localFile);
-                var dlOperation = await Task.Run(() => { return dl.StartAsync(); });
-
-                dlOperation.Completed = async delegate (IAsyncOperationWithProgress<DownloadOperation, DownloadOperation> dlCompleted, AsyncStatus status) {
-                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsProgressVisible = false);
-                    if (dlCompleted.ErrorCode == null) {
-                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await Windows.System.Launcher.LaunchFileAsync(localFile));
-                    } else {
-                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ErrorMessage = dlCompleted.ErrorCode.Message);
-                        await localFile.DeleteAsync();
-                    }
-                };
-                return dlOperation.ErrorCode == null;
-            } catch (Exception e) {
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                return false;
-            }
-        }
-
-        private void ToggleSecondaryCommands(bool isVisible) {
-            if (isVisible) {
-                foreach (ICommandBarElement command in BottomAppBar.SecondaryCommands.ToList()) {
-                    (command as AppBarButton).Visibility = Visibility.Visible;
-                }
-            } else {
-                foreach (ICommandBarElement command in BottomAppBar.SecondaryCommands.ToList()) {
-                    (command as AppBarButton).Visibility = Visibility.Collapsed;
+                    tappedItem.NotifyPropertyChanged("IsDownloaded");
                 }
             }
         }
@@ -258,20 +216,30 @@ namespace Nextcloud.View
         }
 
         private void OnSelectAllClick(object sender, RoutedEventArgs e) {
-            
-        }
-
-        private void OnDeleteRemoteClick(object sender, RoutedEventArgs e) {
-
+            FileListView.SelectAll();
         }
 
         private void OnDeleteLocalClick(object sender, RoutedEventArgs e) {
-            List<object> c = FileListView.SelectedItems.ToList();
+            progress.Text = App.Localization().GetString("Progress_DeletingFiles");
+            List<object> selectedItems = FileListView.SelectedItems.ToList();
+            foreach(File fileToDelete in selectedItems) {
+                if(!fileToDelete.IsRootItem) {
+                    (LayoutRoot.DataContext as FileListViewModel).DeleteFile(fileToDelete);
+                }
+            }
             OnSelectClick(null, null);
         }
 
         private void OnDeleteBothClick(object sender, RoutedEventArgs e) {
-
+            progress.Text = App.Localization().GetString("Progress_DeletingFiles");
+            List<object> selectedItems = FileListView.SelectedItems.ToList();
+            foreach (File fileToDelete in selectedItems) {
+                if(!fileToDelete.IsRootItem) {
+                    (LayoutRoot.DataContext as FileListViewModel).DeleteFile(fileToDelete, remote: true);
+                }
+            }
+            OnSelectClick(null, null);
         }
+        #endregion
     }
 }
