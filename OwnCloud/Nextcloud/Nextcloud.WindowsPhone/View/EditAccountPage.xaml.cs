@@ -9,6 +9,8 @@ using Nextcloud.Data;
 using Windows.UI.Popups;
 using Nextcloud.DAV;
 using Windows.UI.Core;
+using System.Collections.Generic;
+using static Nextcloud.DAV.DAVRequestBody;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -22,6 +24,17 @@ namespace Nextcloud.View
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
         private StatusBarProgressIndicator progress;
         private CoreDispatcher dispatcher;
+        static DAVRequestHeader connCeckHeader = new DAVRequestHeader(DAVRequestHeader.Method.PropertyFind, "/", new Dictionary<string, string>()
+            {
+                {Header.Depth, HeaderAttribute.MethodDepth.ApplyResourceOnly}
+            });
+        static DAVRequestBody connCheckBody = new DAVRequestBody(
+                new Item(Elements.PropertyFind, new List<Item>() {
+                    new Item(Elements.Properties, new List<Item> {
+                        new Item(Properties.ResourceType)
+                    })
+                })
+            );
 
         public EditAccountPage() {
             this.InitializeComponent();
@@ -110,7 +123,7 @@ namespace Nextcloud.View
                 dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
                 AccountViewModel viewModel = LayoutRoot.DataContext as AccountViewModel;
                 WebDAV client = new WebDAV(viewModel.GetWebDAVRoot(), viewModel.GetCredential());
-                client.StartRequest(DAVRequestHeader.CreateListing(), DAVRequestBody.CreateAllPropertiesListing(), null, OnConnectionCheckFinished);
+                client.StartRequest(connCeckHeader, connCheckBody, null, OnConnectionCheckFinished);
                 await progress.ShowAsync();
             } else {
                 var alert = new MessageDialog(App.Localization().GetString("EditAccountPage_SaveFailed"));

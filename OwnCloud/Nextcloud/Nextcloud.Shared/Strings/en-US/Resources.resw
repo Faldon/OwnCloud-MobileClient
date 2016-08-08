@@ -414,4 +414,13 @@ Save account anyway?</value>
   <data name="Progress_DeletingFiles" xml:space="preserve">
     <value>Deleting files...</value>
   </data>
+  <data name="FileListPage_UploadFailed" xml:space="preserve">
+    <value>Error uploading file {0}.</value>
+  </data>
+  <data name="FileListPage_UploadSuccess" xml:space="preserve">
+    <value>Upload completed.</value>
+  </data>
+  <data name="Progress_UploadingFiles" xml:space="preserve">
+    <value>Uploading files...</value>
+  </data>
 </root>

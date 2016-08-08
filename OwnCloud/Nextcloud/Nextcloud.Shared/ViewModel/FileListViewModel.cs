@@ -8,9 +8,11 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.UI.Core;
 using Windows.UI.Notifications;
 
@@ -130,9 +132,6 @@ namespace Nextcloud.ViewModel
             NetworkCredential cred = await _account.GetCredential();
             var webdav = new WebDAV(_account.GetWebDAVRoot(), cred);
             FileCollection.Clear();            
-            foreach (File fileFromDatabase in _account.Files.Where(f => (f.Filepath.TrimEnd('/') == (_account.Server.WebDAVPath.TrimEnd('/') + _currentPath + f.Filename)) || ((_account.Server.WebDAVPath.TrimEnd('/') + _currentPath.TrimEnd('/')) == f.Filepath + f.Filename)).OrderBy(f => f.Filepath).ToList()) {
-                FileCollection.Add(fileFromDatabase);
-            }
             webdav.StartRequest(DAVRequestHeader.CreateListing(_currentPath), DAVRequestBody.CreateAllPropertiesListing(), null, FetchingComplete);
         }
 
@@ -172,27 +171,22 @@ namespace Nextcloud.ViewModel
                         }
                     }
                     if(display) {
-                        File storedFile = _account.Files.Find(f => f.Filename == fileItem.Filename && f.Filepath == fileItem.Filepath);
-                        if(storedFile == null || storedFile.ETag != fileItem.ETag) {
-                            fileItem.IsDownloaded = false;
-                            int id = App.GetDataContext().StoreFile(fileItem);
-                            File updatedFile = App.GetDataContext().LoadFile(id);
-                            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => UpdateFilelist(updatedFile));
-                        }
-                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => remoteFilesInCurrentPath.Add(fileItem));
+                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Add(fileItem));
                     }
                 }
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { IsFetching = false; CleanupDatabase(); });
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { IsFetching = false; SyncDatabaseAsync(); });
             } else {
-                System.Diagnostics.Debug.WriteLine(result.Status);
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     IsFetching = false;
                     LastError = result.Request.LastException.Message;
                 });
+                foreach (File fileFromDatabase in _account.Files.Where(f => (f.Filepath.TrimEnd('/') == (_account.Server.WebDAVPath.TrimEnd('/') + _currentPath + f.Filename)) || ((_account.Server.WebDAVPath.TrimEnd('/') + _currentPath.TrimEnd('/')) == f.Filepath + f.Filename)).OrderBy(f => f.Filepath).ToList()) {
+                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Add(fileFromDatabase));
+                }
             }
         }
 
-        public async void DeleteFile(File fileToDelete, bool remote = false) {
+        public async void DeleteFileAsync(File fileToDelete, bool remote = false) {
             IsFetching = true;
             string localpath = fileToDelete.Filepath.Replace(_account.Server.WebDAVPath.TrimEnd('/'), _account.ServerFQDN + "/" + _account.Username);
             if (!fileToDelete.IsDirectory) {
@@ -209,7 +203,7 @@ namespace Nextcloud.ViewModel
                     if (remote) {
                         NetworkCredential cred = await _account.GetCredential();
                         var webdav = new WebDAV(_account.GetWebDAVRoot(), cred);
-                        webdav.StartRequest(DAVRequestHeader.Delete(fileToDelete.Filepath.Replace(_account.Server.WebDAVPath.TrimEnd('/'), "")), fileToDelete.Filename, DeleteFileComplete);
+                        webdav.StartRequest(DAVRequestHeader.Delete(fileToDelete.Filepath.Replace(_account.Server.WebDAVPath.TrimEnd('/'), "")), fileToDelete.Filename, DeleteFileAsyncComplete);
                     } else {
                         IsFetching = false;
                     }
@@ -229,7 +223,7 @@ namespace Nextcloud.ViewModel
                     if (remote) {
                         NetworkCredential cred = await _account.GetCredential();
                         var webdav = new WebDAV(_account.GetWebDAVRoot(), cred);
-                        webdav.StartRequest(DAVRequestHeader.Delete(fileToDelete.Filepath.Replace(_account.Server.WebDAVPath.TrimEnd('/'), "")), fileToDelete.Filename, DeleteFileComplete);
+                        webdav.StartRequest(DAVRequestHeader.Delete(fileToDelete.Filepath.Replace(_account.Server.WebDAVPath.TrimEnd('/'), "")), fileToDelete.Filename, DeleteFileAsyncComplete);
                     } else {
                         IsFetching = false;
                     }
@@ -237,7 +231,7 @@ namespace Nextcloud.ViewModel
             }
         }
 
-        private async void DeleteFileComplete(DAVRequestResult result, object userObj) {
+        private async void DeleteFileAsyncComplete(DAVRequestResult result, object userObj) {
             if (result.Status != ServerStatus.NoContent) {
                 var xml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
                 xml.GetElementsByTagName("text").First().AppendChild(xml.CreateTextNode(String.Format(App.Localization().GetString("FileListPage_DeletionFailed"), (string)userObj)));
@@ -246,8 +240,9 @@ namespace Nextcloud.ViewModel
                 ToastNotificationManager.CreateToastNotifier().Show(toast);
             } else {
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
-                    foreach (File f in FileCollection.Where(f => f.Filename == (string)userObj).ToList()) {
-                        App.GetDataContext().RemoveFile(f);
+                    List<File> filesToRemove = FileCollection.Where(f => f.Filename == (string)userObj).ToList();
+                    foreach (File f in filesToRemove) {
+                        App.GetDataContext().RemoveFileAsync(f);
                         FileCollection.Remove(f);
                     };
                     IsFetching = false;
@@ -275,7 +270,7 @@ namespace Nextcloud.ViewModel
                 StorageFile localFile;
                 try {
                     localFile = await cwd.GetFileAsync(fileName);
-                    if (localFile.DateCreated > lastModificationDate) {
+                    if (localFile.DateCreated >= lastModificationDate) {
                         await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await Windows.System.Launcher.LaunchFileAsync(localFile));
                         return true;
                     }
@@ -298,34 +293,57 @@ namespace Nextcloud.ViewModel
                     }
                 };
                 return dlOperation.ErrorCode == null;
-            } catch (Exception e) {
-                System.Diagnostics.Debug.WriteLine(e.Message);
+            } catch (Exception) {
                 IsFetching = false;
                 return false;
             }
         }
 
-        private void UpdateFilelist(File updatedFile) {
-            File currentFile = FileCollection.Where(f => f.FileId == updatedFile.FileId).FirstOrDefault();
-            if(currentFile != null) {
-                FileCollection.Remove(currentFile);
-            }
-            FileCollection.Add(updatedFile);
-            NotifyPropertyChanged("FileCollection");
-        }
-
-        private void CleanupDatabase() {
-            string absoluteCurrentPath = _account.Server.WebDAVPath.TrimEnd('/') + _currentPath;
-            List<File> filesInDatabase = App.GetDataContext().GetUserfilesInPath(_account, absoluteCurrentPath);
-            filesInDatabase = filesInDatabase.Where(f => f.ParentFilepath == absoluteCurrentPath || (f.Filepath + f.Filename) == absoluteCurrentPath.TrimEnd('/')).ToList();
-            foreach(File storedFile in filesInDatabase) {
-                if (remoteFilesInCurrentPath.Where(f => storedFile.Filename == f.Filename).FirstOrDefault() == null) {
-                    App.GetDataContext().RemoveFile(storedFile);
-                    FileCollection.Remove(FileCollection.Where(f => f.FileId == storedFile.FileId).First());
-                    NotifyPropertyChanged("FileCollection");
+        public async void UploadFilesAsync(List<StorageFile> files) {
+            var cred = await Account.GetCredential();
+            string remoteFolder = Account.GetWebDAVRoot().ToString().TrimEnd('/') + CurrentPath;
+            foreach (StorageFile file in files) {
+                var uriToUpload = new Uri(remoteFolder + file.Name, UriKind.Absolute);
+                BackgroundUploader loader = new BackgroundUploader();
+                loader.Method = "PUT";
+                loader.ServerCredential = new Windows.Security.Credentials.PasswordCredential(Servername, cred.UserName, cred.Password);
+                UploadOperation ul = loader.CreateUpload(uriToUpload, file);
+                var ulOperation = await Task.Run(() => { return ul.StartAsync(); });
+                ulOperation.Completed = async delegate (IAsyncOperationWithProgress<UploadOperation, UploadOperation> ulCompleted, AsyncStatus status) {
+                    var xml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
+                    if (ulCompleted.ErrorCode == null) {
+                        xml.GetElementsByTagName("text").First().AppendChild(xml.CreateTextNode(App.Localization().GetString("FileListPage_UploadSuccess")));
+                        xml.GetElementsByTagName("text").Last().AppendChild(xml.CreateTextNode(file.Name));
+                    } else {
+                        xml.GetElementsByTagName("text").First().AppendChild(xml.CreateTextNode(String.Format(App.Localization().GetString("FileListPage_UploadFailed"), file.Name)));
+                        xml.GetElementsByTagName("text").Last().AppendChild(xml.CreateTextNode(ulCompleted.ErrorCode.Message));
+                    }
+                    ToastNotification toast = new ToastNotification(xml);
+                    toast.Activated += UploadMessageActivated;
+                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ToastNotificationManager.CreateToastNotifier().Show(toast));
                 };
             }
+        }
+
+        private async void SyncDatabaseAsync() {
+            string absoluteCurrentPath = _account.Server.WebDAVPath.TrimEnd('/') + _currentPath;
+            List<File> filesInDatabase = await App.GetDataContext().GetUserfilesInPath(_account, absoluteCurrentPath);
+            filesInDatabase = filesInDatabase.Where(f => f.ParentFilepath == absoluteCurrentPath || (f.Filepath + f.Filename) == absoluteCurrentPath.TrimEnd('/')).ToList();
+            foreach(File storedFile in filesInDatabase) {
+                File inCollection = FileCollection.Where(f => storedFile.Filename == f.Filename).FirstOrDefault();
+                if (inCollection == null) {
+                    App.GetDataContext().RemoveFileAsync(storedFile);
+                } else {
+                    inCollection.FileId = storedFile.FileId;
+                    inCollection.IsDownloaded = storedFile.IsDownloaded;
+                };
+            }
+            App.GetDataContext().UpdateFilesAsync(FileCollection.ToList());
             _account = App.GetDataContext().LoadAccount(_account.AccountId);
+        }
+
+        private void UploadMessageActivated(ToastNotification sender, object args) {
+            dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => StartFetching(CurrentPath));
         }
     }
 }

@@ -16,6 +16,7 @@
                                                 RootDir="{Binding ElementName=CurrentPath, Path=Text}" />
             <converter:FileModifiedDateVisibilityConverter x:Key="FileModifiedDateVisibilityConverter" />
             <converter:BoolVisibiltyConverter x:Key="BoolVisibiltyConverter" />
+            <converter:InverseBooleanConverter x:Key="InverseBooleanConverter" />
 
             <DataTemplate x:Key="FileItemTemplate" x:Name="FileItem">
                 <Grid x:Name="FileItemGrid" 
@@ -100,13 +101,13 @@
                        Margin="0,-15,0,26.5" />
         </StackPanel>
 
-        <!--TODO: Content should be placed within the following grid-->
         <Grid Grid.Row="1" Margin="19,9.5,19,0">
             <ListView x:Name="FileListView"
                         AutomationProperties.AutomationId="AccountSection"
                         AutomationProperties.Name="List accounts"
                         SelectionMode="None"
                         IsItemClickEnabled="True"
+                        IsTapEnabled="{Binding IsFetching, Converter={StaticResource InverseBooleanConverter}}"
                         ItemsSource="{Binding FileCollection}"
                         ItemTemplate="{StaticResource FileItemTemplate}"
                         ContinuumNavigationTransitionInfo.ExitElementContainer="True"
@@ -116,6 +117,9 @@
     </Grid>
     <Page.BottomAppBar>
         <CommandBar x:Name="BottomAppBar">
+            <AppBarButton x:Uid="AppBarButton_Upload" 
+                          Icon="Upload"
+                          Click="OnUploadClick" />
             <AppBarButton x:Uid="AppBarButton_Select" 
                           Icon="List"
                           Click="OnSelectClick" />

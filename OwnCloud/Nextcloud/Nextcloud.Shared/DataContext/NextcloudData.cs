@@ -47,8 +47,8 @@ namespace Nextcloud.DataContext
             return connection.GetWithChildren<Account>(id, recursive: true);
         }
 
-        public List<File> GetUserfilesInPath(Account user, string path) {
-            List<File> currentFilesInDatabase = connection.GetAllWithChildren<File>(f => f.AccountId == user.AccountId && (f.Filepath.StartsWith(path) || path.StartsWith(f.Filepath+f.Filename)), recursive:true).ToList();
+        public async Task<List<File>> GetUserfilesInPath(Account user, string path) {
+            List<File> currentFilesInDatabase = await GetConnectionAsync().Table<File>().Where(f => f.AccountId == user.AccountId && (f.Filepath.StartsWith(path) || path.StartsWith(f.Filepath + f.Filename))).ToListAsync();
             return currentFilesInDatabase;
         }
 
@@ -61,6 +61,10 @@ namespace Nextcloud.DataContext
                 connection.UpdateWithChildren(newOrUpdatedFile);
             }
             return newOrUpdatedFile.FileId?? 0;
+        }
+
+        public async void UpdateFilesAsync(List<File> filesToUpdate) {
+            await GetConnectionAsync().InsertOrReplaceAllAsync(filesToUpdate);
         }
 
         public File LoadFile(int id) {
@@ -76,7 +80,7 @@ namespace Nextcloud.DataContext
             });
         }
 
-        public async void RemoveFile(File file) {
+        public async void RemoveFileAsync(File file) {
             File fileInDatabase = connection.Get<File>(file.FileId);
             await GetConnectionAsync().DeleteAsync(fileInDatabase);
         }

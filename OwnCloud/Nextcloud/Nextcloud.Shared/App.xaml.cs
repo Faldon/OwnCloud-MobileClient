@@ -116,13 +116,6 @@ namespace Nextcloud
                 // when the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-//                if (dataContext.GetConnection().Table<Account>().ToList().Count == 0) {
-//#if WINDOWS_PHONE_APP
-//                    rootFrame.Navigate(typeof(View.EditAccountPage), null);
-//#else
-
-//#endif
-//                }
 #if WINDOWS_PHONE_APP
                 if(!rootFrame.Navigate(typeof(View.AccountHubPage), e.Arguments)) {
 #else
@@ -157,9 +150,52 @@ namespace Nextcloud
         /// </summary>
         private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
+            
             var deferral = e.SuspendingOperation.GetDeferral();
             await SuspensionManager.SaveAsync();
             deferral.Complete();
         }
+
+        
+        protected async override void OnActivated(IActivatedEventArgs e) {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (rootFrame == null) {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+                //Associate the frame with a SuspensionManager key                                
+                //SuspensionManager.RegisterFrame(rootFrame, "AppFrame");
+
+                //// TODO: change this value to a cache size that is appropriate for your application
+                //rootFrame.CacheSize = 1;
+            }
+
+                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated) {
+                    // Restore the saved session state only when appropriate
+                    try {
+                        await SuspensionManager.RestoreAsync();
+                    } catch (SuspensionManagerException) {
+                        // Something went wrong restoring state.
+                        // Assume there is no state and continue
+                    }
+                }
+
+#if WINDOWS_PHONE_APP
+                var continuationEventArgs = e as IContinuationActivatedEventArgs;
+                if (continuationEventArgs != null) {
+                    var fileListPage = rootFrame.Content as View.FileListPage;
+                    fileListPage.Continue(continuationEventArgs);
+                }
+#endif
+
+            // Ensure the current window is active
+            Window.Current.Activate();
+        }
+
+        
     }
 }

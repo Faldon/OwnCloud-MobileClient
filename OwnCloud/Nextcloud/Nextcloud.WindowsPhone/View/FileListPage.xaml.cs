@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
@@ -167,6 +169,18 @@ namespace Nextcloud.View
             }
         }
 
+        public void Continue(IContinuationActivatedEventArgs args) {
+            if(args.Kind == ActivationKind.PickFileContinuation) {
+                var openPickerContinuationArgs = args as FileOpenPickerContinuationEventArgs;
+                FileListViewModel viewModel = LayoutRoot.DataContext as FileListViewModel;
+                viewModel.CurrentPath = openPickerContinuationArgs.ContinuationData["UploadPath"] as string;
+                if ((openPickerContinuationArgs.ContinuationData["Operation"] as string) == "Fileupload" && openPickerContinuationArgs.Files != null && openPickerContinuationArgs.Files.Count > 0) {
+                    progress.Text = App.Localization().GetString("Progress_UploadingFiles");
+                    viewModel.UploadFilesAsync(openPickerContinuationArgs.Files.ToList());
+                }
+            }
+        }
+
         #region event handling
         private static async void OnIsFetchingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             if ((bool)e.NewValue) {
@@ -224,10 +238,20 @@ namespace Nextcloud.View
             List<object> selectedItems = FileListView.SelectedItems.ToList();
             foreach(File fileToDelete in selectedItems) {
                 if(!fileToDelete.IsRootItem) {
-                    (LayoutRoot.DataContext as FileListViewModel).DeleteFile(fileToDelete);
+                    (LayoutRoot.DataContext as FileListViewModel).DeleteFileAsync(fileToDelete);
                 }
             }
             OnSelectClick(null, null);
+        }
+
+        private void OnUploadClick(object sender, RoutedEventArgs e) {
+            FileOpenPicker opener = new FileOpenPicker();
+            opener.ViewMode = PickerViewMode.Thumbnail;
+            opener.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            opener.FileTypeFilter.Add("*");
+            opener.ContinuationData["Operation"] = "Fileupload";
+            opener.ContinuationData["UploadPath"] = CurrentPath.Text;
+            opener.PickMultipleFilesAndContinue();
         }
 
         private void OnDeleteBothClick(object sender, RoutedEventArgs e) {
@@ -235,7 +259,7 @@ namespace Nextcloud.View
             List<object> selectedItems = FileListView.SelectedItems.ToList();
             foreach (File fileToDelete in selectedItems) {
                 if(!fileToDelete.IsRootItem) {
-                    (LayoutRoot.DataContext as FileListViewModel).DeleteFile(fileToDelete, remote: true);
+                    (LayoutRoot.DataContext as FileListViewModel).DeleteFileAsync(fileToDelete, remote: true);
                 }
             }
             OnSelectClick(null, null);

@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
 namespace Nextcloud.Converter
 {
-    class BoolVisibiltyConverter : IValueConverter
+    class InverseBooleanConverter : IValueConverter
     {
+
         public object Convert(object value, Type targetType, object parameter, string language) {
-            if((bool)value) {
-                return Visibility.Visible;
+            if(targetType != typeof(bool)) {
+                throw new InvalidOperationException("The target must be of type bool");
             } else {
-                return Visibility.Collapsed;
+                return !(bool)value;
             }
         }
 

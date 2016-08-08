@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converter\BoolVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\FileModifiedDateVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\FilenameRootdirConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converter\InverseBooleanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\PossessiveCaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\PrefixValueConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataContext\DatabaseUpdater.cs" />
