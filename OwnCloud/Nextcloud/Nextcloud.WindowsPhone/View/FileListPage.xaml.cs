@@ -218,6 +218,49 @@ namespace Nextcloud.View
             }
         }
 
+        private void OnUploadClick(object sender, RoutedEventArgs e) {
+            FileOpenPicker opener = new FileOpenPicker();
+            opener.ViewMode = PickerViewMode.Thumbnail;
+            opener.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            opener.FileTypeFilter.Add("*");
+            opener.ContinuationData["Operation"] = "Fileupload";
+            opener.ContinuationData["UploadPath"] = CurrentPath.Text;
+            opener.PickMultipleFilesAndContinue();
+        }
+
+        private async void OnMakeCollectionClick(object sender, RoutedEventArgs e) {
+            var enterNewFolderName = new ContentDialog() {
+                Title = App.Localization().GetString("Dialog_NewFolderTitle"),
+                MaxWidth = this.ActualWidth
+            };
+            var dialogPanel = new StackPanel();
+            dialogPanel.Children.Add(new TextBlock {
+                Text = App.Localization().GetString("Dialog_NewFolderContent")
+            });
+            dialogPanel.Children.Add(new TextBox {
+                Name = "NewFolderName"
+            });
+            enterNewFolderName.Content = dialogPanel;
+            enterNewFolderName.PrimaryButtonText = App.Localization().GetString("OK");
+            enterNewFolderName.PrimaryButtonClick += OnEnterNewFolderNameConfirmed;
+            
+            var result = await enterNewFolderName.ShowAsync();
+        }
+
+        private async void OnEnterNewFolderNameConfirmed(ContentDialog sender, ContentDialogButtonClickEventArgs args) {
+            StackPanel dialogContent = (sender.Content as StackPanel);
+            TextBox input = dialogContent.Children.Where(e => e.GetType() == typeof(TextBox)).FirstOrDefault() as TextBox;
+            string folderName = input.Text;
+            if(folderName == "") {
+                var alert = new MessageDialog(App.Localization().GetString("FileListPage_EmptyFolderName"));
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await alert.ShowAsync());
+            } else {
+                progress.Text = App.Localization().GetString("Progress_CreatingFolder");
+                FileListViewModel viewModel = LayoutRoot.DataContext as FileListViewModel;
+                viewModel.CreateFolderAsync(folderName);
+            }
+        }
+
         private void OnSelectClick(object sender, RoutedEventArgs e) {
             if(_isSelectView) {
                 FileListView.SelectionMode = ListViewSelectionMode.None;
@@ -242,16 +285,6 @@ namespace Nextcloud.View
                 }
             }
             OnSelectClick(null, null);
-        }
-
-        private void OnUploadClick(object sender, RoutedEventArgs e) {
-            FileOpenPicker opener = new FileOpenPicker();
-            opener.ViewMode = PickerViewMode.Thumbnail;
-            opener.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-            opener.FileTypeFilter.Add("*");
-            opener.ContinuationData["Operation"] = "Fileupload";
-            opener.ContinuationData["UploadPath"] = CurrentPath.Text;
-            opener.PickMultipleFilesAndContinue();
         }
 
         private void OnDeleteBothClick(object sender, RoutedEventArgs e) {

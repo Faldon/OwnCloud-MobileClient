@@ -117,12 +117,12 @@ namespace Nextcloud
                 // configuring the new page by passing required information as a navigation
                 // parameter
 #if WINDOWS_PHONE_APP
-                if(!rootFrame.Navigate(typeof(View.AccountHubPage), e.Arguments)) {
+                if (!rootFrame.Navigate(typeof(View.AccountHubPage), e.Arguments)) {
 #else
                 if (!rootFrame.Navigate(typeof(AccountHubPage), e.Arguments)) {
 #endif
-                    throw new Exception("Failed to create initial page");
-                }
+                     throw new Exception("Failed to create initial page");
+                 }
             }
 
             // Ensure the current window is active

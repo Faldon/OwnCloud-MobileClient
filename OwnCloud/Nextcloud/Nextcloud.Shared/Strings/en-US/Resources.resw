@@ -293,7 +293,7 @@
     <value>Add Account</value>
   </data>
   <data name="AppName.Text" xml:space="preserve">
-    <value>Nextcloud Client</value>
+    <value>Cloudstore Client</value>
   </data>
   <data name="Button_Cancel.Content" xml:space="preserve">
     <value>Cancel</value>
@@ -340,7 +340,7 @@
 Save account anyway?</value>
   </data>
   <data name="AccountHubPage.Header" xml:space="preserve">
-    <value>Nextcloud Client</value>
+    <value>Cloudstore Client</value>
   </data>
   <data name="AccountHubPage_AccountSection.Header" xml:space="preserve">
     <value>Accounts</value>
@@ -422,5 +422,29 @@ Save account anyway?</value>
   </data>
   <data name="Progress_UploadingFiles" xml:space="preserve">
     <value>Uploading files...</value>
+  </data>
+  <data name="AppBarButton_MakeCollection.Label" xml:space="preserve">
+    <value>New folder</value>
+  </data>
+  <data name="AppBarButton_Upload.Label" xml:space="preserve">
+    <value>Upload files</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Dialog_NewFolderContent" xml:space="preserve">
+    <value>Enter the name for the new folder</value>
+  </data>
+  <data name="Dialog_NewFolderTitle" xml:space="preserve">
+    <value>Create Folder</value>
+  </data>
+  <data name="FileListPage_EmptyFolderName" xml:space="preserve">
+    <value>The name for the new folder cannot be empty.</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Progress_CreatingFolder" xml:space="preserve">
+    <value>Creating folder...</value>
   </data>
 </root>

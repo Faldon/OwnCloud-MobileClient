@@ -21,7 +21,6 @@ namespace Nextcloud.ViewModel
     class FileListViewModel : ViewModel
     {
         private CoreDispatcher dispatcher;
-        private List<File> remoteFilesInCurrentPath;
         private ObservableCollection<File> _fileCollection;
         public ObservableCollection<File> FileCollection
         {
@@ -121,7 +120,6 @@ namespace Nextcloud.ViewModel
             _currentPath = "/";
             _fileCollection = new ObservableCollection<File>();
             IsFetching = false;
-            remoteFilesInCurrentPath = new List<File>();
         }
 
         public async void StartFetching(string path=null)
@@ -138,7 +136,6 @@ namespace Nextcloud.ViewModel
         private async void FetchingComplete(DAVRequestResult result, object userObj)
         {
             if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured && result.Items.Count > 0) {
-                remoteFilesInCurrentPath.Clear();
                 bool _firstItem = false;
                 foreach (DAVRequestResult.Item item in result.Items) {
                     File fileItem = new File()
@@ -319,9 +316,23 @@ namespace Nextcloud.ViewModel
                         xml.GetElementsByTagName("text").Last().AppendChild(xml.CreateTextNode(ulCompleted.ErrorCode.Message));
                     }
                     ToastNotification toast = new ToastNotification(xml);
-                    toast.Activated += UploadMessageActivated;
                     await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ToastNotificationManager.CreateToastNotifier().Show(toast));
                 };
+            }
+        }
+
+        public async void CreateFolderAsync(string folderName) {
+            var cred = await Account.GetCredential();
+            var webdav = new WebDAV(_account.GetWebDAVRoot(), cred);
+            IsFetching = true;
+            webdav.StartRequest(DAVRequestHeader.MakeCollection(CurrentPath+folderName), folderName, CreateFolderAsyncComplete);
+        }
+
+        private async void CreateFolderAsyncComplete(DAVRequestResult result, object userObj) {
+            if (result.Status == ServerStatus.Created) {
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { IsFetching = false; StartFetching(); });
+            } else {
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { IsFetching = false; LastError = result.StatusText; });
             }
         }
 
@@ -336,14 +347,11 @@ namespace Nextcloud.ViewModel
                 } else {
                     inCollection.FileId = storedFile.FileId;
                     inCollection.IsDownloaded = storedFile.IsDownloaded;
+                    inCollection.NotifyPropertyChanged("IsDownloaded");
                 };
             }
             App.GetDataContext().UpdateFilesAsync(FileCollection.ToList());
-            _account = App.GetDataContext().LoadAccount(_account.AccountId);
-        }
-
-        private void UploadMessageActivated(ToastNotification sender, object args) {
-            dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => StartFetching(CurrentPath));
+            _account = await App.GetDataContext().LoadAccountAsync(_account.AccountId);
         }
     }
 }

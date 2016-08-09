@@ -47,6 +47,13 @@ namespace Nextcloud.DataContext
             return connection.GetWithChildren<Account>(id, recursive: true);
         }
 
+        public async Task<Account> LoadAccountAsync(int id) {
+            Account a = await GetConnectionAsync().FindAsync<Account>(id);
+            a.Server = await GetConnectionAsync().FindAsync<Server>(a.ServerFQDN);
+            a.Files = await GetConnectionAsync().Table<File>().Where(f => f.AccountId == a.AccountId).ToListAsync();
+            return a;
+        }
+
         public async Task<List<File>> GetUserfilesInPath(Account user, string path) {
             List<File> currentFilesInDatabase = await GetConnectionAsync().Table<File>().Where(f => f.AccountId == user.AccountId && (f.Filepath.StartsWith(path) || path.StartsWith(f.Filepath + f.Filename))).ToListAsync();
             return currentFilesInDatabase;

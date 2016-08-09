@@ -120,6 +120,9 @@
             <AppBarButton x:Uid="AppBarButton_Upload" 
                           Icon="Upload"
                           Click="OnUploadClick" />
+            <AppBarButton x:Uid="AppBarButton_MakeCollection" 
+                          Icon="NewFolder"
+                          Click="OnMakeCollectionClick" />
             <AppBarButton x:Uid="AppBarButton_Select" 
                           Icon="List"
                           Click="OnSelectClick" />
