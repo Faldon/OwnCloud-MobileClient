@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace Nextcloud.ViewModel
 {
@@ -28,8 +29,16 @@ namespace Nextcloud.ViewModel
             _accountCollection = new ObservableCollection<Account>(accountList);
         }
 
-        public bool DeleteAccount(Account account) {
+        public async Task<bool> DeleteAccount(Account account) {
             AccountCollection.Remove(account);
+            try {
+                StorageFolder localStorage = ApplicationData.Current.LocalFolder;
+                StorageFolder server = await localStorage.GetFolderAsync(account.ServerFQDN);
+                StorageFolder user = await server.GetFolderAsync(account.Username);
+                await user.DeleteAsync();
+            } catch (Exception) {
+
+            }
             App.GetDataContext().RemoveAccount(account);
             return true;
         }

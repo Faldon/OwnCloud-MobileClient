@@ -24,7 +24,8 @@
 
             <DataTemplate x:Key="AccountItemTemplate">
                 <Grid Holding="OnAccountItemHold"
-                      Tapped="OnAccountItemTapped">
+                      Tapped="OnAccountItemTapped"
+                      Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>

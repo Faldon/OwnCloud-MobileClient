@@ -126,7 +126,7 @@ namespace Nextcloud.View
             var command = await alert.ShowAsync();
             if (command.Label.Equals(App.Localization().GetString("Yes"))) {
                 AccountHubViewModel viewModel = LayoutRoot.DataContext as AccountHubViewModel;
-                viewModel.DeleteAccount(selectedAccount);
+                var result = await viewModel.DeleteAccount(selectedAccount);
             }
         }
 

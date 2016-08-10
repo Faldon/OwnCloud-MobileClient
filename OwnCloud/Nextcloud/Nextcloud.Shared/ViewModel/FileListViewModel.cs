@@ -9,6 +9,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
+using Windows.Data.Xml.Dom;
 using Windows.Foundation;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
@@ -253,7 +254,6 @@ namespace Nextcloud.ViewModel
         }
 
         public async Task<bool> DownloadFileAsync(Uri uriToDownload, string fileName, DateTime lastModificationDate, CancellationToken cToken) {
-            IsFetching = true;
             try {
                 StorageFolder localStorage = ApplicationData.Current.LocalFolder;
                 StorageFolder server = await localStorage.CreateFolderAsync(Servername, CreationCollisionOption.OpenIfExists);
@@ -274,6 +274,13 @@ namespace Nextcloud.ViewModel
                 } catch (Exception) {
                     localFile = await cwd.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
                 }
+                var xml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
+                (xml.SelectSingleNode("/toast") as XmlElement).SetAttribute("duration", "short");
+                xml.GetElementsByTagName("text").First().AppendChild(xml.CreateTextNode(App.Localization().GetString("FileListPage_DownloadingFile")));
+                xml.GetElementsByTagName("text").Last().AppendChild(xml.CreateTextNode(fileName));
+                ToastNotification toast = new ToastNotification(xml);
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ToastNotificationManager.CreateToastNotifier().Show(toast));
+
                 BackgroundDownloader loader = new BackgroundDownloader();
                 var cred = await Account.GetCredential();
                 loader.ServerCredential = new Windows.Security.Credentials.PasswordCredential(Servername, cred.UserName, cred.Password);
@@ -283,7 +290,13 @@ namespace Nextcloud.ViewModel
                 dlOperation.Completed = async delegate (IAsyncOperationWithProgress<DownloadOperation, DownloadOperation> dlCompleted, AsyncStatus status) {
                     await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { IsFetching = false; });
                     if (dlCompleted.ErrorCode == null) {
-                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await Windows.System.Launcher.LaunchFileAsync(localFile));
+                        xml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
+                        (xml.SelectSingleNode("/toast") as XmlElement).SetAttribute("launch", localFile.Path);
+                        xml.GetElementsByTagName("text").First().AppendChild(xml.CreateTextNode(App.Localization().GetString("FileListPage_DownloadCompleted")));
+                        xml.GetElementsByTagName("text").Last().AppendChild(xml.CreateTextNode(fileName));
+                        toast = new ToastNotification(xml);
+                        toast.Activated += FileDownloadCompleteNotificationActivated;
+                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ToastNotificationManager.CreateToastNotifier().Show(toast));
                     } else {
                         await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { LastError = dlCompleted.ErrorCode.Message; });
                         await localFile.DeleteAsync();
@@ -291,9 +304,15 @@ namespace Nextcloud.ViewModel
                 };
                 return dlOperation.ErrorCode == null;
             } catch (Exception) {
-                IsFetching = false;
                 return false;
             }
+        }
+
+        private async void FileDownloadCompleteNotificationActivated(ToastNotification sender, object args) {
+            ToastActivatedEventArgs e = (args as ToastActivatedEventArgs);
+            string fileName = e.Arguments;
+            StorageFile localFile = await StorageFile.GetFileFromPathAsync(fileName);
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await Windows.System.Launcher.LaunchFileAsync(localFile));
         }
 
         public async void UploadFilesAsync(List<StorageFile> files) {

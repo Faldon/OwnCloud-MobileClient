@@ -32,6 +32,11 @@ namespace Nextcloud.ViewModel {
             get { return _account.Server.FQDN; }
             set
             {
+                if(value.ToLower().StartsWith("https://")) {
+                    value = value.Substring(8);
+                } else if (value.ToLower().StartsWith("http://")) {
+                    value = value.Substring(7);
+                }
                 _account.Server.FQDN = value;
                 NotifyPropertyChanged();
             }

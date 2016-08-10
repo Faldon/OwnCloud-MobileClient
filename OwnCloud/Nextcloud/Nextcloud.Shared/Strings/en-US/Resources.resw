@@ -293,7 +293,7 @@
     <value>Add Account</value>
   </data>
   <data name="AppName.Text" xml:space="preserve">
-    <value>Cloudstore Client</value>
+    <value>CloudStore Client</value>
   </data>
   <data name="Button_Cancel.Content" xml:space="preserve">
     <value>Cancel</value>
@@ -340,7 +340,7 @@
 Save account anyway?</value>
   </data>
   <data name="AccountHubPage.Header" xml:space="preserve">
-    <value>Cloudstore Client</value>
+    <value>CloudStore Client</value>
   </data>
   <data name="AccountHubPage_AccountSection.Header" xml:space="preserve">
     <value>Accounts</value>
@@ -446,5 +446,8 @@ Save account anyway?</value>
   </data>
   <data name="Progress_CreatingFolder" xml:space="preserve">
     <value>Creating folder...</value>
+  </data>
+  <data name="FileListPage_DownloadingFile" xml:space="preserve">
+    <value>Started download of file.</value>
   </data>
 </root>

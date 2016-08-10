@@ -40,7 +40,15 @@ namespace Nextcloud.DataContext
         }
 
         public void StoreAccount(Account newOrUpdatedAccount) {
-            connection.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server, true);
+            Server s = connection.Find<Server>(newOrUpdatedAccount.Server.FQDN);
+            if(s != null) {
+                connection.GetChildren<Server>(s, recursive: true);
+                if(!s.Accounts.Contains(newOrUpdatedAccount)) {
+                    s.Accounts.Add(newOrUpdatedAccount);
+                    newOrUpdatedAccount.Server = s;
+                }
+            }
+            connection.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server, recursive: true);
         }
 
         public Account LoadAccount(int id) {
@@ -93,7 +101,7 @@ namespace Nextcloud.DataContext
         }
 
         public void RemoveAccount(Account account) {
-            connection.Delete(account);
+            connection.Delete(account, recursive: true);
         }
 
         private void InitializeDatabase(SQLiteConnection db) {
