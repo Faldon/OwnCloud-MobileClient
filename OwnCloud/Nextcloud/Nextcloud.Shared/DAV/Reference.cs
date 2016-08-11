@@ -163,6 +163,11 @@
     struct Properties
     {
         /// <summary>
+        /// (string) Apple iCal extension to record the display color of the calendar
+        /// </summary>
+        public const string CalendarColor = "calendar-color";
+
+        /// <summary>
         /// (DateTime) Records the time and date the resouce was created.
         /// </summary>
         public const string CreationDate = "creationdate";
@@ -186,6 +191,11 @@
         /// (string) Contains the mime-type.
         /// </summary>
         public const string GetContentType = "getcontenttype";
+
+        /// <summary>
+        /// (string) Contains the CalDAV CTag header value.
+        /// </summary>
+        public const string GetCTag = "getctag";
 
         /// <summary>
         /// (string) Contains the ETag header value.

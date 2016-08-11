@@ -110,6 +110,22 @@ namespace Nextcloud.DAV
         }
 
         /// <summary>
+        /// Creates a listening request with the CalDAV properties.
+        /// </summary>
+        /// <returns></returns>
+        static public DAVRequestBody CreateCalendarPropertiesListening() {
+            return new DAVRequestBody(
+                new Item(Elements.PropertyFind, new List<Item>() {
+                    new Item(Elements.Properties, new List<Item> {
+                        new Item(Properties.DisplayName),
+                        new Item(Properties.GetCTag, ns:"http://calendarserver.org/ns/"),
+                        new Item(Properties.CalendarColor, ns:"http://apple.com/ns/ical/")
+                    })
+                })
+            );
+        }
+
+        /// <summary>
         /// Item-Sub-Class
         /// </summary>
         public class Item

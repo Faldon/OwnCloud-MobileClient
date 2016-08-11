@@ -99,7 +99,11 @@ namespace Nextcloud.ViewModel {
 
         public Uri GetWebDAVRoot()
         {
-            return new Uri(_account.Server.Protocol + "://" + _account.Server.FQDN.TrimEnd('/') + _account.Server.WebDAVPath, UriKind.Absolute);
+            return _account.GetWebDAVRoot();
+        }
+
+        public Uri GetCalDAVRoot() {
+            return _account.GetCalDAVRoot();
         }
 
         public NetworkCredential GetCredential()

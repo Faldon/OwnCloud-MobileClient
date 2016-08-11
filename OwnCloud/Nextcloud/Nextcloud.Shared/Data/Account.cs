@@ -38,9 +38,16 @@ namespace Nextcloud.Data
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<File> Files { get; set; }
 
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<Calendar> Calendars { get; set; }
+
         public Uri GetWebDAVRoot()
         {
             return new Uri(Server.Protocol + "://" + Server.FQDN.TrimEnd('/') + Server.WebDAVPath, UriKind.Absolute);
+        }
+
+        public Uri GetCalDAVRoot() {
+            return new Uri(Server.Protocol + "://" + Server.FQDN.TrimEnd('/') + Server.CalDAVPath, UriKind.Absolute);
         }
 
         public async Task<NetworkCredential> GetCredential()

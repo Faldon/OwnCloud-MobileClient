@@ -450,4 +450,7 @@ Save account anyway?</value>
   <data name="FileListPage_DownloadingFile" xml:space="preserve">
     <value>Started download of file.</value>
   </data>
+  <data name="AccountHubPage_CalendarSection.Header" xml:space="preserve">
+    <value>Calendars</value>
+  </data>
 </root>

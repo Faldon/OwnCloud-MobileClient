@@ -60,6 +60,21 @@
                     </StackPanel>
                 </Grid>
             </DataTemplate>
+
+            <DataTemplate x:Key="CalendarItemTemplate">
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" 
+                                Margin="14.5,0,0,0">
+                        <TextBlock x:Name="DisplayName" Text="{Binding DisplayName}" Style="{ThemeResource ListViewItemTextBlockStyle}"/>
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+            
         </ResourceDictionary>
     </Page.Resources>
 
@@ -82,6 +97,19 @@
                         IsItemClickEnabled="True"
                         ItemsSource="{Binding AccountCollection}"
                         ItemTemplate="{StaticResource AccountItemTemplate}"
+                        ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+                    </ListView>
+                </DataTemplate>
+            </HubSection>
+            <HubSection x:Uid="AccountHubPage_CalendarSection" Header="">
+                <DataTemplate>
+                    <ListView 
+                        AutomationProperties.AutomationId="CalendarSection"
+                        AutomationProperties.Name="List calendars"
+                        SelectionMode="None"
+                        IsItemClickEnabled="True"
+                        ItemsSource="{Binding CalendarCollection}"
+                        ItemTemplate="{StaticResource CalendarItemTemplate}"
                         ContinuumNavigationTransitionInfo.ExitElementContainer="True">
                     </ListView>
                 </DataTemplate>

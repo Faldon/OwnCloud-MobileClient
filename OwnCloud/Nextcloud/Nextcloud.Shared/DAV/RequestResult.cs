@@ -81,8 +81,8 @@ namespace Nextcloud.DAV
                         {
                             // look for special elements
                             case XmlNodeType.Element:
-                                if (reader.NamespaceURI == XmlNamespaces.NsDav)
-                                {
+                                //if (reader.NamespaceURI == XmlNamespaces.NsDav)
+                                if (XmlNamespaces.GetXmlNamespaces().Contains(reader.NamespaceURI)) { 
                                     switch (reader.LocalName)
                                     {
                                         // DAV Elements
@@ -160,8 +160,8 @@ namespace Nextcloud.DAV
 
                             // clean up
                             case XmlNodeType.EndElement:
-                                if (reader.NamespaceURI == XmlNamespaces.NsDav)
-                                {
+                                //if (reader.NamespaceURI == XmlNamespaces.NsDav)
+                                if (XmlNamespaces.GetXmlNamespaces().Contains(reader.NamespaceURI)) {
                                     switch (reader.LocalName)
                                     {
                                         // DAV Elements
@@ -252,6 +252,8 @@ namespace Nextcloud.DAV
                                     case Properties.GetContentLanguage:
                                     case Properties.GetContentType:
                                     case Properties.GetETag:
+                                    case Properties.GetCTag:
+                                    case Properties.CalendarColor:
                                         pItem.Properties.Add(lastElementName, reader.Value);
                                         break;
                                     case Properties.GetLastModified:
@@ -426,6 +428,20 @@ namespace Nextcloud.DAV
             }
 
             /// <summary>
+            /// CTag of this property.
+            /// </summary>
+            public string CTag
+            {
+                get
+                {
+                    return (string)_GetValue(DAV.Properties.GetCTag, "");
+                }
+                set
+                {
+                }
+            }
+
+            /// <summary>
             /// Returns the last modified date.
             /// </summary>
             public DateTime LastModified
@@ -562,6 +578,20 @@ namespace Nextcloud.DAV
                 get
                 {
                     return (string)_GetValue(DAV.Properties.GetContentLanguage, "");
+                }
+                set
+                {
+                }
+            }
+
+            /// <summary>
+            /// Gets the calendar color.
+            /// </summary>
+            public string CalendarColor
+            {
+                get
+                {
+                    return (string)_GetValue(DAV.Properties.CalendarColor, "");
                 }
                 set
                 {
