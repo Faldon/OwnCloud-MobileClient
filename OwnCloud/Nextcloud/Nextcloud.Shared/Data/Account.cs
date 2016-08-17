@@ -47,7 +47,7 @@ namespace Nextcloud.Data
         }
 
         public Uri GetCalDAVRoot() {
-            return new Uri(Server.Protocol + "://" + Server.FQDN.TrimEnd('/') + Server.CalDAVPath, UriKind.Absolute);
+            return new Uri(Server.Protocol + "://" + Server.FQDN.TrimEnd('/') + Server.CalDAVPath + "calendars/" + Username + "/", UriKind.Absolute);
         }
 
         public async Task<NetworkCredential> GetCredential()

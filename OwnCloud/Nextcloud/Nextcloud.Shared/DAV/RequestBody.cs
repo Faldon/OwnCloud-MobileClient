@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml;
 using System.IO;
 
@@ -50,15 +48,12 @@ namespace Nextcloud.DAV
             {
                 if (attr.IsNamespaced)
                 {
-                    writer.WriteStartAttribute(attr.LocalName, attr.Namespace);
                     writer.WriteAttributeString(attr.LocalName, attr.Namespace, attr.Value);
                 }
                 else
                 {
-                    writer.WriteStartAttribute(attr.LocalName);
                     writer.WriteAttributeString(attr.LocalName, attr.Value);
                 }
-                writer.WriteEndAttribute();
             }
 
             if (item.HasContent)
@@ -118,11 +113,45 @@ namespace Nextcloud.DAV
                 new Item(Elements.PropertyFind, new List<Item>() {
                     new Item(Elements.Properties, new List<Item> {
                         new Item(Properties.DisplayName),
-                        new Item(Properties.GetCTag, ns:"http://calendarserver.org/ns/"),
-                        new Item(Properties.CalendarColor, ns:"http://apple.com/ns/ical/")
-                    })
+                        new Item(Properties.GetCTag, ns:XmlNamespaces.NsCalenderServer),
+                        new Item(Properties.CalendarColor, ns:XmlNamespaces.NsAppleIcal)
+                    }),
+                    new Item(Elements.Filter, new List<Item> {
+                        new Item(Filters.CompFilter, new List<Item>() {
+                        }, ns:XmlNamespaces.NsCaldav) {
+                            Attributes = new List<Item.AttributeNode> { new Item.AttributeNode("name", "VCALENDAR", ns:"") }
+                        }
+                    }, ns:XmlNamespaces.NsCaldav)
                 })
             );
+        }
+
+        /// <summary>
+        /// Creates a request for all calendar events.
+        /// </summary>
+        /// <returns></returns>
+        static public DAVRequestBody CreateCondensedCalendarEventRequest() {
+            return new DAVRequestBody(
+                new Item(Elements.CalendarQuery, new List<Item>() {
+                    new Item(Elements.Properties, new List<Item> {
+                        new Item(Properties.GetETag)
+                    }),
+                    new Item(Elements.Filter, new List<Item> {
+                        new Item(Filters.CompFilter, new List<Item>() {
+                            new Item(Filters.CompFilter, ns:XmlNamespaces.NsCaldav) {
+                                Attributes = new List<Item.AttributeNode>() { new Item.AttributeNode("name", "VEVENT", ns:"") }
+                            }
+                        }, ns:XmlNamespaces.NsCaldav) {
+                            Attributes = new List<Item.AttributeNode> { new Item.AttributeNode("name", "VCALENDAR", ns:"") }
+                        }
+                    }, ns:XmlNamespaces.NsCaldav)
+                }, ns:XmlNamespaces.NsCaldav)
+            );
+        }
+
+        private static async void dumpXmlToFile(string filename, byte[] buffer) {
+            var file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(filename, Windows.Storage.CreationCollisionOption.ReplaceExisting);
+            await Windows.Storage.FileIO.WriteBytesAsync(file, buffer);
         }
 
         /// <summary>

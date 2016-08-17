@@ -17,7 +17,7 @@ namespace Nextcloud.DataContext
         private SQLiteConnection connection;
         private SQLiteAsyncConnection asyncConnection;
         private StorageFile database;
-        private const int DATABASE_VERSION = 4;
+        private const int DATABASE_VERSION = 6;
 
         public NextcloudData() {
             CreateDatabaseFile("nextcloud.db");
@@ -62,7 +62,7 @@ namespace Nextcloud.DataContext
             return a;
         }
 
-        public async Task<List<File>> GetUserfilesInPath(Account user, string path) {
+        public async Task<List<File>> GetUserfilesInPathAsync(Account user, string path) {
             List<File> currentFilesInDatabase = await GetConnectionAsync().Table<File>().Where(f => f.AccountId == user.AccountId && (f.Filepath.StartsWith(path) || path.StartsWith(f.Filepath + f.Filename))).ToListAsync();
             return currentFilesInDatabase;
         }
@@ -78,6 +78,22 @@ namespace Nextcloud.DataContext
             return newOrUpdatedFile.FileId?? 0;
         }
 
+        public async void StoreCalendarAsync(Calendar newCalendar) {
+            await GetConnectionAsync().InsertAsync(newCalendar);
+        }
+
+        public async void UpdateCalendarAsync(Calendar updatedCalendar) {
+            await GetConnectionAsync().InsertOrReplaceAsync(updatedCalendar);
+        }
+
+        public async void RemoveCalendarAsync(Calendar obsoleteCalendar) {
+            await GetConnectionAsync().DeleteAsync(obsoleteCalendar);
+        }
+
+        public async void StoreCalendarEventAsync(CalendarEvent newOrUpdatedCalendarEvent) {
+            await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedCalendarEvent);
+        }
+
         public async void UpdateFilesAsync(List<File> filesToUpdate) {
             await GetConnectionAsync().InsertOrReplaceAllAsync(filesToUpdate);
         }
@@ -88,7 +104,7 @@ namespace Nextcloud.DataContext
             return f;
         }
 
-        public async void UpdateFile(File updatedFile) {
+        public async void UpdateFileAsync(File updatedFile) {
             await GetConnectionAsync().FindAsync<File>(f => (f.Filename == updatedFile.Filename && f.Filepath == updatedFile.Filepath && f.AccountId == updatedFile.AccountId)).ContinueWith(async f => {
                 updatedFile.FileId = f.Result.FileId;
                 await GetConnectionAsync().UpdateAsync(updatedFile);

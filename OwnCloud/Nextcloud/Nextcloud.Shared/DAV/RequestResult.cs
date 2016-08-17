@@ -4,6 +4,9 @@ using System.Linq;
 using System.IO;
 using System.Xml;
 using System.Net;
+using System.Text;
+using Windows.Data.Xml.Dom;
+using System.Xml.Linq;
 
 namespace Nextcloud.DAV
 {
@@ -60,9 +63,8 @@ namespace Nextcloud.DAV
             // to capture.
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.DtdProcessing = DtdProcessing.Ignore;
-
-            using(XmlReader reader = XmlReader.Create(_stream, settings)) {
-
+            settings.IgnoreWhitespace = true;
+            using (XmlReader reader = XmlReader.Create(_stream, settings)) {
                 Item item = new Item();
                 var waitForResourceType = false;
                 var lastElementName = "";
@@ -217,7 +219,6 @@ namespace Nextcloud.DAV
 
                             // Grap the text values
                             case XmlNodeType.Text:
-
                                 // no whitespace please
                                 if (reader.Value == null) continue;
 

@@ -16,6 +16,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Converter\BoolVisibilityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converter\HexcodeColorConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\FileModifiedDateVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\FilenameRootdirConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\InverseBooleanConverter.cs" />
@@ -28,6 +29,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Data\CalendarEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\IEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\File.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\RecurrenceRule.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Server.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DAV\Locking.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DAV\Reference.cs" />
@@ -39,6 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\Utility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountHubViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\CalendarViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\FileListViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\ViewModel.cs" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\FileIcons\application_pdf.png" />

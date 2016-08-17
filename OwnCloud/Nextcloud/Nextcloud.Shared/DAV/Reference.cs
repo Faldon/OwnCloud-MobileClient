@@ -158,14 +158,26 @@
     }
 
     /// <summary>
-    /// Properties which can be requested by the client.
+    /// Filters which can be requested by the client.
     /// </summary>
-    struct Properties
+    struct Filters
+    {
+        public const string CompFilter = "comp-filter";
+    }
+        /// <summary>
+        /// Properties which can be requested by the client.
+        /// </summary>
+        struct Properties
     {
         /// <summary>
         /// (string) Apple iCal extension to record the display color of the calendar
         /// </summary>
         public const string CalendarColor = "calendar-color";
+
+        /// <summary>
+        /// (string) CalDAV extension for providing calendar data
+        /// </summary>
+        public const string CalendarData = "calendar-data";     
 
         /// <summary>
         /// (DateTime) Records the time and date the resouce was created.
@@ -259,6 +271,11 @@
         public const string AllProperties = "allprop";
 
         /// <summary>
+        /// Specifies the start of a calendar query
+        /// </summary>
+        public const string CalendarQuery = "calendar-query";
+
+        /// <summary>
         /// Identifies the associated resource as a collection. The DAV:resourcetype property of a collection resource MUST contain this element. It is normally empty but extensions may add sub-elements.
         /// </summary>
         public const string Collection = "collection";
@@ -277,6 +294,11 @@
         /// Specifies an exclusive lock.
         /// </summary>
         public const string ExclusiveLocking = "exclusive";
+
+        /// <summary>
+        /// Specifies filter for the queried properties.
+        /// </summary>
+        public const string Filter = "filter";
 
         /// <summary>
         /// Any child element represents the name of a property to be included in the PROPFIND response. All elements inside an 'include' XML element MUST define properties related to the resource, although possible property names are in no way limited to those property names defined in this document or other standards. This element MUST NOT contain text or mixed content.

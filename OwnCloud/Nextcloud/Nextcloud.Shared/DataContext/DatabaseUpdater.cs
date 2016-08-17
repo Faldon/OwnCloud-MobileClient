@@ -19,7 +19,7 @@ namespace Nextcloud.DataContext
                         break;
                     case 2:
                         db.BeginTransaction();
-                        db.Execute("ALTER TABLE Files ADD IsDownloaded NOT NULL DEFAULT FALSE");
+                        db.Execute("ALTER TABLE Files ADD IsDownloaded INTEGER NOT NULL DEFAULT FALSE");
                         db.Commit();
                         break;
                     case 3:
@@ -30,6 +30,31 @@ namespace Nextcloud.DataContext
                         db.Execute("ALTER TABLE Calendars ADD CTag VARCHAR");
                         db.Execute("ALTER TABLE Calendars ADD AccountId INTEGER");
                         db.Execute("CREATE INDEX Calendars_AccountId ON Calendars(AccountId)");
+                        db.Commit();
+                        break;
+                    case 4:
+                        db.BeginTransaction();
+                        db.Execute("ALTER TABLE Calendars ADD IsSynced INTEGER NOT NULL DEFAULT FALSE");
+                        db.Execute("ALTER TABLE CalendarEvents ADD Path VARCHAR NOT NULL DEFAULT ''");
+                        db.Execute("ALTER TABLE CalendarEvents ADD ETag VARCHAR NOT NULL DEFAULT ''");
+                        db.Execute("ALTER TABLE CalendarEvents ADD EventUID INTEGER NOT NULL DEFAULT 0");
+                        db.Execute("ALTER TABLE CalendarEvents ADD EventCreated DATETIME DEFAULT NOW");
+                        db.Execute("ALTER TABLE CalendarEvents ADD EventLastModified DATETIME");
+                        db.Execute("ALTER TABLE CalendarEvents ADD StartDate DATETIME NOT NULL DEFAULT NOW");
+                        db.Execute("ALTER TABLE CalendarEvents ADD EndDate DATETIME");
+                        db.Execute("ALTER TABLE CalendarEvents ADD Summary VARCHAR");
+                        db.Execute("ALTER TABLE CalendarEvents ADD Description VARCHAR");
+                        db.Execute("ALTER TABLE CalendarEvents ADD Location VARCHAR");
+                        db.Execute("ALTER TABLE CalendarEvents ADD Duration VARCHAR");
+                        db.Execute("ALTER TABLE CalendarEvents ADD CalendarId INTEGER");
+                        db.Execute("CREATE INDEX CalendarEvents_CalendarId ON CalendarEvents(CalendarId)");
+                        db.Execute("CREATE TABLE RecurrenceRules(RuleId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Frequency VARCHAR NOT NULL DEFAULT '', Interval INTEGER NOT NULL DEFAULT 1, Count INTEGER, ByMonth VARCHAR, ByDay VARCHAR, Until DATETIME, CalendarEventId INTEGER)");
+                        db.Execute("CREATE INDEX RecurrenceRules_CalendarEventId ON RecurrenceRules(CalendarEventId)");
+                        db.Commit();
+                        break;
+                    case 5:
+                        db.BeginTransaction();
+                        db.Execute("ALTER TABLE CalendarEvents ADD InSync INTEGER NOT NULL DEFAULT FALSE");
                         db.Commit();
                         break;
                     default:

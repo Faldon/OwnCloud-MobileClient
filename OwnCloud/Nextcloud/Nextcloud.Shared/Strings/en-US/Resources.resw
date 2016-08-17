@@ -275,7 +275,7 @@
     <value>Navigation failed.</value>
   </data>
   <data name="EditAccountPage_Calendar.Content" xml:space="preserve">
-    <value>Enable Calendar?</value>
+    <value>Enable Calendar</value>
   </data>
   <data name="EditAccountPage_Password.Header" xml:space="preserve">
     <value>Password</value>
@@ -284,7 +284,7 @@
     <value>Servername</value>
   </data>
   <data name="EditAccountPage_SSL.Content" xml:space="preserve">
-    <value>Use SSL?</value>
+    <value>Use SSL</value>
   </data>
   <data name="EditAccountPage_Username.Header" xml:space="preserve">
     <value>Username</value>

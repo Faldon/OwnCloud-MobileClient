@@ -46,38 +46,8 @@ namespace Nextcloud.ViewModel
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             AccountCollection = new ObservableCollection<Account>(accountList);
             CalendarCollection = new ObservableCollection<Calendar>();
-            foreach (Account account in AccountCollection.ToList()) {
+            foreach (Account account in AccountCollection.Where(a => a.IsCalendarEnabled).ToList()) {
                 StartFetchingCalendarAsync(account);
-            }
-        }
-
-        private async void StartFetchingCalendarAsync(Account account) {
-            var cred = await account.GetCredential();
-            WebDAV dav = new WebDAV(account.GetCalDAVRoot(), cred);
-            DAVRequestHeader header = new DAVRequestHeader("PROPFIND", "/calendars/" + cred.UserName + "/");
-            dav.StartRequest(header, DAVRequestBody.CreateCalendarPropertiesListening(), account, FetchingCalendarAsyncComplete);
-        }
-
-        private async void FetchingCalendarAsyncComplete(DAVRequestResult result, object userObj) {
-            if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured && result.Items.Count > 0) {
-                Account _account = userObj as Account;
-                foreach (DAVRequestResult.Item item in result.Items) {
-                    if (item.Properties != null) {
-                        Calendar calendarItem = new Calendar() {
-                            DisplayName = item.DisplayName,
-                            Path = item.Reference,
-                            CTag = item.CTag,
-                            Color = item.CalendarColor,
-                            AccountId = _account.AccountId,
-                            Account = _account
-                        };
-                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => CalendarCollection.Add(calendarItem));
-                    }
-                }
-            } else {
-                foreach (Calendar calendarFromDatabase in App.GetDataContext().GetConnection().Table<Calendar>().ToList()) {
-                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => CalendarCollection.Add(calendarFromDatabase));
-                }
             }
         }
 
@@ -93,6 +63,59 @@ namespace Nextcloud.ViewModel
             }
             App.GetDataContext().RemoveAccount(account);
             return true;
+        }
+
+        private async void StartFetchingCalendarAsync(Account account) {
+            var cred = await account.GetCredential();
+            WebDAV dav = new WebDAV(account.GetCalDAVRoot(), cred);
+            DAVRequestHeader header = new DAVRequestHeader(DAVRequestHeader.Method.PropertyFind, "/");
+            header.Headers.Add(Header.Depth, HeaderAttribute.MethodDepth.ApplyResourceOnlyNoRoot);
+            dav.StartRequest(header, DAVRequestBody.CreateCalendarPropertiesListening(), account, FetchingCalendarAsyncComplete);
+        }
+
+        private async void FetchingCalendarAsyncComplete(DAVRequestResult result, object userObj) {
+            if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured && result.Items.Count > 0) {
+                Account _account = userObj as Account;
+                foreach (DAVRequestResult.Item item in result.Items) {
+                    if (item.Properties != null && !item.FailedProperties.Select(ps => ps.Status).Contains(ServerStatus.NotFound)) {
+                        Calendar calendarItem = new Calendar() {
+                            DisplayName = item.DisplayName,
+                            Path = item.Reference,
+                            CTag = item.CTag,
+                            Color = item.CalendarColor,
+                            AccountId = _account.AccountId,
+                            Account = _account
+                        };
+                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => CalendarCollection.Add(calendarItem));
+                    }
+                }
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { SyncDatabaseAsync(); });
+            } else {
+                foreach (Calendar calendarFromDatabase in App.GetDataContext().GetConnection().Table<Calendar>().ToList()) {
+                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => CalendarCollection.Add(calendarFromDatabase));
+                }
+            }
+        }
+
+        private async void SyncDatabaseAsync() {
+            List<Calendar> calendarsInDatabase = await App.GetDataContext().GetConnectionAsync().Table<Calendar>().ToListAsync();
+            foreach(Calendar remoteCalendar in CalendarCollection) {
+                var localCalendar = calendarsInDatabase.Where(c => c.Path == remoteCalendar.Path).FirstOrDefault();
+                if (localCalendar==null) {
+                    remoteCalendar.IsSynced = true;
+                    App.GetDataContext().StoreCalendarAsync(remoteCalendar);
+                } else {
+                    remoteCalendar.CalendarId = localCalendar.CalendarId;
+                    remoteCalendar.IsSynced = localCalendar.CTag == remoteCalendar.CTag;
+                    App.GetDataContext().UpdateCalendarAsync(remoteCalendar);
+                }
+            }
+            foreach (Calendar localCalendar in calendarsInDatabase) {
+                var remoteCalendar = CalendarCollection.Where(c => c.Path == localCalendar.Path).FirstOrDefault();
+                if (remoteCalendar == null) {
+                    App.GetDataContext().RemoveCalendarAsync(remoteCalendar);
+                }
+            }
         }
     }
 }

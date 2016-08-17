@@ -134,14 +134,9 @@ namespace Nextcloud.View
             Frame.Navigate(typeof(EditAccountPage), null);
         }
 
-        private void OnAccountListTapped(object sender, TappedRoutedEventArgs e) {
-            ListView accountList = (sender as ListView);
-            if (e.GetPosition(accountList).X < 10) {
-                accountList.ItemTemplate = App.Current.Resources["AccountItemSelectTemplate"] as DataTemplate;
-                var a = accountList.ItemTemplate;
-            }
-            System.Diagnostics.Debug.WriteLine(e.GetPosition(accountList));
-
+        private void OnCalendarListTapped(object sender, TappedRoutedEventArgs e) {
+            AccountHubViewModel viewModel = (LayoutRoot.DataContext as AccountHubViewModel);
+            Frame.Navigate(typeof(CalendarPage), viewModel.CalendarCollection);
         }
 
         private void OnAccountItemTapped(object sender, TappedRoutedEventArgs e) {

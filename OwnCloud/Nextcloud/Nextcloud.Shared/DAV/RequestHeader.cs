@@ -61,6 +61,8 @@ namespace Nextcloud.DAV
             /// Unlocks a locked resource.
             /// </summary>
             public const string UnLock = "UNLOCK";
+
+            public const string Report = "REPORT";
         }
 
         /// <summary>
@@ -137,6 +139,14 @@ namespace Nextcloud.DAV
         static public DAVRequestHeader MakeCollection(string path)
         {
             return new DAVRequestHeader(Method.MakeCollection, path);
+        }
+
+        static public DAVRequestHeader CreateReport(string path) {
+            return new DAVRequestHeader(Method.Report, path, new Dictionary<string, string>()
+            {
+                {Header.Depth, HeaderAttribute.MethodDepth.ApplyResourceAndChildren},
+                {"Prefer", "return_minimal"}
+            });
         }
 
         /// <summary>

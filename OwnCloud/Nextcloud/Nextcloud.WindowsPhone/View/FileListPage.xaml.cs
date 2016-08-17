@@ -212,7 +212,7 @@ namespace Nextcloud.View
                 bool result = await (LayoutRoot.DataContext as FileListViewModel).DownloadFileAsync(uriToDownload, tappedItem.Filename, tappedItem.FileLastModified, new CancellationToken(false));
                 if (result) {
                     tappedItem.IsDownloaded = true;
-                    App.GetDataContext().UpdateFile(tappedItem);
+                    App.GetDataContext().UpdateFileAsync(tappedItem);
                     tappedItem.NotifyPropertyChanged("IsDownloaded");
                 }
             }

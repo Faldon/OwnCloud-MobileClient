@@ -62,15 +62,22 @@
             </DataTemplate>
 
             <DataTemplate x:Key="CalendarItemTemplate">
-                <Grid Margin="0,20,0,0">
+                <Grid Margin="-10,5,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0" 
-                                Margin="14.5,0,0,0">
-                        <TextBlock x:Name="DisplayName" Text="{Binding DisplayName}" Style="{ThemeResource ListViewItemTextBlockStyle}"/>
+                    <BitmapIcon UriSource="/Assets/Icons/appbar.calendar.png"
+                                Foreground="{ThemeResource PhoneAccentBrush}" />
+                    <StackPanel Grid.Column="1" 
+                                Margin="5,0,0,0">
+                        <TextBlock x:Name="AccountName" 
+                                   Text="{Binding Account.Username}" 
+                                   Style="{ThemeResource ListViewItemTextBlockStyle}"/>
+                        <TextBlock x:Name="DisplayName" 
+                                   Text="{Binding DisplayName}" 
+                                   Style="{ThemeResource ListViewItemSubheaderTextBlockStyle}"
+                                   Foreground="{Binding Color}" />
                     </StackPanel>
                 </Grid>
             </DataTemplate>
@@ -107,10 +114,11 @@
                         AutomationProperties.AutomationId="CalendarSection"
                         AutomationProperties.Name="List calendars"
                         SelectionMode="None"
-                        IsItemClickEnabled="True"
+                        IsItemClickEnabled="False"
                         ItemsSource="{Binding CalendarCollection}"
                         ItemTemplate="{StaticResource CalendarItemTemplate}"
-                        ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+                        ContinuumNavigationTransitionInfo.ExitElementContainer="True"
+                        Tapped="OnCalendarListTapped">
                     </ListView>
                 </DataTemplate>
             </HubSection>

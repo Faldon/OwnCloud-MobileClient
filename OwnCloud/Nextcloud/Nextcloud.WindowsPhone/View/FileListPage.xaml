@@ -40,7 +40,7 @@
                                         VerticalAlignment="Bottom"
                                         HorizontalAlignment="Right"
                                         Foreground="{ThemeResource PhoneAccentBrush}"
-                                    Visibility="{Binding IsDownloaded, Converter={StaticResource BoolVisibiltyConverter}}"/>
+                                        Visibility="{Binding IsDownloaded, Converter={StaticResource BoolVisibiltyConverter}}"/>
                         </Border>
                     </Grid>
                     <StackPanel Grid.Column="1" 

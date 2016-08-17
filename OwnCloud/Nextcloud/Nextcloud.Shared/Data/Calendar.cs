@@ -20,10 +20,16 @@ namespace Nextcloud.Data
 
         public string CTag { get; set; }
 
+        [NotNull, Default(value: false)]
+        public bool IsSynced { get; set; }
+
         [ForeignKey(typeof(Account))]
         public int AccountId { get; set; }
 
         [ManyToOne]
         public Account Account { get; set; }
+
+        [OneToMany]
+        public List<CalendarEvent> CalendarEvents { get; set; }
     }
 }

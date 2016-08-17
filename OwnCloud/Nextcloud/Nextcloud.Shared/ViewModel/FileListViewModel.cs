@@ -357,7 +357,7 @@ namespace Nextcloud.ViewModel
 
         private async void SyncDatabaseAsync() {
             string absoluteCurrentPath = _account.Server.WebDAVPath.TrimEnd('/') + _currentPath;
-            List<File> filesInDatabase = await App.GetDataContext().GetUserfilesInPath(_account, absoluteCurrentPath);
+            List<File> filesInDatabase = await App.GetDataContext().GetUserfilesInPathAsync(_account, absoluteCurrentPath);
             filesInDatabase = filesInDatabase.Where(f => f.ParentFilepath == absoluteCurrentPath || (f.Filepath + f.Filename) == absoluteCurrentPath.TrimEnd('/')).ToList();
             foreach(File storedFile in filesInDatabase) {
                 File inCollection = FileCollection.Where(f => storedFile.Filename == f.Filename).FirstOrDefault();
