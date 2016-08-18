@@ -75,7 +75,7 @@ namespace Nextcloud.ViewModel
             foreach (Calendar cal in CalendarCollection) {
                 App.GetDataContext().GetConnection().GetChildren(cal, true);
             }
-            //EventCollection = new ObservableCollection<CalendarEvent>(calendars.SelectMany(c => c.CalendarEvents).ToList());
+            EventCollection = new ObservableCollection<CalendarEvent>(calendars.SelectMany(c => c.CalendarEvents).ToList());
             IsFetching = false;
             FetchAppointmentsAsync();
         }
@@ -88,36 +88,75 @@ namespace Nextcloud.ViewModel
                 App.GetDataContext().GetConnection().GetChildren(account);
                 NetworkCredential cred = await account.GetCredential();
                 var webdav = new WebDAV(new Uri(account.Server.Protocol + "://" + account.Server.FQDN, UriKind.Absolute), cred);
-                foreach (Calendar calendar in CalendarCollection.Where(c => c.Account == account).ToList()) {
+                foreach (Calendar calendar in CalendarCollection.Where(c => c.AccountId == account.AccountId).ToList()) {
                     webdav.StartRequest(DAVRequestHeader.CreateReport(calendar.Path), DAVRequestBody.CreateCondensedCalendarEventRequest(), calendar, OnFetchAppointmentsAsyncComplete);
                 }
             }
         }
 
         private async void OnFetchAppointmentsAsyncComplete(DAVRequestResult result, object userObj) {
-            if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured && result.Items.Count > 0) {
+            if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured) {
                 Calendar _calendar = userObj as Calendar;
                 foreach (DAVRequestResult.Item item in result.Items) {
-                    var eventInDatabase = EventCollection.Where(e => e.CalendarId == _calendar.CalendarId && e.Path == item.Reference).FirstOrDefault();
-                    if(eventInDatabase != null && eventInDatabase.ETag == item.ETag) {
+                    var eventInDatabase = _calendar.CalendarEvents.Where(e => e.Path == item.Reference).FirstOrDefault();
+                    if (eventInDatabase != null && eventInDatabase.ETag == item.ETag) {
                         continue;
                     }
                     CalendarEvent eventItem = new CalendarEvent() {
                         CalendarEventId = eventInDatabase != null ? eventInDatabase.CalendarEventId : null,
                         Path = item.Reference,
                         ETag = item.ETag,
-                        CalendarId = _calendar.AccountId,
+                        InSync = false,
+                        CalendarId = _calendar.CalendarId,
                         Calendar = _calendar
                     };
                     App.GetDataContext().StoreCalendarEventAsync(eventItem);
-
-                        //await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => CalendarCollection.Add(calendarItem));
                 }
-                //await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { SyncDatabaseAsync(); });
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { SyncDatabaseAsync(_calendar); });
             } else {
                 //foreach (Calendar calendarFromDatabase in App.GetDataContext().GetConnection().Table<Calendar>().ToList()) {
-                //    //dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => CalendarCollection.Add(calendarFromDatabase));
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsFetching = false);
                 //}
+            }
+        }
+
+        private async void SyncDatabaseAsync(Calendar calendar) {
+            List<CalendarEvent> unsyncedEvents = await App.GetDataContext().GetUnsyncedEvents();
+            unsyncedEvents = unsyncedEvents.Where(e => e.CalendarId == calendar.CalendarId).ToList();
+
+            Account account = unsyncedEvents.Select(e => e.Calendar).Select(c => c.Account).Distinct().First();
+            App.GetDataContext().GetConnection().GetChildren(account, recursive: true);
+
+            NetworkCredential cred = await account.GetCredential();
+            var webdav = new WebDAV(new Uri(account.Server.Protocol + "://" + account.Server.FQDN, UriKind.Absolute), cred);
+            webdav.StartRequest(DAVRequestHeader.CreateReport(calendar.Path), DAVRequestBody.CreateCalendarEventMultiget(unsyncedEvents), calendar, OnSyncDatabaseAsyncComplete);
+        }
+
+        private async void OnSyncDatabaseAsyncComplete(DAVRequestResult result, object userObj) {
+            if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured) {
+                Calendar _calendar = userObj as Calendar;
+                foreach (DAVRequestResult.Item item in result.Items) {
+                    CalendarEvent fromDatabase = await App.GetDataContext().GetConnectionAsync().Table<CalendarEvent>().Where(e => e.Path == item.Reference && e.CalendarId == _calendar.CalendarId).FirstOrDefaultAsync();
+                    if(fromDatabase == null) {
+
+                    }
+                    if (item.ETag.Length > 0 ) {
+                        fromDatabase.ParseCalendarData(item.CalendarData);
+                    }
+                    var eventInDatabase = _calendar.CalendarEvents.Where(e => e.Path == item.Reference).FirstOrDefault();
+                    if (eventInDatabase != null && eventInDatabase.ETag == item.ETag) {
+                        continue;
+                    }
+                    CalendarEvent eventItem = new CalendarEvent() {
+                        CalendarEventId = eventInDatabase != null ? eventInDatabase.CalendarEventId : null,
+                        Path = item.Reference,
+                        ETag = item.ETag,
+                        InSync = false,
+                        CalendarId = _calendar.CalendarId,
+                        Calendar = _calendar
+                    };
+                    App.GetDataContext().StoreCalendarEventAsync(eventItem);
+                }
             }
         }
     }

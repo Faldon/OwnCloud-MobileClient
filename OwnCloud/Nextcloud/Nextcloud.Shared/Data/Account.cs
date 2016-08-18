@@ -41,8 +41,7 @@ namespace Nextcloud.Data
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Calendar> Calendars { get; set; }
 
-        public Uri GetWebDAVRoot()
-        {
+        public Uri GetWebDAVRoot() {
             return new Uri(Server.Protocol + "://" + Server.FQDN.TrimEnd('/') + Server.WebDAVPath, UriKind.Absolute);
         }
 
@@ -50,10 +49,30 @@ namespace Nextcloud.Data
             return new Uri(Server.Protocol + "://" + Server.FQDN.TrimEnd('/') + Server.CalDAVPath + "calendars/" + Username + "/", UriKind.Absolute);
         }
 
-        public async Task<NetworkCredential> GetCredential()
-        {
+        public async Task<NetworkCredential> GetCredential() {
             var _password = await Utility.DecryptString(Password);
             return new NetworkCredential(Username, _password);
+        }
+
+        protected bool Equals(Account other) {
+            return (this.Username == other.Username) && (this.ServerFQDN == other.ServerFQDN);
+        }
+
+        public override bool Equals(Object obj) {
+            if(ReferenceEquals(null, obj)) {
+                return false;
+            }
+            if(ReferenceEquals(this, obj)) {
+                return true;
+            }
+            if(obj.GetType() != this.GetType()) {
+                return false;
+            }
+            return Equals((Account)obj);
+        }
+
+        public override int GetHashCode() {
+            return (Username + "@" + ServerFQDN).GetHashCode();
         }
     }
 }

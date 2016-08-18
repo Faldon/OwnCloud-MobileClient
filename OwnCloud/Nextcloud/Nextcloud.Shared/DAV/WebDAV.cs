@@ -71,7 +71,7 @@ namespace Nextcloud.DAV
             LastException = null;
             _relativeHost = new Uri(_host + header.RequestedResource);
 
-            //header.Headers[Header.Host] = _host.DnsSafeHost;
+            header.Headers[Header.Host] = _host.DnsSafeHost;
             HttpWebRequest request = WebRequest.CreateHttp(_host + header.RequestedResource);
             request.AllowReadStreamBuffering = false;
             request.Method = header.RequestedMethod.ToString();

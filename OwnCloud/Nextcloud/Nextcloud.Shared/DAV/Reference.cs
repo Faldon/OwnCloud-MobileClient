@@ -271,6 +271,11 @@
         public const string AllProperties = "allprop";
 
         /// <summary>
+        /// Specifies a calendar multiget request.
+        /// </summary>
+        public const string CalendarMultiget = "calendar-multiget";
+
+        /// <summary>
         /// Specifies the start of a calendar query
         /// </summary>
         public const string CalendarQuery = "calendar-query";

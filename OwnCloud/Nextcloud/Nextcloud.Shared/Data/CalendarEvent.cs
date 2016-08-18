@@ -51,5 +51,9 @@ namespace Nextcloud.Data
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<RecurrenceRule> RecurrenceRules { get; set; }
 
+        public void ParseCalendarData(string calendarData) {
+            var data = calendarData.Split('\n');
+        }
+
     }
 }

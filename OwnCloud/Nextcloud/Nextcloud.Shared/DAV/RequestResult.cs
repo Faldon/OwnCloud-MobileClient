@@ -249,12 +249,13 @@ namespace Nextcloud.DAV
                                     case Properties.GetContentLength:
                                         pItem.Properties.Add(lastElementName, long.Parse(reader.Value));
                                         break;
+                                    case Properties.CalendarColor:
+                                    case Properties.CalendarData:
                                     case Properties.DisplayName:
                                     case Properties.GetContentLanguage:
                                     case Properties.GetContentType:
                                     case Properties.GetETag:
                                     case Properties.GetCTag:
-                                    case Properties.CalendarColor:
                                         pItem.Properties.Add(lastElementName, reader.Value);
                                         break;
                                     case Properties.GetLastModified:
@@ -579,6 +580,20 @@ namespace Nextcloud.DAV
                 get
                 {
                     return (string)_GetValue(DAV.Properties.GetContentLanguage, "");
+                }
+                set
+                {
+                }
+            }
+
+            /// <summary>
+            /// Gets the calendar data.
+            /// </summary>
+            public string CalendarData
+            {
+                get
+                {
+                    return (string)_GetValue(DAV.Properties.CalendarData, "");
                 }
                 set
                 {

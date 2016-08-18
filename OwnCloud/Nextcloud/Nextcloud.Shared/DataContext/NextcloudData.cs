@@ -62,6 +62,10 @@ namespace Nextcloud.DataContext
             return a;
         }
 
+        public List<Account> LoadAllAccounts() {
+            return connection.GetAllWithChildren<Account>(recursive: true).ToList();
+        }
+
         public async Task<List<File>> GetUserfilesInPathAsync(Account user, string path) {
             List<File> currentFilesInDatabase = await GetConnectionAsync().Table<File>().Where(f => f.AccountId == user.AccountId && (f.Filepath.StartsWith(path) || path.StartsWith(f.Filepath + f.Filename))).ToListAsync();
             return currentFilesInDatabase;
@@ -120,6 +124,15 @@ namespace Nextcloud.DataContext
             connection.Delete(account, recursive: true);
         }
 
+        public async Task<List<CalendarEvent>> GetUnsyncedEvents() {
+            var events = await App.GetDataContext().GetConnectionAsync().Table<CalendarEvent>().Where(e => !e.InSync).ToListAsync();
+            foreach(var e in events) {
+                connection.GetChildren(e, recursive:true);
+                connection.GetChildren(e.Calendar, recursive:true);
+            }
+            return events;
+        }
+
         private void InitializeDatabase(SQLiteConnection db) {
             object dbVersion;
             ApplicationDataContainer dbSettings = ApplicationData.Current.LocalSettings.CreateContainer("DATABASE", ApplicationDataCreateDisposition.Always);
@@ -130,6 +143,7 @@ namespace Nextcloud.DataContext
                     db.CreateTable<File>();
                     db.CreateTable<Calendar>();
                     db.CreateTable<CalendarEvent>();
+                    db.CreateTable<RecurrenceRule>();
                     dbSettings.Values["DATABASE_VERSION"] = DATABASE_VERSION;
                 } catch (SQLiteException ex) {
                     System.Diagnostics.Debug.WriteLine(ex.Message);
