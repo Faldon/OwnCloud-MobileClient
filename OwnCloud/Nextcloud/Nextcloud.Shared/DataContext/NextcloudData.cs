@@ -17,7 +17,7 @@ namespace Nextcloud.DataContext
         private SQLiteConnection connection;
         private SQLiteAsyncConnection asyncConnection;
         private StorageFile database;
-        private const int DATABASE_VERSION = 6;
+        private const int DATABASE_VERSION = 7;
 
         public NextcloudData() {
             CreateDatabaseFile("nextcloud.db");

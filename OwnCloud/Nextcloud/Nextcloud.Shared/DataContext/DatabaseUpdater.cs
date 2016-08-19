@@ -57,6 +57,12 @@ namespace Nextcloud.DataContext
                         db.Execute("ALTER TABLE CalendarEvents ADD InSync INTEGER NOT NULL DEFAULT FALSE");
                         db.Commit();
                         break;
+                    case 6:
+                        db.BeginTransaction();                        
+                        db.Execute("ALTER TABLE CalendarEvents DROP EventUID");
+                        db.Execute("ALTER TABLE CalendarEvents ADD EventUID VARCHAR NOT NULL DEFAULT ''");
+                        db.Commit();
+                        break;
                     default:
                         break;
                 }
