@@ -17,7 +17,7 @@ namespace Nextcloud.DataContext
         private SQLiteConnection connection;
         private SQLiteAsyncConnection asyncConnection;
         private StorageFile database;
-        private const int DATABASE_VERSION = 7;
+        private const int DATABASE_VERSION = 1;
 
         public NextcloudData() {
             CreateDatabaseFile("nextcloud.db");
@@ -94,6 +94,10 @@ namespace Nextcloud.DataContext
             await GetConnectionAsync().DeleteAsync(obsoleteCalendar);
         }
 
+        public async void StoreCalendarObjectAsync(CalendarObject newOrUpdatedCalendarObject) {
+            await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedCalendarObject);
+        }
+
         public async void StoreCalendarEventAsync(CalendarEvent newOrUpdatedCalendarEvent) {
             await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedCalendarEvent);
         }
@@ -124,11 +128,21 @@ namespace Nextcloud.DataContext
             connection.Delete(account, recursive: true);
         }
 
-        public async Task<List<CalendarEvent>> GetUnsyncedEvents() {
+        public async Task<List<CalendarObject>> GetUnsyncedCalendarObjectsAsync() {
+            var calObjs = await App.GetDataContext().GetConnectionAsync().Table<CalendarObject>().Where(e => !e.InSync).ToListAsync();
+            foreach (var e in calObjs) {
+                connection.GetChildren(e, recursive: true);
+                connection.GetChildren(e.Calendar, recursive: true);
+            }
+            return calObjs;
+        }
+
+        public async Task<List<CalendarEvent>> GetUnsyncedEventsAsync() {
             var events = await App.GetDataContext().GetConnectionAsync().Table<CalendarEvent>().Where(e => !e.InSync).ToListAsync();
             foreach(var e in events) {
                 connection.GetChildren(e, recursive:true);
-                connection.GetChildren(e.Calendar, recursive:true);
+                connection.GetChildren(e.CalendarObject, recursive:true);
+                connection.GetChildren(e.CalendarObject.Calendar, recursive: true);
             }
             return events;
         }
@@ -142,6 +156,7 @@ namespace Nextcloud.DataContext
                     db.CreateTable<Account>();
                     db.CreateTable<File>();
                     db.CreateTable<Calendar>();
+                    db.CreateTable<CalendarObject>();
                     db.CreateTable<CalendarEvent>();
                     db.CreateTable<RecurrenceRule>();
                     dbSettings.Values["DATABASE_VERSION"] = DATABASE_VERSION;
@@ -154,6 +169,7 @@ namespace Nextcloud.DataContext
                     dbVersion = DatabaseUpdater.FromVersion((int)dbVersion, db);
                 }
                 dbSettings.Values["DATABASE_VERSION"] = dbVersion;
+                DatabaseUpdater.DeleteUpdateLog();
             }
         }
 

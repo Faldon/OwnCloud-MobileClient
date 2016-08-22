@@ -132,7 +132,7 @@ namespace Nextcloud.DAV
         /// Creates a request for all calendar events.
         /// </summary>
         /// <returns></returns>
-        static public DAVRequestBody CreateCondensedCalendarEventRequest() {
+        static public DAVRequestBody CreateCondensedCalendarRequest() {
             return new DAVRequestBody(
                 new Item(Elements.CalendarQuery, new List<Item>() {
                     new Item(Elements.Properties, new List<Item> {
@@ -151,14 +151,14 @@ namespace Nextcloud.DAV
             );
         }
 
-        internal static DAVRequestBody CreateCalendarEventMultiget(List<CalendarEvent> unsyncedEvents) {
+        internal static DAVRequestBody CreateCalendarMultiget(List<CalendarObject> unsyncedCalObjs) {
             List<Item> multigetChildren = new List<Item>() {
                     new Item(Elements.Properties, new List<Item> {
                         new Item(Properties.GetETag),
                         new Item(Properties.CalendarData, ns:XmlNamespaces.NsCaldav)
                     })
                 };
-            multigetChildren.AddRange(unsyncedEvents.Select(e => new Item(Elements.Reference, e.Path)));
+            multigetChildren.AddRange(unsyncedCalObjs.Select(e => new Item(Elements.Reference, e.Path)));
             return new DAVRequestBody(new Item(Elements.CalendarMultiget, multigetChildren, ns: XmlNamespaces.NsCaldav));
         }
 

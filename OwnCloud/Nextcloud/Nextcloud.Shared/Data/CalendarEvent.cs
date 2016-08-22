@@ -43,10 +43,10 @@ namespace Nextcloud.Data
         public bool InSync { get; set; }
 
         [ForeignKey(typeof(Calendar))]
-        public int CalendarId { get; set; }
+        public int CalendarObjectId { get; set; }
 
         [ManyToOne]
-        public Calendar Calendar { get; set; }
+        public CalendarObject CalendarObject { get; set; }
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<RecurrenceRule> RecurrenceRules { get; set; }

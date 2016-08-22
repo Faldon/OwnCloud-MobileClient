@@ -30,6 +30,6 @@ namespace Nextcloud.Data
         public Account Account { get; set; }
 
         [OneToMany]
-        public List<CalendarEvent> CalendarEvents { get; set; }
+        public List<CalendarObject> CalendarObjects { get; set; }
     }
 }

@@ -26,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataContext\NextcloudData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Account.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Calendar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\CalendarObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\CalendarEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\IEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\File.cs" />
