@@ -51,6 +51,20 @@ namespace Nextcloud.DataContext
             connection.InsertOrReplaceWithChildren(newOrUpdatedAccount.Server, recursive: true);
         }
 
+        public CalendarEvent GetCalendarEvent(int calendarObjectID, string eventUID) {
+            CalendarEvent evt = connection.Table<CalendarEvent>().Where(e => e.CalendarObjectId == calendarObjectID && e.EventUID == eventUID).FirstOrDefault();
+            if(evt != null) {
+                connection.GetChildren(evt, recursive: true);
+            } else {
+                evt = new CalendarEvent() {
+                    EventUID = eventUID,
+                    CalendarObjectId = calendarObjectID,
+                    RecurrenceRules = new List<RecurrenceRule>()
+                };
+            }
+            return evt;
+        }
+
         public Account LoadAccount(int id) {
             return connection.GetWithChildren<Account>(id, recursive: true);
         }
@@ -131,8 +145,8 @@ namespace Nextcloud.DataContext
         public async Task<List<CalendarObject>> GetUnsyncedCalendarObjectsAsync() {
             var calObjs = await App.GetDataContext().GetConnectionAsync().Table<CalendarObject>().Where(e => !e.InSync).ToListAsync();
             foreach (var e in calObjs) {
-                connection.GetChildren(e, recursive: true);
-                connection.GetChildren(e.Calendar, recursive: true);
+                e.Calendar = await GetConnectionAsync().FindAsync<Calendar>(e.CalendarId);
+                e.Calendar.Account = await GetConnectionAsync().FindAsync<Account>(e.Calendar.AccountId);
             }
             return calObjs;
         }

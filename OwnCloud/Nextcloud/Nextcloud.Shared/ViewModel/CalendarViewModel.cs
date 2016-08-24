@@ -77,10 +77,10 @@ namespace Nextcloud.ViewModel
             }
             EventCollection = new ObservableCollection<CalendarEvent>(calendars.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
             IsFetching = false;
-            FetchAppointmentsAsync();
+            FetchCalendarObjectsAsync();
         }
 
-        public async void FetchAppointmentsAsync() {
+        public async void FetchCalendarObjectsAsync() {
             IsFetching = true;
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             List<Account> accountList = CalendarCollection.Select(c => c.Account).Distinct().ToList();
@@ -89,12 +89,12 @@ namespace Nextcloud.ViewModel
                 NetworkCredential cred = await account.GetCredential();
                 var webdav = new WebDAV(new Uri(account.Server.Protocol + "://" + account.Server.FQDN, UriKind.Absolute), cred);
                 foreach (Calendar calendar in CalendarCollection.Where(c => c.AccountId == account.AccountId).ToList()) {
-                    webdav.StartRequest(DAVRequestHeader.CreateReport(calendar.Path), DAVRequestBody.CreateCondensedCalendarRequest(), calendar, OnFetchAppointmentsAsyncComplete);
+                    webdav.StartRequest(DAVRequestHeader.CreateReport(calendar.Path), DAVRequestBody.CreateCondensedCalendarRequest(), calendar, OnFetchCalendarObjectsAsyncComplete);
                 }
             }
         }
 
-        private async void OnFetchAppointmentsAsyncComplete(DAVRequestResult result, object userObj) {
+        private async void OnFetchCalendarObjectsAsyncComplete(DAVRequestResult result, object userObj) {
             if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured) {
                 Calendar _calendar = userObj as Calendar;
                 foreach (DAVRequestResult.Item item in result.Items) {
@@ -114,9 +114,7 @@ namespace Nextcloud.ViewModel
                 }
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { SyncDatabaseAsync(_calendar); });
             } else {
-                //foreach (Calendar calendarFromDatabase in App.GetDataContext().GetConnection().Table<Calendar>().ToList()) {
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsFetching = false);
-                //}
             }
         }
 
@@ -147,19 +145,6 @@ namespace Nextcloud.ViewModel
                         App.GetDataContext().StoreCalendarObjectAsync(fromDatabase);
                         fromDatabase.ParseCalendarData();
                     }
-                    //var eventInDatabase = _calendar.CalendarEvents.Where(e => e.Path == item.Reference).FirstOrDefault();
-                    //if (eventInDatabase != null && eventInDatabase.ETag == item.ETag) {
-                    //    continue;
-                    //}
-                    //CalendarEvent eventItem = new CalendarEvent() {
-                    //    CalendarEventId = eventInDatabase != null ? eventInDatabase.CalendarEventId : null,
-                    //    Path = item.Reference,
-                    //    ETag = item.ETag,
-                    //    InSync = false,
-                    //    CalendarId = _calendar.CalendarId,
-                    //    Calendar = _calendar
-                    //};
-                    //App.GetDataContext().StoreCalendarEventAsync(eventItem);
                 }
             }
         }
