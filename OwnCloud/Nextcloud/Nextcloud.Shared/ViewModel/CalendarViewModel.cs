@@ -146,6 +146,9 @@ namespace Nextcloud.ViewModel
                         fromDatabase.ParseCalendarData();
                     }
                 }
+                App.GetDataContext().GetConnection().GetChildren(_calendar, recursive: true);
+                EventCollection.Clear();
+                EventCollection.Concat(CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
             }
         }
     }

@@ -23,13 +23,38 @@
 
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
-            <TextBlock Text="MY APPLICATION" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
-            <TextBlock Text="page title" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+            <TextBlock x:Uid="AppName"
+                       Style="{ThemeResource TitleTextBlockStyle}" 
+                       Margin="0,12,0,0"/>
+            <TextBlock x:Uid="CalendarPage_PageTitle" 
+                       Margin="0,-6.5,0,26.5" 
+                       Style="{ThemeResource HeaderTextBlockStyle}" 
+                       CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
         </StackPanel>
 
         <!--TODO: Content should be placed within the following grid-->
-        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,0,19,0">
+            <Grid x:Name="GrdCalendarLines" />
 
+            <Grid x:Name="GrdMovingPart">
+                <Grid.Projection>
+                    <PlaneProjection/>
+                </Grid.Projection>
+
+                <Grid x:Name="GrdDayIndicator"
+                      Background="{ThemeResource PhoneAccentBrush}" />
+                <Grid x:Name="GrdAppointments" />
+                <StackPanel x:Name="DayDetails"
+                            Background="Black"
+                            Visibility="Collapsed" >
+                    <TextBlock x:Name="DayDetailsHeader"
+                               Margin="5,5,5,5"
+                               Style="{StaticResource BaseTextBlockStyle}"
+                               FontStretch="Condensed"
+                               Text="" />
+                    <StackPanel x:Name="DayAppointmentDetails" Margin="10,0,0,10"/>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

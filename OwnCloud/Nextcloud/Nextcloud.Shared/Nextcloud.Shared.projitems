@@ -39,6 +39,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)DAV\RequestResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DAV\WebDAV.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DAV\XmlNamespaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DateExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\GridExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\Utility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountHubViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountViewModel.cs" />

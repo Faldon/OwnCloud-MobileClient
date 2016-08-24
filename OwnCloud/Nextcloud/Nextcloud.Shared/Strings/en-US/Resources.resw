@@ -453,4 +453,7 @@ Save account anyway?</value>
   <data name="AccountHubPage_CalendarSection.Header" xml:space="preserve">
     <value>Calendars</value>
   </data>
+  <data name="CalendarPage_PageTitle.Text" xml:space="preserve">
+    <value>Calendar</value>
+  </data>
 </root>

@@ -2,22 +2,15 @@
 using Nextcloud.Data;
 using Nextcloud.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
-using Windows.UI.ViewManagement;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Shapes;
+using Nextcloud.Extensions;
+using System.Collections.Generic;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -31,8 +24,45 @@ namespace Nextcloud.View
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
+        private int _weekCount = 0;
+        private DateTime _firstDayOfCalendarMonth;
+        private DateTime _lastDayOfCalendarMonth;
+        private Dictionary<int, StackPanel> _dayPanels = new Dictionary<int, StackPanel>();
+        private Color PhoneAccentColor;
+
+        public DateTime SelectedDate
+        {
+            get { return (DateTime)GetValue(SelectedDateProperty); }
+            set
+            {
+                SetValue(SelectedDateProperty, value);
+            }
+        }
+
+        // Using a DependencyProperty as the backing store for SelectedDate.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register("SelectedDate", typeof(DateTime), typeof(CalendarPage), new PropertyMetadata(DateTime.MinValue, OnSelectedDateChanged));
+
+        private static void OnSelectedDateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) {
+            //(sender as CalendarPage).SelectedDateChanged(e);
+        }
+
+        private void SelectedDateChanged(DependencyPropertyChangedEventArgs e) {
+            //OnDateChanging();
+            //if ((DateTime)e.OldValue == DateTime.MinValue) {
+            //    _firstDayOfCalendarMonth = ((DateTime)e.NewValue).FirstOfMonth().FirstDayOfWeek().Date;
+            //    _lastDayOfCalendarMonth = ((DateTime)e.NewValue).LastOfMonth().LastDayOfWeek().AddDays(1);
+            //}
+
+            //if ((DateTime)e.NewValue > (DateTime)e.OldValue)
+            //    this.SlideLeftBegin.Begin();
+            //else this.SlideRightBegin.Begin();
+        }
+
         public CalendarPage() {
             this.InitializeComponent();
+            PhoneAccentColor = (GrdDayIndicator.Background as SolidColorBrush).Color;
+            GrdDayIndicator.Background = null;
+            SelectedDate = DateTime.Now;
 
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
@@ -74,6 +104,7 @@ namespace Nextcloud.View
             } else {
                 LayoutRoot.DataContext = new CalendarViewModel(dataModel);
             }
+            ChangeDate();
         }
 
         /// <summary>
@@ -111,5 +142,104 @@ namespace Nextcloud.View
         }
 
         #endregion
+
+        public void ChangeDate() {
+            //OnDateChanged();
+
+            _firstDayOfCalendarMonth = SelectedDate.FirstOfMonth().FirstDayOfWeek().Date;
+            _lastDayOfCalendarMonth = SelectedDate.LastOfMonth().LastDayOfWeek().AddDays(1);
+
+            _weekCount = SelectedDate.GetMonthCount();
+            ResetGridLines();
+
+            //Dispatcher.BeginInvoke(new Action(() => RefreshAppointments()));
+        }
+
+        private void ResetGridLines() {
+            GrdCalendarLines.Children.Clear();
+            GrdCalendarLines.SetGridRows(_weekCount + 1);
+            GrdCalendarLines.SetGridColumns(7);
+
+            GrdDayIndicator.Children.Clear();
+            GrdDayIndicator.SetGridRows(_weekCount + 1);
+            GrdDayIndicator.SetGridColumns(7);
+
+            GrdAppointments.Children.Clear();
+            GrdAppointments.SetGridRows(_weekCount + 1);
+            GrdAppointments.SetGridColumns(7);
+
+            var firstDay = SelectedDate.FirstOfMonth().FirstDayOfWeek();
+            for (int i = 0; i < 7; i++) {
+                for (int j = 0; j < _weekCount; j++) {
+                    DateTime fieldDate = firstDay.AddDays((j * 7) + i);
+
+                    Color dayIndicatorColor = Colors.White;
+                    //SolidColorBrush indicatorBrush = new SolidColorBrush(Colors.White);
+                    if (fieldDate.Date == DateTime.Now.Date) {
+                        //var a = Application.Current.Resources.ThemeDictionaries.Keys;
+                        dayIndicatorColor = PhoneAccentColor;
+                       // indicatorBrush = (SolidColorBrush)GrdDayIndicator.Background;
+                    } else if (fieldDate.Month != SelectedDate.Month) {
+                        //indicatorBrush.Color = Colors.Gray;
+                        dayIndicatorColor = Colors.Gray;
+                    }
+
+                    var dayIndicator = new TextBlock {
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Text = fieldDate.Day.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                        Foreground = new SolidColorBrush(dayIndicatorColor),
+                        Margin = new Thickness(5, 0, 0, 5)
+                    };
+                    Grid.SetColumn(dayIndicator, i);
+                    Grid.SetRow(dayIndicator, j + 1);
+                    GrdDayIndicator.Children.Add(dayIndicator);
+
+                    var dayOpenControl = new StackPanel {
+                        Background = new SolidColorBrush(Colors.Black),
+                        Name = fieldDate.ToString()
+                    };
+                    //dayOpenControl.Tap += ShowDayDetails;
+                    Grid.SetColumn(dayOpenControl, i);
+                    Grid.SetRow(dayOpenControl, j + 1);
+                    GrdCalendarLines.Children.Add(dayOpenControl);
+                }
+            }
+
+            for (int i = 0; i < 6; i++) {
+                var vRect = new Rectangle();
+                vRect.Fill = new SolidColorBrush(Colors.White);
+                vRect.Width = 2;
+                vRect.HorizontalAlignment = HorizontalAlignment.Right;
+                Grid.SetRow(vRect, 1);
+                Grid.SetRowSpan(vRect, _weekCount);
+                Grid.SetColumn(vRect, i);
+
+                GrdCalendarLines.Children.Add(vRect);
+            }
+            for (int i = 0; i < _weekCount + 1; i++) {
+                var hRect = new Rectangle();
+                hRect.Fill = new SolidColorBrush(Colors.White);
+                hRect.Height = 2;
+                hRect.VerticalAlignment = VerticalAlignment.Bottom;
+                Grid.SetColumnSpan(hRect, 7);
+                Grid.SetRow(hRect, i);
+
+                GrdCalendarLines.Children.Add(hRect);
+            }
+
+            var targetDate = _firstDayOfCalendarMonth;
+            for (int i = 0; i < 7; i++) {
+
+                TextBlock dayBlock = new TextBlock();
+                Grid.SetColumn(dayBlock, i);
+                dayBlock.VerticalAlignment = VerticalAlignment.Bottom;
+                dayBlock.HorizontalAlignment = HorizontalAlignment.Center;
+                dayBlock.Text = targetDate.ToString("ddd");
+                GrdCalendarLines.Children.Add(dayBlock);
+
+                targetDate = targetDate.AddDays(1);
+            }
+        }
     }
 }
