@@ -113,6 +113,7 @@ namespace Nextcloud.DataContext
         }
 
         public async void StoreCalendarEventAsync(CalendarEvent newOrUpdatedCalendarEvent) {
+            await GetConnectionAsync().InsertOrReplaceAllAsync(newOrUpdatedCalendarEvent.RecurrenceRules);
             await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedCalendarEvent);
         }
 

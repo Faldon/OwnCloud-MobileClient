@@ -11,6 +11,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 using Nextcloud.Extensions;
 using System.Collections.Generic;
+using Windows.Foundation;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -29,6 +30,7 @@ namespace Nextcloud.View
         private DateTime _lastDayOfCalendarMonth;
         private Dictionary<int, StackPanel> _dayPanels = new Dictionary<int, StackPanel>();
         private Color PhoneAccentColor;
+        private Point initialPoint;
 
         public DateTime SelectedDate
         {
@@ -40,22 +42,27 @@ namespace Nextcloud.View
         }
 
         // Using a DependencyProperty as the backing store for SelectedDate.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register("SelectedDate", typeof(DateTime), typeof(CalendarPage), new PropertyMetadata(DateTime.MinValue, OnSelectedDateChanged));
+        public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register("SelectedDate", typeof(DateTime), typeof(CalendarPage), new PropertyMetadata(DateTime.MinValue, OnSelectedDateChange));
 
-        private static void OnSelectedDateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e) {
-            //(sender as CalendarPage).SelectedDateChanged(e);
+        private static void OnSelectedDateChange(DependencyObject sender, DependencyPropertyChangedEventArgs e) {
+            (sender as CalendarPage).SelectedDateChanged(e);
         }
 
         private void SelectedDateChanged(DependencyPropertyChangedEventArgs e) {
-            //OnDateChanging();
-            //if ((DateTime)e.OldValue == DateTime.MinValue) {
-            //    _firstDayOfCalendarMonth = ((DateTime)e.NewValue).FirstOfMonth().FirstDayOfWeek().Date;
-            //    _lastDayOfCalendarMonth = ((DateTime)e.NewValue).LastOfMonth().LastDayOfWeek().AddDays(1);
-            //}
+            CurrentYear.Text = SelectedDate.Year.ToString();
+            CurrentMonth.Text = SelectedDate.ToString("MMMM");
+            NextMonth.Text = SelectedDate.AddMonths(1).ToString("MMMM");
+            OnDateChanging();
+            if ((DateTime)e.OldValue == DateTime.MinValue) {
+                _firstDayOfCalendarMonth = ((DateTime)e.NewValue).FirstOfMonth().FirstDayOfWeek().Date;
+                _lastDayOfCalendarMonth = ((DateTime)e.NewValue).LastOfMonth().LastDayOfWeek().AddDays(1);
+            }
 
-            //if ((DateTime)e.NewValue > (DateTime)e.OldValue)
-            //    this.SlideLeftBegin.Begin();
-            //else this.SlideRightBegin.Begin();
+            if ((DateTime)e.NewValue > (DateTime)e.OldValue) {
+                this.SlideLeftBegin.Begin();
+            } else {
+                this.SlideRightBegin.Begin();
+            }
         }
 
         public CalendarPage() {
@@ -144,7 +151,7 @@ namespace Nextcloud.View
         #endregion
 
         public void ChangeDate() {
-            //OnDateChanged();
+            OnDateChanged();
 
             _firstDayOfCalendarMonth = SelectedDate.FirstOfMonth().FirstDayOfWeek().Date;
             _lastDayOfCalendarMonth = SelectedDate.LastOfMonth().LastDayOfWeek().AddDays(1);
@@ -174,13 +181,9 @@ namespace Nextcloud.View
                     DateTime fieldDate = firstDay.AddDays((j * 7) + i);
 
                     Color dayIndicatorColor = Colors.White;
-                    //SolidColorBrush indicatorBrush = new SolidColorBrush(Colors.White);
                     if (fieldDate.Date == DateTime.Now.Date) {
-                        //var a = Application.Current.Resources.ThemeDictionaries.Keys;
                         dayIndicatorColor = PhoneAccentColor;
-                       // indicatorBrush = (SolidColorBrush)GrdDayIndicator.Background;
                     } else if (fieldDate.Month != SelectedDate.Month) {
-                        //indicatorBrush.Color = Colors.Gray;
                         dayIndicatorColor = Colors.Gray;
                     }
 
@@ -239,6 +242,57 @@ namespace Nextcloud.View
                 GrdCalendarLines.Children.Add(dayBlock);
 
                 targetDate = targetDate.AddDays(1);
+            }
+        }
+
+        private void SlideLeftBegin_OnCompleted(object sender, object e) {
+            ChangeDate();
+            SlideLeftEnd.Begin();
+        }
+
+        private void SlideRightBegin_OnCompleted(object sender, object e) {
+            ChangeDate();
+            SlideRightEnd.Begin();
+        }
+
+        #region Private events
+
+        private void OnFlick() {
+
+        }
+
+        #endregion
+
+        #region public events
+
+        private void OnDateChanging() {
+            if (DateChanging != null)
+                DateChanging(this, new RoutedEventArgs());
+        }
+        public event RoutedEventHandler DateChanging;
+
+        private void OnDateChanged() {
+            if (DateChanged != null)
+                DateChanged(this, new RoutedEventArgs());
+        }
+        public event RoutedEventHandler DateChanged;
+
+        #endregion
+
+        private void ContentRoot_ManipulationStarted(object sender, Windows.UI.Xaml.Input.ManipulationStartedRoutedEventArgs e) {
+            initialPoint = e.Position;
+        }
+
+        private void ContentRoot_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e) {
+            if(e.IsInertial) {
+                if(e.Position.X - initialPoint.X >= 300) {
+                    SelectedDate = SelectedDate.AddMonths(-1);
+                    e.Complete();
+                }
+                else if (initialPoint.X - e.Position.X >= 300) {
+                    SelectedDate = SelectedDate.AddMonths(1);
+                    e.Complete();
+                }
             }
         }
     }

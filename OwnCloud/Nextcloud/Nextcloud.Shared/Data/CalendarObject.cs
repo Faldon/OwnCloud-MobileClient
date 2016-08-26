@@ -82,6 +82,45 @@ namespace Nextcloud.Data
                         if (kv[0].StartsWith("LOCATION")) {
                             calEvent.Location = kv[1];
                         }
+                        if (kv[0].StartsWith("RRULE")) {
+                            RecurrenceRule rule = new RecurrenceRule();
+                            foreach (string ruleString in kv[1].Split(';')) {
+                                var rrulparam = ruleString.Split('=');
+                                if(rrulparam[0] == "FREQ") {
+                                    rule.Frequency = rrulparam[1];
+                                }
+                                if (rrulparam[0] == "BYDAY") {
+                                    rule.Frequency = rrulparam[1];
+                                }
+                                if (rrulparam[0] == "BYMONTH") {
+                                    rule.Frequency = rrulparam[1];
+                                }
+                                if (rrulparam[0] == "INTERVAL") {
+                                    int parsed;
+                                    if (Int32.TryParse(rrulparam[1], out parsed)) {
+                                        rule.Interval = parsed;
+                                    }
+                                }
+                                if (rrulparam[0] == "COUNT") {
+                                    int parsed;
+                                    if (Int32.TryParse(rrulparam[1], out parsed)) {
+                                        rule.Count = parsed;
+                                    }
+                                }
+                                if (rrulparam[0] == "UNTIL") {
+                                    DateTime until;
+                                    if (DateTime.TryParseExact(rrulparam[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.None, out until)) {
+                                        rule.Until = until;
+                                    }
+                                }
+                            };
+
+                            var inDatabase = calEvent.RecurrenceRules.Find(r => r.ByDay == rule.ByDay && r.ByMonth == rule.ByMonth && r.Interval == rule.Interval && r.Count == rule.Count && r.Frequency == rule.Frequency && r.Until == rule.Until);
+                            if (inDatabase == null) {
+                                rule.CalendarEvent = calEvent;
+                                calEvent.RecurrenceRules.Add(rule);
+                            }
+                        }
                     }
                     App.GetDataContext().StoreCalendarEventAsync(calEvent);
                 } catch (ArgumentNullException ex) {

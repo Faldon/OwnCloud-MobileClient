@@ -147,8 +147,7 @@ namespace Nextcloud.ViewModel
                     }
                 }
                 App.GetDataContext().GetConnection().GetChildren(_calendar, recursive: true);
-                EventCollection.Clear();
-                EventCollection.Concat(CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
+                EventCollection = new ObservableCollection<CalendarEvent>(CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
             }
         }
     }
