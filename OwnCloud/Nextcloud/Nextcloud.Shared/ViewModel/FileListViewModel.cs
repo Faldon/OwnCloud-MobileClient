@@ -119,7 +119,7 @@ namespace Nextcloud.ViewModel
         {
             _account = account;
             _currentPath = "/";
-            _fileCollection = new ObservableCollection<File>();
+            _fileCollection = new ObservableCollection<File>(_account.Files);
             IsFetching = false;
         }
 
@@ -130,13 +130,13 @@ namespace Nextcloud.ViewModel
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             NetworkCredential cred = await _account.GetCredential();
             var webdav = new WebDAV(_account.GetWebDAVRoot(), cred);
-            FileCollection.Clear();            
             webdav.StartRequest(DAVRequestHeader.CreateListing(_currentPath), DAVRequestBody.CreateAllPropertiesListing(), null, FetchingComplete);
         }
 
         private async void FetchingComplete(DAVRequestResult result, object userObj)
         {
             if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured && result.Items.Count > 0) {
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => FileCollection.Clear());
                 bool _firstItem = false;
                 foreach (DAVRequestResult.Item item in result.Items) {
                     File fileItem = new File()

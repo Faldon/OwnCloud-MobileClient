@@ -11,7 +11,12 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 using Nextcloud.Extensions;
 using System.Collections.Generic;
+using System.Linq;
 using Windows.Foundation;
+using System.Collections.Specialized;
+using Nextcloud.Shared.Converter;
+using SQLiteNetExtensions.Extensions;
+using System.ComponentModel;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -111,7 +116,171 @@ namespace Nextcloud.View
             } else {
                 LayoutRoot.DataContext = new CalendarViewModel(dataModel);
             }
-            ChangeDate();
+            (LayoutRoot.DataContext as CalendarViewModel).PropertyChanged += OnPropertyChanged;
+            //ChangeDate();
+        }
+
+        private async void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == "EventCollection") {
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => ChangeDate());
+            }
+        }
+
+        private void PutEvents() {
+            //if(e.PropertyName == "EventCollection") {
+                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => GrdAppointments.Children.Clear());
+                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => _dayPanels.Clear());
+                var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate >= _firstDayOfCalendarMonth && q.StartDate <= _lastDayOfCalendarMonth) || (q.IsRecurringEvent && q.StartDate <= _lastDayOfCalendarMonth)).ToList();
+                foreach (CalendarEvent calendarEvent in events) {
+                    App.GetDataContext().GetConnection().GetChildren(calendarEvent, recursive: true);
+                    App.GetDataContext().GetConnection().GetChildren(calendarEvent.CalendarObject, recursive: true);
+                var currentDate = calendarEvent.StartDate.Date;
+                    var endDate = calendarEvent.EndDate.Date;
+
+                    if (calendarEvent.IsRecurringEvent) {
+                        //foreach(RecurrenceRule rrule in calendarEvent.RecurrenceRules) {
+                        //    string rFrequency = (string)rRules.Single(r => r.Key == "FREQ").Value;
+                        //    int rInterval = (int)rRules.Single(r => r.Key == "INTERVAL").Value;
+                        //    DateTime rEnd = ((string)rRules.SingleOrDefault(r => r.Key == "UNTIL").Key == "UNTIL") ? Convert.ToDateTime(rRules.Single(r => r.Key == "UNTIL").Value) : DateTime.MaxValue;
+                        //    int rCount = (string)rRules.SingleOrDefault(r => r.Key == "COUNT").Key == "COUNT" ? (int)rRules.Single(r => r.Key == "COUNT").Value : 0;
+
+                        //    if((int)rrule.Count > 0) {
+
+                        //    }
+
+                        //    if (rCount == 0 && rEnd < _firstDayOfCalendarMonth) { continue; } else if (rCount > 0) {
+                        //        for (var i = 0; i < rCount; i++) {
+                        //            switch (rFrequency) {
+                        //                case "DAILY":
+                        //                    currentDate = calendarEvent.StartDate.Date.AddDays(i * rInterval);
+                        //                    endDate = calendarEvent.EndDate.Date.AddDays(i * rInterval);
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                    break;
+                        //                case "WEEKLY":
+                        //                    currentDate = calendarEvent.StartDate.Date.AddDays(i * rInterval * 7);
+                        //                    endDate = calendarEvent.EndDate.Date.AddDays(i * rInterval * 7);
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                    break;
+                        //                case "MONTHLY":
+                        //                    currentDate = calendarEvent.StartDate.Date.AddMonths(i * rInterval);
+                        //                    endDate = calendarEvent.EndDate.Date.AddMonths(i * rInterval);
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                    break;
+                        //                case "YEARLY":
+                        //                    currentDate = calendarEvent.StartDate.Date.AddYears(i * rInterval);
+                        //                    endDate = calendarEvent.EndDate.Date.AddYears(i * rInterval);
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                    break;
+                        //            }
+                        //        }
+                        //    } else if (rEnd > _firstDayOfCalendarMonth) {
+                        //        switch (rFrequency) {
+                        //            case "DAILY":
+                        //                currentDate = currentDate.AddDays((_firstDayOfCalendarMonth - currentDate).TotalDays + (_firstDayOfCalendarMonth - currentDate).TotalDays % rInterval);
+                        //                endDate = endDate.AddDays((_firstDayOfCalendarMonth - endDate).TotalDays + (_firstDayOfCalendarMonth - endDate).TotalDays % rInterval);
+                        //                while (currentDate < calendarEvent.StartDate) {
+                        //                    currentDate = currentDate.AddDays(rInterval);
+                        //                    endDate = endDate.AddDays(rInterval);
+                        //                }
+                        //                while (currentDate <= rEnd && currentDate <= _lastDayOfCalendarMonth) {
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                    currentDate = currentDate.AddDays(rInterval);
+                        //                    endDate = endDate.AddDays(rInterval);
+                        //                }
+                        //                break;
+                        //            case "WEEKLY":
+                        //                currentDate = calendarEvent.StartDate;
+                        //                endDate = calendarEvent.EndDate;
+                        //                while (currentDate <= _firstDayOfCalendarMonth) {
+                        //                    currentDate = currentDate.AddDays(7 * rInterval);
+                        //                    endDate = endDate.AddDays(7 * rInterval);
+                        //                }
+                        //                while (currentDate <= rEnd && currentDate <= _lastDayOfCalendarMonth) {
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                    currentDate = currentDate.AddDays(7 * rInterval);
+                        //                    endDate = endDate.AddDays(7 * rInterval);
+                        //                }
+                        //                break;
+                        //            case "MONTHLY":
+                        //                currentDate = calendarEvent.StartDate;
+                        //                endDate = calendarEvent.EndDate;
+                        //                while (currentDate.Date < SelectedDate.Date) {
+                        //                    currentDate = currentDate.AddMonths(rInterval);
+                        //                    endDate = endDate.AddMonths(rInterval);
+                        //                }
+                        //                if (currentDate <= rEnd && currentDate >= _firstDayOfCalendarMonth && currentDate <= _lastDayOfCalendarMonth) {
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                }
+                        //                break;
+                        //            case "YEARLY":
+                        //                currentDate = calendarEvent.StartDate;
+                        //                endDate = calendarEvent.EndDate;
+                        //                while (currentDate.Year < SelectedDate.Year) {
+                        //                    currentDate = currentDate.AddYears(rInterval);
+                        //                    endDate = endDate.AddYears(rInterval);
+                        //                }
+                        //                if (currentDate <= rEnd && currentDate >= _firstDayOfCalendarMonth && currentDate <= _lastDayOfCalendarMonth) {
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                }
+                        //                break;
+                        //        }
+                        //    } else if (rCount == 0 && rEnd == DateTime.MaxValue) {
+                        //        switch (rFrequency) {
+                        //            case "DAILY":
+                        //                currentDate = currentDate.AddDays((_firstDayOfCalendarMonth - currentDate).TotalDays + (_firstDayOfCalendarMonth - currentDate).TotalDays % rInterval);
+                        //                endDate = endDate.AddDays((_firstDayOfCalendarMonth - endDate).TotalDays + (_firstDayOfCalendarMonth - endDate).TotalDays % rInterval);
+                        //                while (currentDate < calendarEvent.StartDate) {
+                        //                    currentDate = currentDate.AddDays(rInterval);
+                        //                    endDate = endDate.AddDays(rInterval);
+                        //                }
+                        //                while (currentDate <= _lastDayOfCalendarMonth) {
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                    currentDate = currentDate.AddDays(rInterval);
+                        //                    endDate = endDate.AddDays(rInterval);
+                        //                }
+                        //                break;
+                        //            case "WEEKLY":
+                        //                currentDate = calendarEvent.StartDate;
+                        //                endDate = calendarEvent.EndDate;
+                        //                while (currentDate < _firstDayOfCalendarMonth) {
+                        //                    currentDate = currentDate.AddDays(7 * rInterval);
+                        //                    endDate = endDate.AddDays(7 * rInterval);
+                        //                }
+                        //                while (currentDate <= _lastDayOfCalendarMonth) {
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                    currentDate = currentDate.AddDays(7 * rInterval);
+                        //                    endDate = endDate.AddDays(7 * rInterval);
+                        //                }
+                        //                break;
+                        //            case "MONTHLY":
+                        //                while (currentDate.Date < SelectedDate.Date) {
+                        //                    currentDate = currentDate.AddMonths(rInterval);
+                        //                    endDate = endDate.AddMonths(rInterval);
+                        //                }
+                        //                if (currentDate >= _firstDayOfCalendarMonth && currentDate <= _lastDayOfCalendarMonth) {
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                }
+                        //                break;
+                        //            case "YEARLY":
+                        //                currentDate = calendarEvent.StartDate;
+                        //                endDate = calendarEvent.EndDate;
+                        //                while (currentDate.Year < SelectedDate.Year) {
+                        //                    currentDate = currentDate.AddYears(rInterval);
+                        //                    endDate = endDate.AddYears(rInterval);
+                        //                }
+                        //                if (currentDate >= _firstDayOfCalendarMonth && currentDate <= _lastDayOfCalendarMonth) {
+                        //                    PutSingleEvent(calendarEvent, currentDate, endDate);
+                        //                }
+                        //                break;
+                        //        }
+                        //    }
+                        //}
+                    } else {
+                        PutSingleEvent(calendarEvent, currentDate, endDate);
+                    }
+                }
+            //}
+
         }
 
         /// <summary>
@@ -155,9 +324,16 @@ namespace Nextcloud.View
 
             _firstDayOfCalendarMonth = SelectedDate.FirstOfMonth().FirstDayOfWeek().Date;
             _lastDayOfCalendarMonth = SelectedDate.LastOfMonth().LastDayOfWeek().AddDays(1);
-
             _weekCount = SelectedDate.GetMonthCount();
+
             ResetGridLines();
+
+            //Delete displayed events
+            GrdAppointments.Children.Clear();
+            _dayPanels.Clear();
+
+            //Insert new events
+            PutEvents();
 
             //Dispatcher.BeginInvoke(new Action(() => RefreshAppointments()));
         }
@@ -243,6 +419,54 @@ namespace Nextcloud.View
 
                 targetDate = targetDate.AddDays(1);
             }
+        }
+
+        private void PutSingleEvent(CalendarEvent calendarEvent, DateTime currentDate, DateTime endDate) {
+            if (endDate == currentDate)
+                endDate = endDate.AddSeconds(1);
+
+            while (currentDate < endDate) {
+                StackPanel dPanel = GetDayStackPanel(currentDate);
+
+                if (dPanel == null) { currentDate = currentDate.AddDays(1); continue; }
+                var converter = new HexcodeColorConverter();
+                SolidColorBrush color = (SolidColorBrush)converter.Convert(calendarEvent.CalendarObject.Calendar.Color, null, null, null);
+
+                var rect = new Rectangle {
+                    Name = calendarEvent.CalendarObjectId.ToString() + "_" + calendarEvent.CalendarEventId.ToString() + "_" + currentDate.ToString(),
+                    Fill = color,
+                    Width = GrdAppointments.ColumnDefinitions[0].ActualWidth * 0.35,
+                    Height = 2.5,
+                    RadiusX = 1.5,
+                    RadiusY = 1.5,
+                    Margin = new Thickness(0, 3, 5, 0),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Visibility = Visibility.Visible
+                };
+                dPanel.Children.Add(rect);
+                currentDate = currentDate.AddDays(1);
+                GrdAppointments.UpdateLayout();
+            }
+
+        }
+
+        private StackPanel GetDayStackPanel(DateTime date) {
+            if (date < _firstDayOfCalendarMonth || date > _lastDayOfCalendarMonth) {
+                return null;
+            }
+            int sIndex = (int)(date.Date - _firstDayOfCalendarMonth).TotalDays;
+
+            if (_dayPanels.ContainsKey(sIndex)) {
+                return _dayPanels[sIndex];
+            }
+            StackPanel newSPanel = new StackPanel();
+            newSPanel.Orientation = Orientation.Vertical;
+            Grid.SetColumn(newSPanel, sIndex % 7);
+            Grid.SetRow(newSPanel, sIndex / 7 + 1);
+            GrdAppointments.Children.Add(newSPanel);
+            _dayPanels[sIndex] = newSPanel;
+
+            return newSPanel;
         }
 
         private void SlideLeftBegin_OnCompleted(object sender, object e) {

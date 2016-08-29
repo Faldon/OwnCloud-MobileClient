@@ -14,6 +14,7 @@ namespace Nextcloud.ViewModel
     {
         private CoreDispatcher dispatcher;
         private ObservableCollection<Calendar> _calendarCollection;
+        private int _calendarsToSync;
         public ObservableCollection<Calendar> CalendarCollection
         {
             get
@@ -82,6 +83,7 @@ namespace Nextcloud.ViewModel
 
         public async void FetchCalendarObjectsAsync() {
             IsFetching = true;
+            _calendarsToSync = 0;
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             List<Account> accountList = CalendarCollection.Select(c => c.Account).Distinct().ToList();
             foreach(Account account in accountList) {
@@ -89,6 +91,7 @@ namespace Nextcloud.ViewModel
                 NetworkCredential cred = await account.GetCredential();
                 var webdav = new WebDAV(new Uri(account.Server.Protocol + "://" + account.Server.FQDN, UriKind.Absolute), cred);
                 foreach (Calendar calendar in CalendarCollection.Where(c => c.AccountId == account.AccountId).ToList()) {
+                    _calendarsToSync++;
                     webdav.StartRequest(DAVRequestHeader.CreateReport(calendar.Path), DAVRequestBody.CreateCondensedCalendarRequest(), calendar, OnFetchCalendarObjectsAsyncComplete);
                 }
             }
@@ -147,7 +150,11 @@ namespace Nextcloud.ViewModel
                     }
                 }
                 App.GetDataContext().GetConnection().GetChildren(_calendar, recursive: true);
-                EventCollection = new ObservableCollection<CalendarEvent>(CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
+                if(--_calendarsToSync == 0) {
+                    //var events = await App.GetDataContext().GetConnectionAsync().Table<CalendarEvent>().ToListAsync();
+                    EventCollection = new ObservableCollection<CalendarEvent>(App.GetDataContext().GetConnection().Table<CalendarEvent>().ToList());
+                    NotifyPropertyChanged("EventCollection");
+                }
             }
         }
     }

@@ -10,7 +10,7 @@ namespace Nextcloud.Extensions
         public static void SetGridRows(this Grid target, int count) {
             target.RowDefinitions.Clear();
             for (int i = 0; i < count; i++) {
-                target.RowDefinitions.Add(new RowDefinition());
+                target.RowDefinitions.Add(new RowDefinition() { Height = new Windows.UI.Xaml.GridLength(target.ActualWidth / 7) });
             }
         }
 

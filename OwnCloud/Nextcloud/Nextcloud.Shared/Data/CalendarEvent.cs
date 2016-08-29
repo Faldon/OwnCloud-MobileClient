@@ -44,5 +44,11 @@ namespace Nextcloud.Data
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<RecurrenceRule> RecurrenceRules { get; set; }
+
+        [Ignore]
+        public bool IsRecurringEvent
+        {
+            get { return RecurrenceRules != null && RecurrenceRules.Count > 0; }
+        }
     }
 }
