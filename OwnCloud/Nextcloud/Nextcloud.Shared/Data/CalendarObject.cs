@@ -52,22 +52,31 @@ namespace Nextcloud.Data
                         var kv = data.Split(new char[] { ':' }, 2);
                         if(kv[0].StartsWith("DTSTART")) {
                             DateTime startDate;
-                            DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.None, out startDate);
+                            DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.AdjustToUniversal, out startDate);
+                            List<string> dtStartParams = kv[0].Split(';').ToList();
+                            foreach (string dtStartParam in dtStartParams) {
+                                if (dtStartParam.IndexOf("TZID=") > -1) {
+                                    var tz = dtStartParam.Split('=')[1];
+#if DEBUG
+                                    tz = "Europe/Moscow";
+#endif
+                                }
+                            };
                             calEvent.StartDate = startDate;
                         }
                         if (kv[0].StartsWith("DTEND")) {
                             DateTime endDate;
-                            DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.None, out endDate);
+                            DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.AdjustToUniversal, out endDate);
                             calEvent.EndDate = endDate;
                         }
                         if (kv[0].StartsWith("CREATED")) {
                             DateTime created;
-                            DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.None, out created);
+                            DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.AdjustToUniversal, out created);
                             calEvent.EventCreated = created;
                         }
                         if (kv[0].StartsWith("LAST-MODIFIED")) {
                             DateTime modified;
-                            DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.None, out modified);
+                            DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.AdjustToUniversal, out modified);
                             calEvent.EventLastModified = modified;
                         }
                         if (kv[0].StartsWith("DURATION")) {
@@ -109,7 +118,7 @@ namespace Nextcloud.Data
                                 }
                                 if (rrulparam[0] == "UNTIL") {
                                     DateTime until;
-                                    if (DateTime.TryParseExact(rrulparam[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.None, out until)) {
+                                    if (DateTime.TryParseExact(rrulparam[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.AdjustToUniversal, out until)) {
                                         rule.Until = until;
                                     }
                                 }
@@ -144,7 +153,8 @@ namespace Nextcloud.Data
         private static String[] DateTimeFormats = {
             "yyyyMMddTHHmmssZ",
             "yyyyMMddTHHmmss",
-            "yyyyMMdd"
+            "yyyyMMdd",
+            "yyyyMMddTHHmmssZzzz"
         };
     }
 }
