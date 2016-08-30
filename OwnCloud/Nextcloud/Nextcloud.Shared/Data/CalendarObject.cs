@@ -57,11 +57,18 @@ namespace Nextcloud.Data
                             foreach (string dtStartParam in dtStartParams) {
                                 if (dtStartParam.IndexOf("TZID=") > -1) {
                                     var tz = dtStartParam.Split('=')[1];
-#if DEBUG
-                                    tz = "Europe/Moscow";
-#endif
-                                }
-                            };
+                                    var cal = new Windows.Globalization.Calendar(new[] { "en-US" }, "GregorianCalendar", "24HourClock", tz);
+                                    cal.SetDateTime(new DateTimeOffset(startDate));
+
+                                    // Can't use cal.GetDateTime() because it always uses the local time zone.
+                                    // Instead, get the local time from the calendar properties and use it to calculate the offset manually.
+                                    var dt = new DateTime(cal.Year, cal.Month, cal.Day, cal.Hour, cal.Minute, cal.Second).AddTicks(cal.Nanosecond / 100);
+                                    TimeSpan offset = dt - startDate.ToUniversalTime();
+                                    DateTimeOffset d = new DateTimeOffset(startDate, offset);
+
+                                    startDate = new DateTime(d.UtcDateTime.Ticks, DateTimeKind.Utc);
+                                };
+                            }
                             calEvent.StartDate = startDate;
                         }
                         if (kv[0].StartsWith("DTEND")) {

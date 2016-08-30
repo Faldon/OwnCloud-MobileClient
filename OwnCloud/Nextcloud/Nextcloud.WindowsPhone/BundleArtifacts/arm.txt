@@ -1,0 +1,4 @@
+MainPackage=C:\Users\faldon\Documents\GitHubVisualStudio\OwnCloud-MobileClient\OwnCloud\Nextcloud\Nextcloud.WindowsPhone\bin\ARM\Release\Nextcloud.WindowsPhone_1.1.0.0_ARM.appx
+SymbolPackage=C:\Users\faldon\Documents\GitHubVisualStudio\OwnCloud-MobileClient\OwnCloud\Nextcloud\Nextcloud.WindowsPhone\AppPackages\Nextcloud.WindowsPhone_1.1.0.0_Test\Nextcloud.WindowsPhone_1.1.0.0_ARM.appxsym
+ResourcePack=C:\Users\faldon\Documents\GitHubVisualStudio\OwnCloud-MobileClient\OwnCloud\Nextcloud\Nextcloud.WindowsPhone\bin\ARM\Release\Nextcloud.WindowsPhone_1.1.0.0_scale-100.appx
+ResourcePack=C:\Users\faldon\Documents\GitHubVisualStudio\OwnCloud-MobileClient\OwnCloud\Nextcloud\Nextcloud.WindowsPhone\bin\ARM\Release\Nextcloud.WindowsPhone_1.1.0.0_scale-140.appx

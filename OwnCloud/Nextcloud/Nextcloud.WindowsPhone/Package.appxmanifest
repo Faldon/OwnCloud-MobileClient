@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="5bda5fe7-80bc-4680-9980-4ae90454f2e8" Publisher="CN=thopu" Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="5bda5fe7-80bc-4680-9980-4ae90454f2e8" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="48208pWare.CloudStore" Publisher="CN=54C66771-0DAE-40FB-BFB8-163361F3BD8F" Version="1.1.0.0" />
+  <mp:PhoneIdentity PhoneProductId="b95a2ed8-528f-44dc-8d81-50e51e4df994" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>Nextcloud.WindowsPhone</DisplayName>
-    <PublisherDisplayName>thopu</PublisherDisplayName>
+    <DisplayName>CloudStore</DisplayName>
+    <PublisherDisplayName>pWare</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Prerequisites>
