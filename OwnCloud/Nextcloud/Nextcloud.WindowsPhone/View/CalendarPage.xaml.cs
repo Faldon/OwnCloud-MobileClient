@@ -134,8 +134,8 @@ namespace Nextcloud.View
                 foreach (CalendarEvent calendarEvent in events) {
                     App.GetDataContext().GetConnection().GetChildren(calendarEvent, recursive: true);
                     App.GetDataContext().GetConnection().GetChildren(calendarEvent.CalendarObject, recursive: true);
-                var currentDate = calendarEvent.StartDate.Date;
-                    var endDate = calendarEvent.EndDate.Date;
+                var currentDate = calendarEvent.StartDate.ToLocalTime().Date;
+                    var endDate = calendarEvent.EndDate.ToLocalTime().Date;
 
                     if (calendarEvent.IsRecurringEvent) {
                         //foreach(RecurrenceRule rrule in calendarEvent.RecurrenceRules) {
