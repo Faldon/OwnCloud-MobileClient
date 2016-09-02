@@ -76,12 +76,11 @@ namespace Nextcloud.ViewModel
             foreach (Calendar cal in CalendarCollection) {
                 App.GetDataContext().GetConnection().GetChildren(cal, true);
             }
-            EventCollection = new ObservableCollection<CalendarEvent>(calendars.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
-            IsFetching = false;
             FetchCalendarObjectsAsync();
         }
 
         public async void FetchCalendarObjectsAsync() {
+            EventCollection = new ObservableCollection<CalendarEvent>(CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
             IsFetching = true;
             _calendarsToSync = 0;
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
@@ -115,10 +114,14 @@ namespace Nextcloud.ViewModel
                     };
                     App.GetDataContext().StoreCalendarObjectAsync(calObj);
                 }
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { SyncDatabaseAsync(_calendar); });
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => SyncDatabaseAsync(_calendar));
             } else {
+                //await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsFetching = false);
+            }
+            if(--_calendarsToSync == 0) {
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsFetching = false);
             }
+            
         }
 
         private async void SyncDatabaseAsync(Calendar calendar) {
@@ -146,15 +149,15 @@ namespace Nextcloud.ViewModel
                         fromDatabase.ETag = item.ETag;
                         fromDatabase.InSync = true;
                         App.GetDataContext().StoreCalendarObjectAsync(fromDatabase);
-                        fromDatabase.ParseCalendarData();
+                        await fromDatabase.ParseCalendarData();
                     }
                 }
                 App.GetDataContext().GetConnection().GetChildren(_calendar, recursive: true);
-                if(--_calendarsToSync == 0) {
-                    //var events = await App.GetDataContext().GetConnectionAsync().Table<CalendarEvent>().ToListAsync();
-                    EventCollection = new ObservableCollection<CalendarEvent>(App.GetDataContext().GetConnection().Table<CalendarEvent>().ToList());
-                    NotifyPropertyChanged("EventCollection");
-                }
+                //if(--_calendarsToSync == 0) {
+                //    //var events = await App.GetDataContext().GetConnectionAsync().Table<CalendarEvent>().ToListAsync();
+                //    EventCollection = new ObservableCollection<CalendarEvent>(App.GetDataContext().GetConnection().Table<CalendarEvent>().ToList());
+                //    NotifyPropertyChanged("EventCollection");
+                //}
             }
         }
     }

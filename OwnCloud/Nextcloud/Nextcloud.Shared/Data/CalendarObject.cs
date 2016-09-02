@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
+using System.Threading.Tasks;
 
 namespace Nextcloud.Data
 {
@@ -33,12 +34,12 @@ namespace Nextcloud.Data
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<CalendarEvent> CalendarEvents { get; set; }
 
-        public void ParseCalendarData() {
+        public async Task ParseCalendarData() {
             List<string> vevents = new List<string>();
             int lastStart = -1;
             while ((lastStart = CalendarData.IndexOf("BEGIN:VEVENT", ++lastStart)) > -1) {
                 int lastEnd = CalendarData.IndexOf("END:VEVENT", lastStart);
-                if(lastEnd > -1) {
+                if (lastEnd > -1) {
                     vevents.Add(CalendarData.Substring(lastStart, lastEnd - lastStart + 10));
                 }
             }
@@ -48,9 +49,9 @@ namespace Nextcloud.Data
                     calEvent.CalendarObject = this;
                     calEvent.CalendarObjectId = (int)CalendarObjectId;
 
-                    foreach(string data in vevent.Split('\n').ToList()) {
+                    foreach (string data in vevent.Split('\n').ToList()) {
                         var kv = data.Split(new char[] { ':' }, 2);
-                        if(kv[0].StartsWith("DTSTART")) {
+                        if (kv[0].StartsWith("DTSTART")) {
                             DateTime startDate;
                             DateTime.TryParseExact(kv[1], DateTimeFormats, null, System.Globalization.DateTimeStyles.AdjustToUniversal, out startDate);
                             List<string> dtStartParams = kv[0].Split(';').ToList();
@@ -102,7 +103,7 @@ namespace Nextcloud.Data
                             RecurrenceRule rule = new RecurrenceRule();
                             foreach (string ruleString in kv[1].Split(';')) {
                                 var rrulparam = ruleString.Split('=');
-                                if(rrulparam[0] == "FREQ") {
+                                if (rrulparam[0] == "FREQ") {
                                     rule.Frequency = rrulparam[1];
                                 }
                                 if (rrulparam[0] == "BYDAY") {
@@ -138,23 +139,12 @@ namespace Nextcloud.Data
                             }
                         }
                     }
-                    App.GetDataContext().StoreCalendarEventAsync(calEvent);
+                    calEvent.InSync = true;
+                    await App.GetDataContext().StoreCalendarEventAsync(calEvent);
                 } catch (ArgumentNullException ex) {
                     continue;
                 }
             }
-            //int start = CalendarData.IndexOf("BEGIN:VEVENT");
-            //int end = CalendarData.IndexOf("END:VEVENT");
-            //if(start == end) {
-            //    return;
-            //}
-            //CalendarData = calendarData.Substring(start, end-start);
-            //var data = CalendarData.Split('\n');
-            //foreach(string s in data) {
-            //    var line = s.Split(':');
-            //    //if(line[0].StartsWith("UID")) { EventUID = line[1]; }
-            //    //if (line[0].StartsWith("CREATED")) { EventCreated = DateTime.Parse(line[1]); }
-            //}
         }
 
         private static String[] DateTimeFormats = {

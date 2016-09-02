@@ -369,7 +369,7 @@ namespace Nextcloud.ViewModel
                     inCollection.NotifyPropertyChanged("IsDownloaded");
                 };
             }
-            App.GetDataContext().UpdateFilesAsync(FileCollection.ToList());
+            await App.GetDataContext().UpdateFilesAsync(FileCollection.ToList());
             _account = await App.GetDataContext().LoadAccountAsync(_account.AccountId);
         }
     }

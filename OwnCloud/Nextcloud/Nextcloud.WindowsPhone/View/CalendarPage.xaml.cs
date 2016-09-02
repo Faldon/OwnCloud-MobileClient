@@ -121,8 +121,13 @@ namespace Nextcloud.View
         }
 
         private async void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == "EventCollection") {
-                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => ChangeDate());
+            //if (e.PropertyName == "EventCollection") {
+            //    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => PutEvents());
+            //}
+            if (e.PropertyName == "IsFetching") {
+                if(!(LayoutRoot.DataContext as CalendarViewModel).IsFetching) {
+                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => PutEvents());
+                }
             }
         }
 
@@ -422,9 +427,10 @@ namespace Nextcloud.View
         }
 
         private void PutSingleEvent(CalendarEvent calendarEvent, DateTime currentDate, DateTime endDate) {
-            if (endDate == currentDate)
+            if (endDate == currentDate) {
                 endDate = endDate.AddSeconds(1);
-
+            }
+                
             while (currentDate < endDate) {
                 StackPanel dPanel = GetDayStackPanel(currentDate);
 
@@ -443,7 +449,12 @@ namespace Nextcloud.View
                     HorizontalAlignment = HorizontalAlignment.Right,
                     Visibility = Visibility.Visible
                 };
-                dPanel.Children.Add(rect);
+                try {
+                    dPanel.Children.Add(rect);
+                } catch (System.ArgumentException e) {
+                    currentDate = currentDate.AddDays(1);
+                    continue;
+                }
                 currentDate = currentDate.AddDays(1);
                 GrdAppointments.UpdateLayout();
             }

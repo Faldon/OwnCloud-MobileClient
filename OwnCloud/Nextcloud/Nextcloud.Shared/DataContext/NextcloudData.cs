@@ -112,12 +112,17 @@ namespace Nextcloud.DataContext
             await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedCalendarObject);
         }
 
-        public async void StoreCalendarEventAsync(CalendarEvent newOrUpdatedCalendarEvent) {
+        public void StoreCalendarEvent(CalendarEvent newOrUpdatedCalendarEvent) {
+            connection.InsertOrReplaceAll(newOrUpdatedCalendarEvent.RecurrenceRules);
+            connection.InsertOrReplaceWithChildren(newOrUpdatedCalendarEvent, recursive: true);
+        }
+
+        public async Task StoreCalendarEventAsync(CalendarEvent newOrUpdatedCalendarEvent) {
             await GetConnectionAsync().InsertOrReplaceAllAsync(newOrUpdatedCalendarEvent.RecurrenceRules);
             await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedCalendarEvent);
         }
 
-        public async void UpdateFilesAsync(List<File> filesToUpdate) {
+        public async Task UpdateFilesAsync(List<File> filesToUpdate) {
             await GetConnectionAsync().InsertOrReplaceAllAsync(filesToUpdate);
         }
 
