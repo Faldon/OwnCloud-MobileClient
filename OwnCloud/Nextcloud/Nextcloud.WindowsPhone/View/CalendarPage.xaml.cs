@@ -17,6 +17,7 @@ using System.Collections.Specialized;
 using Nextcloud.Shared.Converter;
 using SQLiteNetExtensions.Extensions;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -72,13 +73,13 @@ namespace Nextcloud.View
 
         public CalendarPage() {
             this.InitializeComponent();
-            PhoneAccentColor = (GrdDayIndicator.Background as SolidColorBrush).Color;
-            GrdDayIndicator.Background = null;
-            SelectedDate = DateTime.Now;
-
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
+
+            PhoneAccentColor = (GrdDayIndicator.Background as SolidColorBrush).Color;
+            GrdDayIndicator.Background = null;
+            SelectedDate = DateTime.Now.Date;
         }
 
         /// <summary>
@@ -124,11 +125,11 @@ namespace Nextcloud.View
             //if (e.PropertyName == "EventCollection") {
             //    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => PutEvents());
             //}
-            if (e.PropertyName == "IsFetching") {
-                if(!(LayoutRoot.DataContext as CalendarViewModel).IsFetching) {
-                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => PutEvents());
-                }
-            }
+            //if (e.PropertyName == "IsFetching") {
+            //    if(!(LayoutRoot.DataContext as CalendarViewModel).IsFetching) {
+            //        await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => PutEvents());
+            //    }
+            //}
         }
 
         private void PutEvents() {
@@ -339,8 +340,6 @@ namespace Nextcloud.View
 
             //Insert new events
             PutEvents();
-
-            //Dispatcher.BeginInvoke(new Action(() => RefreshAppointments()));
         }
 
         private void ResetGridLines() {
@@ -434,14 +433,16 @@ namespace Nextcloud.View
             while (currentDate < endDate) {
                 StackPanel dPanel = GetDayStackPanel(currentDate);
 
-                if (dPanel == null) { currentDate = currentDate.AddDays(1); continue; }
+                if (dPanel == null) {
+                    currentDate = currentDate.AddDays(1); continue;
+                }
                 var converter = new HexcodeColorConverter();
                 SolidColorBrush color = (SolidColorBrush)converter.Convert(calendarEvent.CalendarObject.Calendar.Color, null, null, null);
 
                 var rect = new Rectangle {
                     Name = calendarEvent.CalendarObjectId.ToString() + "_" + calendarEvent.CalendarEventId.ToString() + "_" + currentDate.ToString(),
                     Fill = color,
-                    Width = GrdAppointments.ColumnDefinitions[0].ActualWidth * 0.35,
+                    Width = (GrdAppointments.ActualWidth / 7) * 0.35,
                     Height = 2.5,
                     RadiusX = 1.5,
                     RadiusY = 1.5,
@@ -451,12 +452,13 @@ namespace Nextcloud.View
                 };
                 try {
                     dPanel.Children.Add(rect);
+                    dPanel.UpdateLayout();
                 } catch (System.ArgumentException e) {
-                    currentDate = currentDate.AddDays(1);
-                    continue;
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+#endif
                 }
                 currentDate = currentDate.AddDays(1);
-                GrdAppointments.UpdateLayout();
             }
 
         }
