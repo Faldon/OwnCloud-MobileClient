@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Windows.Globalization.DateTimeFormatting;
 
 namespace Nextcloud.Extensions
 {
@@ -52,6 +53,13 @@ namespace Nextcloud.Extensions
 
         public static DateTime CombineWithTime(this DateTime date, DateTime time) {
             return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, time.Minute, date.Date.Kind);
+        }
+
+        public static string FormatDate(this DateTime date, string formatString) {
+            Windows.Globalization.GeographicRegion userRegion = new Windows.Globalization.GeographicRegion();
+            var formatter = new DateTimeFormatter(formatString, new[] { userRegion.CodeTwoLetter });
+            var formattedDate = formatter.Format(date);
+            return formattedDate;
         }
     }
 }

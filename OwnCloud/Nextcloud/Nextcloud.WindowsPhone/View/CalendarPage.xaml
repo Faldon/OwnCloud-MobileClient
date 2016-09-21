@@ -49,6 +49,71 @@
                 <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="1"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
+        <Style x:Key="PhoneTextExtraSmallStyle" x:Name="PhoneTextExtraSmallStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource PhoneFontFamilyNormal}" />
+            <Setter Property="Foreground" Value="{StaticResource PhoneForegroundBrush}" />
+            <Setter Property="Margin" Value="12,0" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        <Style x:Key="PhoneTextSmallStyle" x:Name="PhoneTextSmallStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource PhoneFontFamilyNormal}" />
+            <Setter Property="Foreground" Value="{StaticResource PhoneForegroundBrush}" />
+            <Setter Property="Margin" Value="12,0" />
+            <Setter Property="FontSize" Value="18.667" />
+        </Style>
+        <DataTemplate x:Key="CalendarEventTemplate">
+            <Grid x:Name="AppointmentGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="Summary"
+                           Text="{Binding Summary}"
+                           Style="{StaticResource PhoneTextExtraSmallStyle}"
+                           Margin="10,0,10,0"
+                           Foreground="{Binding SummaryForeground}"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           Grid.Column="1"
+                           Grid.Row="0" />
+                
+                <TextBlock x:Name="Duration"
+                           Text="{Binding Duration}"
+                           Style="{StaticResource PhoneTextExtraSmallStyle}"
+                           Margin="10,0,10,0"
+                           Foreground="Gray"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           Grid.Column="1"
+                           Grid.Row="1" />
+                <StackPanel Grid.Column="0"
+                            Grid.Row="0"
+                            Grid.RowSpan="{Binding RowSpan}" 
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Rectangle x:Name="FullDayEventIndicator"
+                               Stroke="{Binding FullDayEventIndicatorStroke}"
+                               Fill="{Binding FullDayEventIndicatorFill}"
+                               StrokeThickness="1.0"
+                               Width="10"
+                               Height="30"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center" />
+                    <TextBlock x:Name="StartTime"
+                           Text="{Binding StartTime}"
+                           Style="{StaticResource PhoneTextExtraSmallStyle}"
+                           Margin="10,0,10,0"
+                           Foreground="White"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top" />
+                </StackPanel>
+                
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid x:Name="LayoutRoot">
@@ -82,13 +147,8 @@
                            Style="{ThemeResource HeaderTextBlockStyle}"
                            Margin="10,0,0,5" />
             </StackPanel>
-            <!--<TextBlock x:Uid="CalendarPage_PageTitle" 
-                       Margin="0,-6.5,0,26.5" 
-                       Style="{ThemeResource HeaderTextBlockStyle}" 
-                       CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>-->
         </StackPanel>
 
-        <!--TODO: Content should be placed within the following grid-->
         <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,-20,19,0"
               ManipulationStarted="ContentRoot_ManipulationStarted"
               ManipulationDelta="ContentRoot_ManipulationDelta"
@@ -104,13 +164,24 @@
                 <Grid x:Name="GrdAppointments" />
                 <StackPanel x:Name="DayDetails"
                             Background="Black"
-                            Visibility="Collapsed" >
+                            VerticalAlignment="Top"
+                            Visibility="Collapsed">
                     <TextBlock x:Name="DayDetailsHeader"
                                Margin="5,5,5,5"
                                Style="{StaticResource BaseTextBlockStyle}"
                                FontStretch="Condensed"
                                Text="" />
-                    <StackPanel x:Name="DayAppointmentDetails" Margin="10,0,0,10" />
+                    <ListView 
+                        x:Name="DayAppointmentDetails"
+                        Margin="10,0,0,10"
+                        AutomationProperties.AutomationId="DayAppointmentList"
+                        AutomationProperties.Name="List day appointments"
+                        SelectionMode="None"
+                        IsItemClickEnabled="False"
+                        ItemTemplate="{StaticResource CalendarEventTemplate}"
+                        ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+                    </ListView>
+                    <!--<StackPanel x:Name="DayAppointmentDetails" Margin="10,0,0,10" />-->
                 </StackPanel>
             </Grid>
         </Grid>

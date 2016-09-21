@@ -44,6 +44,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\Utility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountHubViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\AccountViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\CalendarEventViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\CalendarViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\FileListViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\ViewModel.cs" />

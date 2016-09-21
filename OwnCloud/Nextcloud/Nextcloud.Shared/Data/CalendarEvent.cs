@@ -50,5 +50,11 @@ namespace Nextcloud.Data
         {
             get { return RecurrenceRules != null && RecurrenceRules.Count > 0; }
         }
+
+        [Ignore]
+        public bool IsFullDayEvent
+        {
+            get { return StartDate.ToLocalTime().TimeOfDay == new TimeSpan(0, 0, 0) && EndDate.ToLocalTime().TimeOfDay == new TimeSpan(0, 0, 0); }
+        }
     }
 }

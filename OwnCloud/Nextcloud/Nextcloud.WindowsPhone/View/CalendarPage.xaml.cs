@@ -18,6 +18,8 @@ using Nextcloud.Shared.Converter;
 using SQLiteNetExtensions.Extensions;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Input;
+using Windows.Globalization.DateTimeFormatting;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -382,7 +384,7 @@ namespace Nextcloud.View
                         Background = new SolidColorBrush(Colors.Black),
                         Name = fieldDate.ToString()
                     };
-                    //dayOpenControl.Tap += ShowDayDetails;
+                    dayOpenControl.Tapped += ShowDayDetails;
                     Grid.SetColumn(dayOpenControl, i);
                     Grid.SetRow(dayOpenControl, j + 1);
                     GrdCalendarLines.Children.Add(dayOpenControl);
@@ -425,6 +427,31 @@ namespace Nextcloud.View
             }
         }
 
+        private void ShowDayDetails(object sender, TappedRoutedEventArgs e) {
+            StackPanel dPanel = (StackPanel)sender;
+            DateTime fieldDate = DateTime.Parse(dPanel.Name);
+
+            if (DayDetailsHeader.Text == fieldDate.ToLocalTime().FormatDate("year month day")) {
+                DayDetails.Visibility = DayDetails.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                return;
+            }
+            
+            DayDetails.Margin = new Thickness(0, GrdAppointments.RowDefinitions.FirstOrDefault().ActualHeight * GrdAppointments.GetGridRows(), 0, 0);
+            DayDetailsHeader.Text = fieldDate.ToLocalTime().FormatDate("year month day");
+
+            var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate.Date >= fieldDate.Date && q.StartDate.Date <= fieldDate.Date) || (q.IsRecurringEvent && q.StartDate <= fieldDate)).ToList();
+            ObservableCollection<CalendarEventViewModel> appointmentsView = new ObservableCollection<CalendarEventViewModel>(events.Select((calEvent) => new CalendarEventViewModel(calEvent)).ToList());
+            DayAppointmentDetails.ItemsSource = appointmentsView;
+            
+            DayDetails.Visibility = Visibility.Visible;
+        }
+
+        private Brush GetCalendarColor(Calendar calendar) {
+            var converter = new HexcodeColorConverter();
+            SolidColorBrush color = (SolidColorBrush)converter.Convert(calendar.Color, null, null, null);
+            return color;
+        }
+
         private void PutSingleEvent(CalendarEvent calendarEvent, DateTime currentDate, DateTime endDate) {
             if (endDate == currentDate) {
                 endDate = endDate.AddSeconds(1);
@@ -436,12 +463,10 @@ namespace Nextcloud.View
                 if (dPanel == null) {
                     currentDate = currentDate.AddDays(1); continue;
                 }
-                var converter = new HexcodeColorConverter();
-                SolidColorBrush color = (SolidColorBrush)converter.Convert(calendarEvent.CalendarObject.Calendar.Color, null, null, null);
 
                 var rect = new Rectangle {
                     Name = calendarEvent.CalendarObjectId.ToString() + "_" + calendarEvent.CalendarEventId.ToString() + "_" + currentDate.ToString(),
-                    Fill = color,
+                    Fill = GetCalendarColor(calendarEvent.CalendarObject.Calendar),
                     Width = (GrdAppointments.ActualWidth / 7) * 0.35,
                     Height = 2.5,
                     RadiusX = 1.5,
@@ -472,8 +497,12 @@ namespace Nextcloud.View
             if (_dayPanels.ContainsKey(sIndex)) {
                 return _dayPanels[sIndex];
             }
-            StackPanel newSPanel = new StackPanel();
-            newSPanel.Orientation = Orientation.Vertical;
+            StackPanel newSPanel = new StackPanel() {
+                //Name = date.ToLocalTime().Date.ToString(),
+                Orientation = Orientation.Vertical
+            };
+            //newSPanel.Name = date.ToLocalTime().Date.ToString();
+            //newSPanel.Orientation = Orientation.Vertical;
             Grid.SetColumn(newSPanel, sIndex % 7);
             Grid.SetRow(newSPanel, sIndex / 7 + 1);
             GrdAppointments.Children.Add(newSPanel);
@@ -492,16 +521,6 @@ namespace Nextcloud.View
             SlideRightEnd.Begin();
         }
 
-        #region Private events
-
-        private void OnFlick() {
-
-        }
-
-        #endregion
-
-        #region public events
-
         private void OnDateChanging() {
             if (DateChanging != null)
                 DateChanging(this, new RoutedEventArgs());
@@ -513,8 +532,6 @@ namespace Nextcloud.View
                 DateChanged(this, new RoutedEventArgs());
         }
         public event RoutedEventHandler DateChanged;
-
-        #endregion
 
         private void ContentRoot_ManipulationStarted(object sender, Windows.UI.Xaml.Input.ManipulationStartedRoutedEventArgs e) {
             initialPoint = e.Position;
