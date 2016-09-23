@@ -28,7 +28,7 @@ namespace Nextcloud.ViewModel
             get
             {
                 if(!calendarEvent.IsFullDayEvent) {
-                    return calendarEvent.StartDate.ToLocalTime().FormatDate("hour minute");
+                    return calendarEvent.StartDate.ToLocalTime().FormatDate("shorttime");
                 } else {
                     return "";
                 }
@@ -93,6 +93,11 @@ namespace Nextcloud.ViewModel
         public double RowSpan
         {
             get { return calendarEvent.IsFullDayEvent ? 2 : 1; }
+        }
+
+        public bool IsDurationVisible
+        {
+            get { return !calendarEvent.IsFullDayEvent; }
         }
 
         public CalendarEventViewModel(CalendarEvent dataModel) {

@@ -431,13 +431,13 @@ namespace Nextcloud.View
             StackPanel dPanel = (StackPanel)sender;
             DateTime fieldDate = DateTime.Parse(dPanel.Name);
 
-            if (DayDetailsHeader.Text == fieldDate.ToLocalTime().FormatDate("year month day")) {
+            if (DayDetailsHeader.Text == fieldDate.ToLocalTime().FormatDate("shortdate")) {
                 DayDetails.Visibility = DayDetails.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
                 return;
             }
             
             DayDetails.Margin = new Thickness(0, GrdAppointments.RowDefinitions.FirstOrDefault().ActualHeight * GrdAppointments.GetGridRows(), 0, 0);
-            DayDetailsHeader.Text = fieldDate.ToLocalTime().FormatDate("year month day");
+            DayDetailsHeader.Text = fieldDate.ToLocalTime().FormatDate("shortdate");
 
             var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate.Date >= fieldDate.Date && q.StartDate.Date <= fieldDate.Date) || (q.IsRecurringEvent && q.StartDate <= fieldDate)).ToList();
             ObservableCollection<CalendarEventViewModel> appointmentsView = new ObservableCollection<CalendarEventViewModel>(events.Select((calEvent) => new CalendarEventViewModel(calEvent)).ToList());
