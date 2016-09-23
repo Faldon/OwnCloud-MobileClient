@@ -28,7 +28,7 @@ namespace Nextcloud.ViewModel
             get
             {
                 if(!calendarEvent.IsFullDayEvent) {
-                    return calendarEvent.StartDate.ToLocalTime().FormatDate("shorttime");
+                    return calendarEvent.StartDate.ToLocalTime().FormatDate("{hour.integer(2)}:{minute.integer(2)} {period.abbreviated}");
                 } else {
                     return "";
                 }
@@ -51,9 +51,9 @@ namespace Nextcloud.ViewModel
             }
         }
 
-        public string CalendarColor
+        public Brush CalendarColor
         {
-            get { return calendarEvent.CalendarObject.Calendar.Color; }
+            get { return calendarEvent.CalendarObject.Calendar.GetColor(); }
         }
 
         public string Location
@@ -61,17 +61,12 @@ namespace Nextcloud.ViewModel
             get { return calendarEvent.Location; }
         }
 
-        public Brush FullDayEventIndicatorStroke
-        {
-            get { return GetCalendarColor(); }
-        }
-
         public Brush FullDayEventIndicatorFill
         {
             get
             {
                 if(!calendarEvent.IsFullDayEvent) {
-                    return GetCalendarColor();
+                    return calendarEvent.CalendarObject.Calendar.GetColor();
                 } else {
                     return new SolidColorBrush(Colors.Black);
                 }
@@ -83,7 +78,7 @@ namespace Nextcloud.ViewModel
             get
             {
                 if (calendarEvent.IsFullDayEvent) {
-                    return GetCalendarColor();
+                    return calendarEvent.CalendarObject.Calendar.GetColor();
                 } else {
                     return new SolidColorBrush(Colors.White);
                 }
@@ -102,12 +97,6 @@ namespace Nextcloud.ViewModel
 
         public CalendarEventViewModel(CalendarEvent dataModel) {
             calendarEvent = dataModel;
-        }
-
-        private Brush GetCalendarColor() {
-            var converter = new HexcodeColorConverter();
-            SolidColorBrush color = (SolidColorBrush)converter.Convert(CalendarColor, null, null, null);
-            return color;
         }
     }
 }

@@ -49,6 +49,7 @@ namespace Nextcloud.View
             }
         }
 
+        #region DependencyProperties
         // Using a DependencyProperty as the backing store for SelectedDate.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register("SelectedDate", typeof(DateTime), typeof(CalendarPage), new PropertyMetadata(DateTime.MinValue, OnSelectedDateChange));
 
@@ -72,6 +73,7 @@ namespace Nextcloud.View
                 this.SlideRightBegin.Begin();
             }
         }
+        #endregion
 
         public CalendarPage() {
             this.InitializeComponent();
@@ -101,6 +103,12 @@ namespace Nextcloud.View
             get { return this.defaultViewModel; }
         }
 
+        private async void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == "EventCollection") {
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => PutEvents());
+            }
+        }
+
         /// <summary>
         /// Populates the page with content passed during navigation.  Any saved state is also
         /// provided when recreating a page from a prior session.
@@ -119,34 +127,179 @@ namespace Nextcloud.View
             } else {
                 LayoutRoot.DataContext = new CalendarViewModel(dataModel);
             }
-            (LayoutRoot.DataContext as CalendarViewModel).PropertyChanged += OnPropertyChanged;
-            //ChangeDate();
+            (LayoutRoot.DataContext as CalendarViewModel).PropertyChanged += new PropertyChangedEventHandler(OnPropertyChanged);
         }
 
-        private async void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            //if (e.PropertyName == "EventCollection") {
-            //    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => PutEvents());
-            //}
-            //if (e.PropertyName == "IsFetching") {
-            //    if(!(LayoutRoot.DataContext as CalendarViewModel).IsFetching) {
-            //        await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => PutEvents());
-            //    }
-            //}
+        /// <summary>
+        /// Preserves state associated with this page in case the application is suspended or the
+        /// page is discarded from the navigation cache.  Values must conform to the serialization
+        /// requirements of <see cref="SuspensionManager.SessionState"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
+        /// <param name="e">Event data that provides an empty dictionary to be populated with
+        /// serializable state.</param>
+        private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e) {
+        }
+
+        #region NavigationHelper registration
+
+        /// <summary>
+        /// The methods provided in this section are simply used to allow
+        /// NavigationHelper to respond to the page's navigation methods.
+        /// <para>
+        /// Page specific logic should be placed in event handlers for the  
+        /// <see cref="NavigationHelper.LoadState"/>
+        /// and <see cref="NavigationHelper.SaveState"/>.
+        /// The navigation parameter is available in the LoadState method 
+        /// in addition to page state preserved during an earlier session.
+        /// </para>
+        /// </summary>
+        /// <param name="e">Provides data for navigation methods and event
+        /// handlers that cannot cancel the navigation request.</param>
+        protected override void OnNavigatedTo(NavigationEventArgs e) {
+            this.navigationHelper.OnNavigatedTo(e);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e) {
+            this.navigationHelper.OnNavigatedFrom(e);
+        }
+
+        #endregion
+
+        public void ChangeDate() {
+            OnDateChanged();
+
+            _firstDayOfCalendarMonth = SelectedDate.FirstOfMonth().FirstDayOfWeek().Date;
+            _lastDayOfCalendarMonth = SelectedDate.LastOfMonth().LastDayOfWeek().AddDays(1);
+            _weekCount = SelectedDate.GetMonthCount();
+
+            ResetGridLines();
+            PutEvents();
+        }
+
+        private void ResetGridLines() {
+            GrdCalendarLines.Children.Clear();
+            GrdCalendarLines.SetGridRows(_weekCount + 1);
+            GrdCalendarLines.SetGridColumns(7);
+
+            GrdDayIndicator.Children.Clear();
+            GrdDayIndicator.SetGridRows(_weekCount + 1);
+            GrdDayIndicator.SetGridColumns(7);
+
+            GrdAppointments.Children.Clear();
+            GrdAppointments.SetGridRows(_weekCount + 1);
+            GrdAppointments.SetGridColumns(7);
+
+            var firstDay = SelectedDate.FirstOfMonth().FirstDayOfWeek();
+            for (int i = 0; i < 7; i++) {
+                for (int j = 0; j < _weekCount; j++) {
+                    DateTime fieldDate = firstDay.AddDays((j * 7) + i);
+
+                    Color dayIndicatorColor = Colors.White;
+                    if (fieldDate.Date == DateTime.Now.Date) {
+                        dayIndicatorColor = PhoneAccentColor;
+                    } else if (fieldDate.Month != SelectedDate.Month) {
+                        dayIndicatorColor = Colors.Gray;
+                    }
+
+                    var dayIndicator = new TextBlock {
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Text = fieldDate.Day.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                        Foreground = new SolidColorBrush(dayIndicatorColor),
+                        Margin = new Thickness(5, 0, 0, 5)
+                    };
+                    Grid.SetColumn(dayIndicator, i);
+                    Grid.SetRow(dayIndicator, j + 1);
+                    GrdDayIndicator.Children.Add(dayIndicator);
+
+                    var dayOpenControl = new StackPanel {
+                        Background = new SolidColorBrush(Colors.Black),
+                        Name = fieldDate.ToString()
+                    };
+                    dayOpenControl.Tapped += OnDayPanelTapped;
+                    Grid.SetColumn(dayOpenControl, i);
+                    Grid.SetRow(dayOpenControl, j + 1);
+                    GrdCalendarLines.Children.Add(dayOpenControl);
+                }
+            }
+
+            for (int i = 0; i < 6; i++) {
+                var vRect = new Rectangle();
+                vRect.Fill = new SolidColorBrush(Colors.White);
+                vRect.Width = 2;
+                vRect.HorizontalAlignment = HorizontalAlignment.Right;
+                Grid.SetRow(vRect, 1);
+                Grid.SetRowSpan(vRect, _weekCount);
+                Grid.SetColumn(vRect, i);
+
+                GrdCalendarLines.Children.Add(vRect);
+            }
+            for (int i = 0; i < _weekCount + 1; i++) {
+                var hRect = new Rectangle();
+                hRect.Fill = new SolidColorBrush(Colors.White);
+                hRect.Height = 2;
+                hRect.VerticalAlignment = VerticalAlignment.Bottom;
+                Grid.SetColumnSpan(hRect, 7);
+                Grid.SetRow(hRect, i);
+
+                GrdCalendarLines.Children.Add(hRect);
+            }
+
+            var targetDate = _firstDayOfCalendarMonth;
+            for (int i = 0; i < 7; i++) {
+
+                TextBlock dayBlock = new TextBlock();
+                Grid.SetColumn(dayBlock, i);
+                dayBlock.VerticalAlignment = VerticalAlignment.Bottom;
+                dayBlock.HorizontalAlignment = HorizontalAlignment.Center;
+                dayBlock.Text = targetDate.ToString("ddd");
+                GrdCalendarLines.Children.Add(dayBlock);
+
+                targetDate = targetDate.AddDays(1);
+            }
+        }
+
+        private void OnDayPanelTapped(object sender, TappedRoutedEventArgs e) {
+            StackPanel dPanel = (StackPanel)sender;
+            DateTime fieldDate = DateTime.Parse(dPanel.Name);
+
+            if (DayDetailsHeader.Text == fieldDate.ToLocalTime().FormatDate("shortdate")) {
+                if(DayDetails.Visibility == Visibility.Visible) {
+                    this.SlideDownBegin.Begin();
+                } else {
+                    DayDetails.Visibility = Visibility.Visible;
+                    this.SlideUpBegin.Begin();
+                }
+                //DayDetails.Visibility = DayDetails.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                return;
+            }
+            
+            DayDetails.Margin = new Thickness(0, GrdAppointments.RowDefinitions.FirstOrDefault().ActualHeight * GrdAppointments.GetGridRows(), 0, 0);
+            DayDetailsHeader.Text = fieldDate.ToLocalTime().FormatDate("shortdate");
+
+            var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate.Date >= fieldDate.Date && q.StartDate.Date <= fieldDate.Date) || (q.IsRecurringEvent && q.StartDate <= fieldDate)).ToList();
+            ObservableCollection<CalendarEventViewModel> appointmentsView = new ObservableCollection<CalendarEventViewModel>(events.Select((calEvent) => new CalendarEventViewModel(calEvent)).ToList());
+            DayAppointmentDetails.ItemsSource = appointmentsView;
+            
+            DayDetails.Visibility = Visibility.Visible;
+            this.SlideUpBegin.Begin();
         }
 
         private void PutEvents() {
-            //if(e.PropertyName == "EventCollection") {
-                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => GrdAppointments.Children.Clear());
-                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => _dayPanels.Clear());
-                var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate >= _firstDayOfCalendarMonth && q.StartDate <= _lastDayOfCalendarMonth) || (q.IsRecurringEvent && q.StartDate <= _lastDayOfCalendarMonth)).ToList();
-                foreach (CalendarEvent calendarEvent in events) {
-                    App.GetDataContext().GetConnection().GetChildren(calendarEvent, recursive: true);
-                    App.GetDataContext().GetConnection().GetChildren(calendarEvent.CalendarObject, recursive: true);
-                var currentDate = calendarEvent.StartDate.ToLocalTime().Date;
-                    var endDate = calendarEvent.EndDate.ToLocalTime().Date;
+            //Delete displayed events
+            GrdAppointments.Children.Clear();
+            _dayPanels.Clear();
 
-                    if (calendarEvent.IsRecurringEvent) {
-                        //foreach(RecurrenceRule rrule in calendarEvent.RecurrenceRules) {
+            var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate >= _firstDayOfCalendarMonth && q.StartDate <= _lastDayOfCalendarMonth) || (q.IsRecurringEvent && q.StartDate <= _lastDayOfCalendarMonth)).ToList();
+            foreach (CalendarEvent calendarEvent in events) {
+                App.GetDataContext().GetConnection().GetChildren(calendarEvent, recursive: true);
+                App.GetDataContext().GetConnection().GetChildren(calendarEvent.CalendarObject, recursive: true);
+                var currentDate = calendarEvent.StartDate.ToLocalTime().Date;
+                var endDate = calendarEvent.EndDate.ToLocalTime().Date;
+
+                if (calendarEvent.IsRecurringEvent) {
+                    foreach (RecurrenceRule rrule in calendarEvent.RecurrenceRules) {
                         //    string rFrequency = (string)rRules.Single(r => r.Key == "FREQ").Value;
                         //    int rInterval = (int)rRules.Single(r => r.Key == "INTERVAL").Value;
                         //    DateTime rEnd = ((string)rRules.SingleOrDefault(r => r.Key == "UNTIL").Key == "UNTIL") ? Convert.ToDateTime(rRules.Single(r => r.Key == "UNTIL").Value) : DateTime.MaxValue;
@@ -282,174 +435,13 @@ namespace Nextcloud.View
                         //                break;
                         //        }
                         //    }
-                        //}
-                    } else {
-                        PutSingleEvent(calendarEvent, currentDate, endDate);
                     }
+                } else {
+                    PutSingleEvent(calendarEvent, currentDate, endDate);
                 }
+            }
             //}
 
-        }
-
-        /// <summary>
-        /// Preserves state associated with this page in case the application is suspended or the
-        /// page is discarded from the navigation cache.  Values must conform to the serialization
-        /// requirements of <see cref="SuspensionManager.SessionState"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
-        /// <param name="e">Event data that provides an empty dictionary to be populated with
-        /// serializable state.</param>
-        private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e) {
-        }
-
-        #region NavigationHelper registration
-
-        /// <summary>
-        /// The methods provided in this section are simply used to allow
-        /// NavigationHelper to respond to the page's navigation methods.
-        /// <para>
-        /// Page specific logic should be placed in event handlers for the  
-        /// <see cref="NavigationHelper.LoadState"/>
-        /// and <see cref="NavigationHelper.SaveState"/>.
-        /// The navigation parameter is available in the LoadState method 
-        /// in addition to page state preserved during an earlier session.
-        /// </para>
-        /// </summary>
-        /// <param name="e">Provides data for navigation methods and event
-        /// handlers that cannot cancel the navigation request.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e) {
-            this.navigationHelper.OnNavigatedTo(e);
-        }
-
-        protected override void OnNavigatedFrom(NavigationEventArgs e) {
-            this.navigationHelper.OnNavigatedFrom(e);
-        }
-
-        #endregion
-
-        public void ChangeDate() {
-            OnDateChanged();
-
-            _firstDayOfCalendarMonth = SelectedDate.FirstOfMonth().FirstDayOfWeek().Date;
-            _lastDayOfCalendarMonth = SelectedDate.LastOfMonth().LastDayOfWeek().AddDays(1);
-            _weekCount = SelectedDate.GetMonthCount();
-
-            ResetGridLines();
-
-            //Delete displayed events
-            GrdAppointments.Children.Clear();
-            _dayPanels.Clear();
-
-            //Insert new events
-            PutEvents();
-        }
-
-        private void ResetGridLines() {
-            GrdCalendarLines.Children.Clear();
-            GrdCalendarLines.SetGridRows(_weekCount + 1);
-            GrdCalendarLines.SetGridColumns(7);
-
-            GrdDayIndicator.Children.Clear();
-            GrdDayIndicator.SetGridRows(_weekCount + 1);
-            GrdDayIndicator.SetGridColumns(7);
-
-            GrdAppointments.Children.Clear();
-            GrdAppointments.SetGridRows(_weekCount + 1);
-            GrdAppointments.SetGridColumns(7);
-
-            var firstDay = SelectedDate.FirstOfMonth().FirstDayOfWeek();
-            for (int i = 0; i < 7; i++) {
-                for (int j = 0; j < _weekCount; j++) {
-                    DateTime fieldDate = firstDay.AddDays((j * 7) + i);
-
-                    Color dayIndicatorColor = Colors.White;
-                    if (fieldDate.Date == DateTime.Now.Date) {
-                        dayIndicatorColor = PhoneAccentColor;
-                    } else if (fieldDate.Month != SelectedDate.Month) {
-                        dayIndicatorColor = Colors.Gray;
-                    }
-
-                    var dayIndicator = new TextBlock {
-                        VerticalAlignment = VerticalAlignment.Bottom,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        Text = fieldDate.Day.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                        Foreground = new SolidColorBrush(dayIndicatorColor),
-                        Margin = new Thickness(5, 0, 0, 5)
-                    };
-                    Grid.SetColumn(dayIndicator, i);
-                    Grid.SetRow(dayIndicator, j + 1);
-                    GrdDayIndicator.Children.Add(dayIndicator);
-
-                    var dayOpenControl = new StackPanel {
-                        Background = new SolidColorBrush(Colors.Black),
-                        Name = fieldDate.ToString()
-                    };
-                    dayOpenControl.Tapped += ShowDayDetails;
-                    Grid.SetColumn(dayOpenControl, i);
-                    Grid.SetRow(dayOpenControl, j + 1);
-                    GrdCalendarLines.Children.Add(dayOpenControl);
-                }
-            }
-
-            for (int i = 0; i < 6; i++) {
-                var vRect = new Rectangle();
-                vRect.Fill = new SolidColorBrush(Colors.White);
-                vRect.Width = 2;
-                vRect.HorizontalAlignment = HorizontalAlignment.Right;
-                Grid.SetRow(vRect, 1);
-                Grid.SetRowSpan(vRect, _weekCount);
-                Grid.SetColumn(vRect, i);
-
-                GrdCalendarLines.Children.Add(vRect);
-            }
-            for (int i = 0; i < _weekCount + 1; i++) {
-                var hRect = new Rectangle();
-                hRect.Fill = new SolidColorBrush(Colors.White);
-                hRect.Height = 2;
-                hRect.VerticalAlignment = VerticalAlignment.Bottom;
-                Grid.SetColumnSpan(hRect, 7);
-                Grid.SetRow(hRect, i);
-
-                GrdCalendarLines.Children.Add(hRect);
-            }
-
-            var targetDate = _firstDayOfCalendarMonth;
-            for (int i = 0; i < 7; i++) {
-
-                TextBlock dayBlock = new TextBlock();
-                Grid.SetColumn(dayBlock, i);
-                dayBlock.VerticalAlignment = VerticalAlignment.Bottom;
-                dayBlock.HorizontalAlignment = HorizontalAlignment.Center;
-                dayBlock.Text = targetDate.ToString("ddd");
-                GrdCalendarLines.Children.Add(dayBlock);
-
-                targetDate = targetDate.AddDays(1);
-            }
-        }
-
-        private void ShowDayDetails(object sender, TappedRoutedEventArgs e) {
-            StackPanel dPanel = (StackPanel)sender;
-            DateTime fieldDate = DateTime.Parse(dPanel.Name);
-
-            if (DayDetailsHeader.Text == fieldDate.ToLocalTime().FormatDate("shortdate")) {
-                DayDetails.Visibility = DayDetails.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-                return;
-            }
-            
-            DayDetails.Margin = new Thickness(0, GrdAppointments.RowDefinitions.FirstOrDefault().ActualHeight * GrdAppointments.GetGridRows(), 0, 0);
-            DayDetailsHeader.Text = fieldDate.ToLocalTime().FormatDate("shortdate");
-
-            var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate.Date >= fieldDate.Date && q.StartDate.Date <= fieldDate.Date) || (q.IsRecurringEvent && q.StartDate <= fieldDate)).ToList();
-            ObservableCollection<CalendarEventViewModel> appointmentsView = new ObservableCollection<CalendarEventViewModel>(events.Select((calEvent) => new CalendarEventViewModel(calEvent)).ToList());
-            DayAppointmentDetails.ItemsSource = appointmentsView;
-            
-            DayDetails.Visibility = Visibility.Visible;
-        }
-
-        private Brush GetCalendarColor(Calendar calendar) {
-            var converter = new HexcodeColorConverter();
-            SolidColorBrush color = (SolidColorBrush)converter.Convert(calendar.Color, null, null, null);
-            return color;
         }
 
         private void PutSingleEvent(CalendarEvent calendarEvent, DateTime currentDate, DateTime endDate) {
@@ -466,7 +458,7 @@ namespace Nextcloud.View
 
                 var rect = new Rectangle {
                     Name = calendarEvent.CalendarObjectId.ToString() + "_" + calendarEvent.CalendarEventId.ToString() + "_" + currentDate.ToString(),
-                    Fill = GetCalendarColor(calendarEvent.CalendarObject.Calendar),
+                    Fill = calendarEvent.CalendarObject.Calendar.GetColor(),
                     Width = (GrdAppointments.ActualWidth / 7) * 0.35,
                     Height = 2.5,
                     RadiusX = 1.5,
@@ -498,11 +490,8 @@ namespace Nextcloud.View
                 return _dayPanels[sIndex];
             }
             StackPanel newSPanel = new StackPanel() {
-                //Name = date.ToLocalTime().Date.ToString(),
                 Orientation = Orientation.Vertical
             };
-            //newSPanel.Name = date.ToLocalTime().Date.ToString();
-            //newSPanel.Orientation = Orientation.Vertical;
             Grid.SetColumn(newSPanel, sIndex % 7);
             Grid.SetRow(newSPanel, sIndex / 7 + 1);
             GrdAppointments.Children.Add(newSPanel);
@@ -513,11 +502,13 @@ namespace Nextcloud.View
 
         private void SlideLeftBegin_OnCompleted(object sender, object e) {
             ChangeDate();
+            DayDetails.Visibility = Visibility.Collapsed;
             SlideLeftEnd.Begin();
         }
 
         private void SlideRightBegin_OnCompleted(object sender, object e) {
             ChangeDate();
+            DayDetails.Visibility = Visibility.Collapsed;
             SlideRightEnd.Begin();
         }
 
@@ -548,6 +539,14 @@ namespace Nextcloud.View
                     e.Complete();
                 }
             }
+        }
+
+        private void Appointment_Tapped(object sender, TappedRoutedEventArgs e) {
+
+        }
+
+        private void SlideDownBegin_Completed(object sender, object e) {
+            DayDetails.Visibility = Visibility.Collapsed;
         }
     }
 }

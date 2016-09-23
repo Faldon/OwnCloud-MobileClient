@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
+using Windows.UI.Xaml.Media;
+using Nextcloud.Shared.Converter;
 
 namespace Nextcloud.Data
 {
@@ -31,5 +33,11 @@ namespace Nextcloud.Data
 
         [OneToMany]
         public List<CalendarObject> CalendarObjects { get; set; }
+
+        public Brush GetColor() {
+            var converter = new HexcodeColorConverter();
+            SolidColorBrush color = (SolidColorBrush)converter.Convert(Color, null, null, null);
+            return color;
+        }
     }
 }

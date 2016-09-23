@@ -51,6 +51,18 @@
                 <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="1"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
+        <Storyboard x:Name="SlideUpBegin">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetY)" Storyboard.TargetName="DayDetails">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="90"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="SlideDownBegin" Completed="SlideDownBegin_Completed">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.GlobalOffsetY)" Storyboard.TargetName="DayDetails">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.15" Value="90"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
         <Style x:Key="PhoneTextExtraSmallStyle" x:Name="PhoneTextExtraSmallStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="{StaticResource PhoneFontFamilyNormal}" />
             <Setter Property="Foreground" Value="{StaticResource PhoneForegroundBrush}" />
@@ -64,7 +76,8 @@
             <Setter Property="FontSize" Value="16" />
         </Style>
         <DataTemplate x:Key="CalendarEventTemplate">
-            <Grid Margin="0,5,0,5">
+            <Grid Margin="0,5,0,5"
+                  Tapped="Appointment_Tapped">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="5*"/>
@@ -73,51 +86,47 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Vertical"
-                            VerticalAlignment="Center"
+                            VerticalAlignment="Stretch"
                             HorizontalAlignment="Left"
                             Grid.Column="1"
                             Grid.Row="0"
                             Margin="5,0,0,0">
                     <TextBlock x:Name="Summary"
-                           Text="{Binding Summary}"
-                           Style="{StaticResource PhoneTextSmallStyle}"
-                           Foreground="{Binding SummaryForeground}"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Bottom"  />
+                               Text="{Binding Summary}"
+                               Style="{StaticResource PhoneTextSmallStyle}"
+                               Foreground="{Binding SummaryForeground}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top" />
 
                     <TextBlock x:Name="Duration"
-                           Text="{Binding Duration}"
-                           Style="{StaticResource PhoneTextExtraSmallStyle}"
-                           Foreground="Gray"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Top"
-                               Visibility="{Binding IsDurationVisible, Converter={StaticResource BoolVisibilityConverter}}"
-                             />
+                               Text="{Binding Duration}"
+                               Style="{StaticResource PhoneTextExtraSmallStyle}"
+                               Foreground="Gray"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               Visibility="{Binding IsDurationVisible, Converter={StaticResource BoolVisibilityConverter}}" />
                 </StackPanel>
-                            
-                
-                <StackPanel Grid.Column="0"
-                            Grid.Row="0"
-                            Orientation="Horizontal"
+
+                <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Stretch"
-                            HorizontalAlignment="Right">
+                            HorizontalAlignment="Right"
+                            Grid.Column="0"
+                            Grid.Row="0" >
                     <Rectangle x:Name="FullDayEventIndicator"
-                               Stroke="{Binding FullDayEventIndicatorStroke}"
+                               Stroke="{Binding CalendarColor}"
                                Fill="{Binding FullDayEventIndicatorFill}"
                                StrokeThickness="1.0"
                                Width="10"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Stretch" />
                     <TextBlock x:Name="StartTime"
-                           Text="{Binding StartTime}"
-                           Style="{StaticResource PhoneTextExtraSmallStyle}"
-                           Foreground="White"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Top"
-                               Visibility="{Binding IsDurationVisible, Converter={StaticResource BoolVisibilityConverter}}"
-                               />
+                               Text="{Binding StartTime}"
+                               Style="{StaticResource PhoneTextExtraSmallStyle}"
+                               Foreground="White"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Top"
+                               Visibility="{Binding IsDurationVisible, Converter={StaticResource BoolVisibilityConverter}}" />
                 </StackPanel>
-                
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -172,6 +181,10 @@
                             Background="Black"
                             VerticalAlignment="Top"
                             Visibility="Collapsed">
+                    <StackPanel.Projection>
+                        <PlaneProjection />
+                    </StackPanel.Projection>
+                    
                     <TextBlock x:Name="DayDetailsHeader"
                                Margin="5,5,5,5"
                                Style="{StaticResource BaseTextBlockStyle}"

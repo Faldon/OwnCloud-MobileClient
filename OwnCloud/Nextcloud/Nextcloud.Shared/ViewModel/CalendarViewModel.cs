@@ -28,17 +28,17 @@ namespace Nextcloud.ViewModel
             }
         }
 
-        private ObservableCollection<CalendarEvent> _eventCollcetion;
-        public ObservableCollection<CalendarEvent> EventCollection
+        //private ObservableCollection<CalendarEvent> _eventCollcetion;
+        public List<CalendarEvent> EventCollection
         {
             get
             {
-                return _eventCollcetion;
+                return CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList();
             }
             set
             {
-                _eventCollcetion = value;
-                NotifyPropertyChanged();
+                //_eventCollcetion = value;
+                //NotifyPropertyChanged();
             }
         }
 
@@ -80,7 +80,7 @@ namespace Nextcloud.ViewModel
         }
 
         public async void FetchCalendarObjectsAsync() {
-            EventCollection = new ObservableCollection<CalendarEvent>(CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
+            //EventCollection = new ObservableCollection<CalendarEvent>(CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
             IsFetching = true;
             _calendarsToSync = 0;
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
@@ -115,13 +115,7 @@ namespace Nextcloud.ViewModel
                     App.GetDataContext().StoreCalendarObjectAsync(calObj);
                 }
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => SyncDatabaseAsync(_calendar));
-            } else {
-                //await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsFetching = false);
-            }
-            if(--_calendarsToSync == 0) {
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsFetching = false);
-            }
-            
+            }          
         }
 
         private async void SyncDatabaseAsync(Calendar calendar) {
@@ -139,6 +133,7 @@ namespace Nextcloud.ViewModel
         private async void OnSyncDatabaseAsyncComplete(DAVRequestResult result, object userObj) {
             if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured) {
                 Calendar _calendar = userObj as Calendar;
+                var _inSync = true;
                 foreach (DAVRequestResult.Item item in result.Items) {
                     CalendarObject fromDatabase = await App.GetDataContext().GetConnectionAsync().Table<CalendarObject>().Where(e => e.Path == item.Reference && e.CalendarId == _calendar.CalendarId).FirstOrDefaultAsync();
                     if(fromDatabase == null) {
@@ -150,14 +145,13 @@ namespace Nextcloud.ViewModel
                         fromDatabase.InSync = true;
                         App.GetDataContext().StoreCalendarObjectAsync(fromDatabase);
                         await fromDatabase.ParseCalendarData();
+                        _inSync = false;
                     }
                 }
-                App.GetDataContext().GetConnection().GetChildren(_calendar, recursive: true);
-                //if(--_calendarsToSync == 0) {
-                //    //var events = await App.GetDataContext().GetConnectionAsync().Table<CalendarEvent>().ToListAsync();
-                //    EventCollection = new ObservableCollection<CalendarEvent>(App.GetDataContext().GetConnection().Table<CalendarEvent>().ToList());
-                //    NotifyPropertyChanged("EventCollection");
-                //}
+                if(!_inSync) {
+                    App.GetDataContext().GetConnection().GetChildren(_calendar, recursive: true);
+                    NotifyPropertyChanged("EventCollection");
+                }
             }
         }
     }
