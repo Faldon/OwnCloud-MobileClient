@@ -74,7 +74,8 @@ namespace Nextcloud.ViewModel
         public CalendarViewModel(ObservableCollection<Calendar> calendars) {
             CalendarCollection = calendars;
             foreach (Calendar cal in CalendarCollection) {
-                App.GetDataContext().GetConnection().GetChildren(cal, true);
+                App.GetDataContext().LoadCalender(cal);
+                //App.GetDataContext().GetConnection().GetChildren(cal, true);
             }
             FetchCalendarObjectsAsync();
         }

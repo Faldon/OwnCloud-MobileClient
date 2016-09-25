@@ -100,7 +100,9 @@ namespace Nextcloud.Data
                             calEvent.Location = kv[1];
                         }
                         if (kv[0].StartsWith("RRULE")) {
-                            RecurrenceRule rule = new RecurrenceRule();
+                            RecurrenceRule rule = new RecurrenceRule() {
+                                Until = DateTime.MaxValue,
+                            };
                             foreach (string ruleString in kv[1].Split(';')) {
                                 var rrulparam = ruleString.Split('=');
                                 if (rrulparam[0] == "FREQ") {
@@ -131,10 +133,10 @@ namespace Nextcloud.Data
                                     }
                                 }
                             };
+                            rule.CalendarEvent = calEvent;
 
-                            var inDatabase = calEvent.RecurrenceRules.Find(r => r.ByDay == rule.ByDay && r.ByMonth == rule.ByMonth && r.Interval == rule.Interval && r.Count == rule.Count && r.Frequency == rule.Frequency && r.Until == rule.Until);
-                            if (inDatabase == null) {
-                                rule.CalendarEvent = calEvent;
+                            //var inDatabase = calEvent.RecurrenceRules.Find(r => r.ByDay == rule.ByDay && r.ByMonth == rule.ByMonth && r.Interval == rule.Interval && r.Count == rule.Count && r.Frequency == rule.Frequency && r.Until == rule.Until);
+                            if (calEvent.RecurrenceRules.Find(r => r.CalendarEvent == calEvent) == null) {
                                 calEvent.RecurrenceRules.Add(rule);
                             }
                         }

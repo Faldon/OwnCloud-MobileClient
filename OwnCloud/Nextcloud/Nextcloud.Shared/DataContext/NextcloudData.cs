@@ -80,6 +80,16 @@ namespace Nextcloud.DataContext
             return connection.GetAllWithChildren<Account>(recursive: true).ToList();
         }
 
+        public void LoadCalender(Calendar cal) {
+            connection.GetChildren(cal, true);
+            foreach(CalendarObject calObj in cal.CalendarObjects) {
+                connection.GetChildren(calObj, true);
+                foreach(CalendarEvent calEvt in calObj.CalendarEvents) {
+                    connection.GetChildren(calEvt, true);
+                }
+            }
+        }
+
         public async Task<List<File>> GetUserfilesInPathAsync(Account user, string path) {
             List<File> currentFilesInDatabase = await GetConnectionAsync().Table<File>().Where(f => f.AccountId == user.AccountId && (f.Filepath.StartsWith(path) || path.StartsWith(f.Filepath + f.Filename))).ToListAsync();
             return currentFilesInDatabase;
@@ -118,8 +128,11 @@ namespace Nextcloud.DataContext
         }
 
         public async Task StoreCalendarEventAsync(CalendarEvent newOrUpdatedCalendarEvent) {
-            await GetConnectionAsync().InsertOrReplaceAllAsync(newOrUpdatedCalendarEvent.RecurrenceRules);
             await GetConnectionAsync().InsertOrReplaceAsync(newOrUpdatedCalendarEvent);
+            foreach(RecurrenceRule rule in newOrUpdatedCalendarEvent.RecurrenceRules) {
+                rule.CalendarEventId = newOrUpdatedCalendarEvent.CalendarEventId ?? 0;
+            }
+            await GetConnectionAsync().InsertOrReplaceAllAsync(newOrUpdatedCalendarEvent.RecurrenceRules);
         }
 
         public async Task UpdateFilesAsync(List<File> filesToUpdate) {

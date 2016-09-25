@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converter\InverseBooleanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\PossessiveCaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\PrefixValueConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converter\ToUppercaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataContext\DatabaseUpdater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataContext\NextcloudData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Account.cs" />
