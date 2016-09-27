@@ -106,6 +106,10 @@ namespace Nextcloud.DataContext
             return newOrUpdatedFile.FileId?? 0;
         }
 
+        public void StoreCalendarObject(CalendarObject newOrUpdatedCalendarObject) {
+            connection.InsertOrReplace(newOrUpdatedCalendarObject);
+        }
+
         public async void StoreCalendarAsync(Calendar newCalendar) {
             await GetConnectionAsync().InsertAsync(newCalendar);
         }
@@ -123,7 +127,7 @@ namespace Nextcloud.DataContext
         }
 
         public void StoreCalendarEvent(CalendarEvent newOrUpdatedCalendarEvent) {
-            connection.InsertOrReplaceAll(newOrUpdatedCalendarEvent.RecurrenceRules);
+            //connection.InsertOrReplaceAll(newOrUpdatedCalendarEvent.RecurrenceRules);
             connection.InsertOrReplaceWithChildren(newOrUpdatedCalendarEvent, recursive: true);
         }
 

@@ -34,7 +34,7 @@ namespace Nextcloud.Data
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<CalendarEvent> CalendarEvents { get; set; }
 
-        public async Task ParseCalendarData() {
+        public void ParseCalendarData() {
             List<string> vevents = new List<string>();
             int lastStart = -1;
             while ((lastStart = CalendarData.IndexOf("BEGIN:VEVENT", ++lastStart)) > -1) {
@@ -109,10 +109,13 @@ namespace Nextcloud.Data
                                     rule.Frequency = rrulparam[1];
                                 }
                                 if (rrulparam[0] == "BYDAY") {
-                                    rule.Frequency = rrulparam[1];
+                                    rule.ByDay = rrulparam[1];
                                 }
                                 if (rrulparam[0] == "BYMONTH") {
-                                    rule.Frequency = rrulparam[1];
+                                    rule.ByMonth = rrulparam[1];
+                                }
+                                if (rrulparam[0] == "BYMONTHDAY") {
+                                    rule.ByMonthDay = rrulparam[1];
                                 }
                                 if (rrulparam[0] == "INTERVAL") {
                                     int parsed;
@@ -141,8 +144,10 @@ namespace Nextcloud.Data
                             }
                         }
                     }
+                    //await App.GetDataContext().StoreCalendarEventAsync(calEvent);
+                    App.GetDataContext().StoreCalendarEvent(calEvent);
                     calEvent.InSync = true;
-                    await App.GetDataContext().StoreCalendarEventAsync(calEvent);
+                    App.GetDataContext().GetConnection().Update(calEvent);
                 } catch (ArgumentNullException ex) {
                     continue;
                 }

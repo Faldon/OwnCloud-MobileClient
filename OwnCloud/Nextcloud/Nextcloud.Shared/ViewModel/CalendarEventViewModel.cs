@@ -40,9 +40,9 @@ namespace Nextcloud.ViewModel
             get
             {
                 if (!calendarEvent.IsFullDayEvent) {
-                    var duration = (calendarEvent.EndDate - calendarEvent.StartDate).Duration().TotalHours.ToString() + "h";
+                    var duration = calendarEvent.Duration ?? (calendarEvent.EndDate - calendarEvent.StartDate).Duration().TotalHours.ToString() + "h";
                     if (calendarEvent.Location.Length != 0) {
-                        duration += " (" + calendarEvent.Location + ")";
+                        duration += " (" + calendarEvent.Location.ToString() + ")";
                     }
                     return duration;
                 } else {

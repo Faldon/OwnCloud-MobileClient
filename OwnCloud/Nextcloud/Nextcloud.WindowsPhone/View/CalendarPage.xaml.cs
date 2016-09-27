@@ -278,7 +278,12 @@ namespace Nextcloud.View
             DayDetails.Margin = new Thickness(0, GrdAppointments.RowDefinitions.FirstOrDefault().ActualHeight * GrdAppointments.GetGridRows(), 0, 0);
             DayDetailsHeader.Text = fieldDate.ToLocalTime().FormatDate("shortdate");
 
-            var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate.Date >= fieldDate.Date && q.StartDate.Date <= fieldDate.Date) || (q.IsRecurringEvent && q.StartDate <= fieldDate)).ToList();
+            var events = (LayoutRoot.DataContext as CalendarViewModel).EventCollection.Where(q => (q.EndDate.Date >= fieldDate.Date && q.StartDate.Date <= fieldDate.Date) || q.IsReccuringOnDate(fieldDate)).ToList();
+            //foreach(CalendarEvent calEvt in events) {
+            //    if(!calEvt.IsReccuringOnDate(fieldDate.ToLocalTime())) {
+            //        events.Remove(calEvt);
+            //    }
+            //}
             ObservableCollection<CalendarEventViewModel> appointmentsView = new ObservableCollection<CalendarEventViewModel>(events.Select((calEvent) => new CalendarEventViewModel(calEvent)).ToList());
             DayAppointmentDetails.ItemsSource = appointmentsView;
             

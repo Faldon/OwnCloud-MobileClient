@@ -58,6 +58,12 @@ namespace Nextcloud.Data
             get { return StartDate.ToLocalTime().TimeOfDay == new TimeSpan(0, 0, 0) && EndDate.ToLocalTime().TimeOfDay == new TimeSpan(0, 0, 0); }
         }
 
+        public bool IsReccuringOnDate(DateTime givenDate) {
+            var startDates = new List<DateTime>();
+            var endDates = new List<DateTime>();
+            return GetReccurenceDates(givenDate.Date, givenDate.Date, out startDates, out endDates) > 0;
+        }
+
         public int GetReccurenceDates(DateTime firstDay, DateTime lastDay, out List<DateTime> startDates, out List<DateTime> endDates) {
             startDates = new List<DateTime>();
             endDates = new List<DateTime>();
@@ -67,6 +73,10 @@ namespace Nextcloud.Data
                 DateTime rEnd = rrule.Until;
                 int rCount = rrule.Count;
 
+                string byDay = rrule.ByDay.ToString();
+                string byMonth = rrule.ByMonth.ToString();
+                string byMonthDay = rrule.ByMonthDay.ToString();
+
                 if (rCount == 0 && rEnd < firstDay) { continue; };
                 if (rCount > 0) {
                     for (var i = 0; i < rCount; i++) {
@@ -74,22 +84,18 @@ namespace Nextcloud.Data
                             case "DAILY":
                                 startDates.Add(StartDate.Date.AddDays(i * rInterval));
                                 endDates.Add(EndDate.Date.AddDays(i * rInterval));
-                                
                                 break;
                             case "WEEKLY":
                                 startDates.Add(StartDate.Date.AddDays(i * rInterval * 7));
                                 endDates.Add(EndDate.Date.AddDays(i * rInterval * 7));
-                                
                                 break;
                             case "MONTHLY":
                                 startDates.Add(StartDate.Date.AddMonths(i * rInterval));
                                 endDates.Add(EndDate.Date.AddMonths(i * rInterval));
-                                
                                 break;
                             case "YEARLY":
                                 startDates.Add(StartDate.Date.AddYears(i * rInterval));
                                 endDates.Add(EndDate.Date.AddYears(i * rInterval));
-                                
                                 break;
                         }
                     }

@@ -24,6 +24,8 @@ namespace Nextcloud.Data
 
         public string ByDay { get; set; }
 
+        public string ByMonthDay { get; set; }
+
         public DateTime Until { get; set; }
 
         [ForeignKey(typeof(CalendarEvent))]

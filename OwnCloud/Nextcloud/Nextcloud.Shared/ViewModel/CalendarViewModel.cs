@@ -14,7 +14,6 @@ namespace Nextcloud.ViewModel
     {
         private CoreDispatcher dispatcher;
         private ObservableCollection<Calendar> _calendarCollection;
-        private int _calendarsToSync;
         public ObservableCollection<Calendar> CalendarCollection
         {
             get
@@ -33,7 +32,7 @@ namespace Nextcloud.ViewModel
         {
             get
             {
-                return CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList();
+                return CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).Where(e => e.InSync).ToList();
             }
             set
             {
@@ -82,8 +81,7 @@ namespace Nextcloud.ViewModel
 
         public async void FetchCalendarObjectsAsync() {
             //EventCollection = new ObservableCollection<CalendarEvent>(CalendarCollection.SelectMany(c => c.CalendarObjects).SelectMany(o => o.CalendarEvents).ToList());
-            IsFetching = true;
-            _calendarsToSync = 0;
+            //IsFetching = true;
             dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             List<Account> accountList = CalendarCollection.Select(c => c.Account).Distinct().ToList();
             foreach(Account account in accountList) {
@@ -91,7 +89,6 @@ namespace Nextcloud.ViewModel
                 NetworkCredential cred = await account.GetCredential();
                 var webdav = new WebDAV(new Uri(account.Server.Protocol + "://" + account.Server.FQDN, UriKind.Absolute), cred);
                 foreach (Calendar calendar in CalendarCollection.Where(c => c.AccountId == account.AccountId).ToList()) {
-                    _calendarsToSync++;
                     webdav.StartRequest(DAVRequestHeader.CreateReport(calendar.Path), DAVRequestBody.CreateCondensedCalendarRequest(), calendar, OnFetchCalendarObjectsAsyncComplete);
                 }
             }
@@ -113,7 +110,7 @@ namespace Nextcloud.ViewModel
                         CalendarId = _calendar.CalendarId,
                         Calendar = _calendar
                     };
-                    App.GetDataContext().StoreCalendarObjectAsync(calObj);
+                    App.GetDataContext().StoreCalendarObject(calObj);
                 }
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => SyncDatabaseAsync(_calendar));
             }          
@@ -134,7 +131,7 @@ namespace Nextcloud.ViewModel
         private async void OnSyncDatabaseAsyncComplete(DAVRequestResult result, object userObj) {
             if (result.Status == ServerStatus.MultiStatus && !result.Request.ErrorOccured) {
                 Calendar _calendar = userObj as Calendar;
-                var _inSync = true;
+                var updateLayout = false;
                 foreach (DAVRequestResult.Item item in result.Items) {
                     CalendarObject fromDatabase = await App.GetDataContext().GetConnectionAsync().Table<CalendarObject>().Where(e => e.Path == item.Reference && e.CalendarId == _calendar.CalendarId).FirstOrDefaultAsync();
                     if(fromDatabase == null) {
@@ -143,13 +140,14 @@ namespace Nextcloud.ViewModel
                     if (item.ETag.Length > 0) {
                         fromDatabase.CalendarData = item.CalendarData;
                         fromDatabase.ETag = item.ETag;
+                        App.GetDataContext().StoreCalendarObject(fromDatabase);
+                        fromDatabase.ParseCalendarData();
                         fromDatabase.InSync = true;
-                        App.GetDataContext().StoreCalendarObjectAsync(fromDatabase);
-                        await fromDatabase.ParseCalendarData();
-                        _inSync = false;
+                        await App.GetDataContext().GetConnectionAsync().UpdateAsync(fromDatabase);
+                        updateLayout = true;
                     }
                 }
-                if(!_inSync) {
+                if(updateLayout) {
                     App.GetDataContext().GetConnection().GetChildren(_calendar, recursive: true);
                     NotifyPropertyChanged("EventCollection");
                 }
