@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 using Nextcloud.Extensions;
@@ -67,25 +68,23 @@ namespace Nextcloud.Data
         public int GetReccurenceDates(DateTime firstDay, DateTime lastDay, out List<DateTime> startDates, out List<DateTime> endDates) {
             startDates = new List<DateTime>();
             endDates = new List<DateTime>();
-            foreach (RecurrenceRule rrule in RecurrenceRules) {
+            foreach (RecurrenceRule rrule in RecurrenceRules.ToList()) {
                 string rFrequency = rrule.Frequency;
                 int rInterval = rrule.Interval;
                 DateTime rEnd = rrule.Until;
                 int rCount = rrule.Count;
-
-                string byDay = rrule.ByDay.ToString();
-                string byMonth = rrule.ByMonth.ToString();
-                string byMonthDay = rrule.ByMonthDay.ToString();
 
                 if (rCount == 0 && rEnd < firstDay) { continue; };
                 if (rCount > 0) {
                     for (var i = 0; i < rCount; i++) {
                         switch (rFrequency) {
                             case "DAILY":
+                                var x = rrule.IsApplyingOn(StartDate.Date.AddDays(i * rInterval));
                                 startDates.Add(StartDate.Date.AddDays(i * rInterval));
                                 endDates.Add(EndDate.Date.AddDays(i * rInterval));
                                 break;
                             case "WEEKLY":
+                                var yx = rrule.IsApplyingOn(StartDate.Date.AddDays(i * rInterval));
                                 startDates.Add(StartDate.Date.AddDays(i * rInterval * 7));
                                 endDates.Add(EndDate.Date.AddDays(i * rInterval * 7));
                                 break;

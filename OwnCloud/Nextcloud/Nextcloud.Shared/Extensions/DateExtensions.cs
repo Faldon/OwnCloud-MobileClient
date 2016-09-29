@@ -57,7 +57,12 @@ namespace Nextcloud.Extensions
 
         public static string FormatDate(this DateTime date, string formatString) {
             Windows.Globalization.GeographicRegion userRegion = new Windows.Globalization.GeographicRegion();
-            var formatter = new DateTimeFormatter(formatString, new[] { userRegion.CodeTwoLetter });
+            return FormatDate(date, formatString, new[] { userRegion.CodeTwoLetter });
+        }
+
+        public static string FormatDate(this DateTime date, string formatString, string[] languages) {
+            Windows.Globalization.GeographicRegion userRegion = new Windows.Globalization.GeographicRegion();
+            var formatter = new DateTimeFormatter(formatString, languages);
             var formattedDate = formatter.Format(date);
             return formattedDate;
         }
